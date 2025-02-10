@@ -3,11 +3,6 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<Database>();
-builder.Services.AddScoped<ServerService>();
-
-var app = builder.Build();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -19,13 +14,17 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddSingleton<Database>();
+builder.Services.AddScoped<ServerService>();
+var app = builder.Build();
+
 app.UseCors("AllowAll");
+
 app.MapGet("/api/user", async (ServerService serverService) =>
     await serverService.GetUsersAsync());
 
 app.Run();
-
-
 
 public class User
 {

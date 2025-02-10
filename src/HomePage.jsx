@@ -19,11 +19,11 @@ import { Link } from "react-router-dom";
         });
 
     return <>
-        {name.map((names) => (
+        {name.map((name) => (
             <div key={name.id}>
                 <ul>
                     <li>
-                        <p>Name: {name.names}</p>
+                        <p>Name: {name.name}</p>
                     </li>
                 </ul>
             </div>
