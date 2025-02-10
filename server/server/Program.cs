@@ -24,9 +24,37 @@ app.UseCors("AllowAll");
 app.MapGet("/api/user", async (ServerService serverService) =>
     await serverService.GetUsersAsync());
 
-app.MapPost("/api/adduser", AddUser);
+// app.MapPost("/api/adduser", AddUser);
+
+// app.MapPost("/api/adduser", AddUser());
+
+// app.MapPost("/api/adduser", async (HttpRequest request, ServerService serverService)=> {
+//     string Name = await request.ReadFromJsonAsync<name>();
+//
+// });
+
+app.MapPost("/api/adduser", async (HttpContext context) => {
+    // WordRequest here, is a class that defines the post requestBody format
+    var requestBody = await context.Request.ReadFromJsonAsync<>();
+    if (requestBody?.Word is null)
+    {
+        return Results.BadRequest("Word is required.");
+    }
+    bool success = await NewWord(requestBody.Word);
+    return success ? Results.Ok("Word added successfully.") : Results.StatusCode(500);
+});
 
 app.Run();
+
+
+
+    // {
+    //     await using var cmd = db.CreateCommand("INSERT INTO words (word, clientid) VALUES ($1, $2)");
+    //     cmd.Parameters.AddWithValue(word);
+    //     cmd.Parameters.AddWithValue(clientId);
+    //     int rowsAffected = await cmd.ExecuteNonQueryAsync(); // Returns the number of rows affected
+    //     return rowsAffected > 0; // Return true if the insert was successful
+    // }
 
 
 
@@ -35,23 +63,31 @@ public class User
     public string Name { get; set; } = string.Empty;
 }
 
+
 public class ServerService
 {
     private readonly Database _database;
-
 
     public ServerService(Database database)
     {
         _database = database;
     }
 
-    public void AddUser(string name)
+    public void AddUser(string nameFromReact)
     {
-        try
-        {
-            string query = @"INSERT INTO TESTUSER ";
-        }
+        string query = @"
+            INSERT INTO customer (name)
+            VALUES ($1)
+            RETURNING id;";
+
+        using var conn = _database.Connection().CreateConnection();
+        conn.OpenAsync();
+
+        using var cmd = new NpgsqlCommand(query, conn);
+        cmd.Parameters.AddWithValue(nameFromReact); 
+        cmd.ExecuteNonQuery();
     }
+
     public async Task<List<User>> GetUsersAsync()
     {
         var users = new List<User>();
