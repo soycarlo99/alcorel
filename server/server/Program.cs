@@ -24,7 +24,11 @@ app.UseCors("AllowAll");
 app.MapGet("/api/user", async (ServerService serverService) =>
     await serverService.GetUsersAsync());
 
+app.MapPost("/api/adduser", AddUser);
+
 app.Run();
+
+
 
 public class User
 {
@@ -41,6 +45,13 @@ public class ServerService
         _database = database;
     }
 
+    public void AddUser(string name)
+    {
+        try
+        {
+            string query = @"INSERT INTO TESTUSER ";
+        }
+    }
     public async Task<List<User>> GetUsersAsync()
     {
         var users = new List<User>();
