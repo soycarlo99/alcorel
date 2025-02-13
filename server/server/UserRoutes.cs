@@ -14,8 +14,8 @@ public static class UserRoutes
 
         using var query = db.CreateCommand("SELECT user_id, name FROM testuser");
         using var reader = await query.ExecuteReaderAsync();
-        
-        while(await reader.ReadAsync())
+
+        while (await reader.ReadAsync())
         {
             result.Add(new(reader.GetInt32(0), reader.GetString(1)));
         }
@@ -23,15 +23,15 @@ public static class UserRoutes
         return result;
     }
 
-    public static async Task<Results<Created<User>, BadRequest<string>>> 
+    public static async Task<Results<Created<User>, BadRequest<string>>>
     PostUser(PostUserDTO userDto, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
+        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING user_id, name");
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
-        //command.Parameters.AddWithValue("password", userDto.Password);
-        //command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
-        //command.Parameters.AddWithValue("company_id", userDto.company_id);
+        command.Parameters.AddWithValue("password", userDto.Password);
+        command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
+        command.Parameters.AddWithValue("company_id", userDto.company_id);
 
         try
         {
@@ -51,14 +51,14 @@ public static class UserRoutes
 
     public record LoginDTO(string Email, string Password);
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>> 
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
         CheckCredentials(LoginDTO loginDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
             SELECT user_id, name, email, admin_customer_employee
             FROM testuser
             WHERE email = @email AND password = @password");
-        
+
         command.Parameters.AddWithValue("email", loginDto.Email);
         command.Parameters.AddWithValue("password", loginDto.Password);
 
