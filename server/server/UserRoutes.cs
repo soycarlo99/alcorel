@@ -1,6 +1,5 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
-
 namespace Server;
 
 public static class UserRoutes
@@ -8,6 +7,8 @@ public static class UserRoutes
     public record User(int Id, string Name);
     public record PostUserDTO(string Name, string Email, string Password, string admin_customer_employee, int company_id);
     public record CreationOfTicketDTO(string Name, string Email);
+
+    public record CreationOfTicketThroughUsersDTO(string Message, int Category_id);
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
     {
         List<User> result = new();
@@ -51,11 +52,31 @@ public static class UserRoutes
 
     public static async Task<Results<Created<User>, BadRequest<string>>>
 
-   CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
+
+
+
+
+
+
+
+
+
+
+
+
+   CreationOfTicket(CreationOfTicketDTO userDto, TicketRoutes.PostTicketDTO ticketDto, NpgsqlDataSource db)
+
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
+        using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
+
+        using var ticketCommand = db.CreateCommand(@"
+            INSERT INTO ticket (message, category_id) 
+            VALUES (@message, @category_id) 
+            RETURNING message, category_id");
+        ticketCommand.Parameters.AddWithValue("message", ticketDto.message);
+        ticketCommand.Parameters.AddWithValue("category_id", ticketDto.category_id);
 
 
         try
@@ -64,15 +85,34 @@ public static class UserRoutes
             if (await reader.ReadAsync())
             {
                 var user = new User(reader.GetInt32(0), reader.GetString(1));
-                return TypedResults.Created($"/api/createusers/{user.Id}", user);
             }
-            return TypedResults.BadRequest("Failed to create user");
+            using var ticketReader = await ticketCommand.ExecuteReaderAsync();
+            if (await ticketReader.ReadAsync())
+            {
+                var ticket = new Ticket(ticketReader.GetString(0), ticketReader.GetInt32(1));
+            }
+
+            return TypedResults.Created("/api/tickets", new { User = user, Ticket = ticket });
         }
         catch (PostgresException ex)
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public record LoginDTO(string Email, string Password);
 
