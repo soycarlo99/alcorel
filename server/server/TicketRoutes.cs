@@ -5,13 +5,13 @@ namespace Server;
 public static class TicketRoutes
 {
     public record Ticket(
-        int ticket_id, 
-        DateTime? ticket_time, 
-        string message, 
-        string answers, 
-        int questions_id, 
-        string status, 
-        int user_id, 
+        int ticket_id,
+        DateTime? ticket_time,
+        string message,
+        string answers,
+        int questions_id,
+        string status,
+        int user_id,
         int category_id
     );
 
