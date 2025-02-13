@@ -26,12 +26,12 @@ public static class UserRoutes
     public static async Task<Results<Created<User>, BadRequest<string>>> 
     PostUser(PostUserDTO userDto, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING user_id, name");
+        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
-        command.Parameters.AddWithValue("password", userDto.Password);
-        command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
-        command.Parameters.AddWithValue("company_id", userDto.company_id);
+        //command.Parameters.AddWithValue("password", userDto.Password);
+        //command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
+        //command.Parameters.AddWithValue("company_id", userDto.company_id);
 
         try
         {

@@ -3,39 +3,30 @@ import "./TicketCreation.css";
 
 
 export default function TicketCreation() {
-    const [categories, SetCategories] = useState([])
-    const [name, setName] = useState([])
-    const [email, setEmail] = useState([])
+    const [categories, setCategories] = useState([])
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
 
     const handleEmailChange = (event) => { setEmail(event.target.value); };
     const handleNameChange = (event) => { setName(event.target.value); };
     
-    function handleSubmit() {
+    function handleSubmit(event) {
+        event.preventDefault();
 
         fetch("/api/users", {
-
             headers: { "Content-Type": "application/json" },
-
             method: "POST",
-
-            body: JSON.stringify(name, email)
-
+            body: JSON.stringify({ name, email })
         })
-
             .then(response => {
-
                 if (response.ok) // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300)
-
                 {
-
-                    setCart([]);
-
+                    setName("");
+                    setEmail("");
                 }
-
-            });
-
+    });
     }
-
+/*
     useEffect(() => {
     async function fetchCategories() {
       try {
@@ -55,7 +46,7 @@ export default function TicketCreation() {
     const myArray = ["apple", "banana", "orange"];
     const myList = myArray.map((item) => <p>{item}</p>);
   };
-
+*/
   return (
     <main>
       <form className="form">
@@ -82,15 +73,11 @@ export default function TicketCreation() {
         </label>
               
 
-        <label for="cars">Choose a category</label>
-        <select name="cars" id="cars">
-          <option value="volvo">Volvo</option>
-          <option value="saab">Saab</option>
-          <option value="mercedes">Mercedes</option>
-          <option value="audi">Audi</option>
-        </select>
+        
           </form>
-          <button onClick={handleSubmit}>submit</button>
+          <form className="form" onSubmit={handleSubmit}>
+              <button type="submit">Submit</button>
+          </form>
     </main>
   );
 }
