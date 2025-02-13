@@ -87,7 +87,7 @@ public static class CategoryRoutes
         using var command = db.CreateCommand(@"
             DELETE FROM categories WHERE category_id = @selected_category");
         
-        command.Parameters.AddWithValue("selected_category", selectedCategory);
+        command.Parameters.AddWithValue("category_id", categoryId);
 
         try
         {
