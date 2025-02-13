@@ -19,6 +19,7 @@ var app = builder.Build();
 app.MapGet("/api/users", UserRoutes.GetUsers);
 app.MapPost("/api/users", UserRoutes.PostUser);
 app.MapPost("/api/login", UserRoutes.CheckCredentials);
+app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);

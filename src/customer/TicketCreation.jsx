@@ -1,32 +1,36 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import "./TicketCreation.css";
 
-
 export default function TicketCreation() {
-    const [categories, setCategories] = useState([])
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
+  const [categories, setCategories] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("initialpassword");
 
-    const handleEmailChange = (event) => { setEmail(event.target.value); };
-    const handleNameChange = (event) => { setName(event.target.value); };
-    
-    function handleSubmit(event) {
-        event.preventDefault();
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
 
-        fetch("/api/users", {
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ name, email })
-        })
-            .then(response => {
-                if (response.ok) // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300)
-                {
-                    setName("");
-                    setEmail("");
-                }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    fetch("/api/createusers", {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify({ name, email }),
+    }).then((response) => {
+      if (response.ok) {
+        // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300)
+        setName("");
+        setEmail("");
+      }
     });
-    }
-/*
+  }
+  /*
     useEffect(() => {
     async function fetchCategories() {
       try {
@@ -52,35 +56,22 @@ export default function TicketCreation() {
       <form className="form">
         <label>
           Enter your name:
-          <input
-            type="text"
-            value={name}
-            onChange={handleNameChange}
-          />
+          <input type="text" value={name} onChange={handleNameChange} />
         </label>
 
         <label>
           Enter your email:
-          <input
-            type="text"
-            value={email}
-            onChange={handleEmailChange}
-          />
+          <input type="text" value={email} onChange={handleEmailChange} />
         </label>
-              
+
         <label>
           <input type="file" id="myFile" name="filename"></input>
         </label>
-              
-
         
-          </form>
-          <form className="form" onSubmit={handleSubmit}>
-              <button type="submit">Submit</button>
-          </form>
+      </form>
+      <form className="form" onSubmit={handleSubmit}>
+        <button type="submit">Submit</button>
+      </form>
     </main>
   );
 }
-
-
-
