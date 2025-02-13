@@ -2,19 +2,20 @@ import { useEffect } from "react"
 
 export default function AdminView() {
     useEffect(() => {
-        async function GetUsers() {
+        async function GetCategory() {
             try {
-                const response = await fetch("localhost:5001/api/tickets/");
+                const response = await fetch("/api/category");
                 const body = await response.json();
 
-                console.log(body.name);
+                console.log(body);
             } catch (error) {
                 console.error(error)
             }
 
         }
 
-        GetUsers();
+        GetCategory();
+
     }, []);
 
 
