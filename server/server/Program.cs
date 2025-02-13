@@ -6,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 string host = "localhost";
 string port = "5432";
 string username = "postgres";
-string password = "postgres";
-string database = "alcorel1";
+string password = "Kappa030921";
+string database = "alcorel";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 
