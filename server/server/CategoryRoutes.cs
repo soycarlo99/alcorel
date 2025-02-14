@@ -5,8 +5,8 @@ namespace Server;
 public static class CategoryRoutes
 {
     public record Category(
-        int category_id
-        string category_name
+        int id,
+        string category_name,
         int company_id
     );
 
@@ -16,14 +16,14 @@ public static class CategoryRoutes
     /////////////////////////
 
     public record PostCategoryDTO(
-        int category_id
-        string category_name
+        int id,
+        string category_name,
         int company_id
     );
 
     public record DeleteCategoryDTO(
-        int category_id
-        string category_name
+        int id,
+        string category_name,
         int company_id
     );
 
@@ -52,11 +52,11 @@ public static class CategoryRoutes
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
-            INSERT INTO categories (category_id, category_name, company_id) 
+            INSERT INTO categories (id, category_name, company_id) 
             VALUES (@id, @category_name, @company_id) 
-            RETURNING category_id, category_name, company_id");
+            RETURNING id, category_name, company_id");
         
-        command.Parameters.AddWithValue("id", categoryDto.category_id);
+        command.Parameters.AddWithValue("id", categoryDto.id);
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
         command.Parameters.AddWithValue("company_id", categoryDto.company_id);
         try
@@ -69,7 +69,7 @@ public static class CategoryRoutes
                 reader.GetString(1),
                 reader.GetInt32(2)
                 );
-                return TypedResults.Created($"/api/categories/{category.category_id}", category);
+                return TypedResults.Created($"/api/categories/{category.id}", category);
             }
             return TypedResults.BadRequest("Failed to create category");
         }
@@ -80,14 +80,14 @@ public static class CategoryRoutes
     }
 
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>> 
-    UpdateTicketStatus(int categoryId, UpdateStatusDTO statusDto, NpgsqlDataSource db)
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
+    RemoveCategory(int categoryId, DeleteCategoryDTO DeleteDTO, NpgsqlDataSource db)
     {
         
         using var command = db.CreateCommand(@"
-            DELETE FROM categories WHERE category_id = @selected_category");
+            DELETE FROM categories WHERE id = @selected_category");
         
-        command.Parameters.AddWithValue("selected_category", selectedCategory);
+        command.Parameters.AddWithValue("id", categoryId);
 
         try
         {

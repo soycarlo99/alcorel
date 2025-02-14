@@ -7,7 +7,7 @@ string host = "localhost";
 string port = "5432";
 string username = "postgres";
 string password = "";
-string database = "alcorel";
+string database = "alcorel1";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 
