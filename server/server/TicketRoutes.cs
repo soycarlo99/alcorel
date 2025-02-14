@@ -5,7 +5,7 @@ namespace Server;
 public static class TicketRoutes
 {
     public record Ticket(
-        int ticket_id, 
+        int id, 
         DateTime? ticket_time, 
         string message, 
         string answers, 
@@ -39,7 +39,7 @@ public static class TicketRoutes
     public static async Task<List<Ticket>> GetTickets(NpgsqlDataSource db)
     {
         List<Ticket> result = new();
-        using var query = db.CreateCommand("SELECT ticket_id, ticket_time, message, answers, questions_id, status, user_id, category_id FROM ticket");
+        using var query = db.CreateCommand("SELECT id, ticket_time, message, answers, questions_id, status, user_id, category_id FROM ticket");
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())
@@ -64,7 +64,7 @@ public static class TicketRoutes
         using var command = db.CreateCommand(@"
             INSERT INTO ticket (ticket_time, message, answers, questions_id, status, user_id, category_id) 
             VALUES (@time, @message, @answers, @questions, @status, @user_id, @category_id) 
-            RETURNING ticket_id, ticket_time, message, answers, questions_id, status, user_id, category_id");
+            RETURNING id, ticket_time, message, answers, questions_id, status, user_id, category_id");
         
         command.Parameters.AddWithValue("time", ticketDto.ticket_time);
         command.Parameters.AddWithValue("message", ticketDto.message);
@@ -109,10 +109,10 @@ public static class TicketRoutes
             UPDATE ticket
             SET status = @status
             WHERE ticket_id = @ticket_id
-            RETURNING ticket_id, status");
+            RETURNING id, status");
         
         command.Parameters.AddWithValue("status", newStatus);
-        command.Parameters.AddWithValue("ticket_id", ticketId);
+        command.Parameters.AddWithValue("id", ticketId);
 
         try
         {
