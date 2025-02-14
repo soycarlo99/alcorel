@@ -5,11 +5,8 @@ namespace Server;
 public static class TicketRoutes
 {
     public record Ticket(
-        int ticket_id, 
+        int id, 
         DateTime? ticket_time, 
-        string message, 
-        string answers, 
-        int questions_id, 
         string status, 
         int user_id, 
         int category_id
@@ -22,9 +19,6 @@ public static class TicketRoutes
 
     public record PostTicketDTO(
         DateTime ticket_time,
-        string message,
-        string answers,
-        int questions_id,
         string status,
         int user_id,
         int category_id
@@ -39,7 +33,7 @@ public static class TicketRoutes
     public static async Task<List<Ticket>> GetTickets(NpgsqlDataSource db)
     {
         List<Ticket> result = new();
-        using var query = db.CreateCommand("SELECT ticket_id, ticket_time, message, answers, questions_id, status, user_id, category_id FROM ticket");
+        using var query = db.CreateCommand("SELECT id, ticket_time, status, user_id, category_id FROM ticket");
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())
@@ -48,11 +42,8 @@ public static class TicketRoutes
                 reader.GetInt32(0),
                 reader.GetFieldValue<DateTime>(1),
                 reader.GetString(2),
-                reader.GetString(3),
-                reader.GetInt32(4),
-                reader.GetString(5),
-                reader.GetInt32(6),
-                reader.GetInt32(7)
+                reader.GetInt32(3),
+                reader.GetInt32(4)
             ));
         }
         return result;
@@ -62,14 +53,11 @@ public static class TicketRoutes
         PostTicket(PostTicketDTO ticketDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
-            INSERT INTO ticket (ticket_time, message, answers, questions_id, status, user_id, category_id) 
-            VALUES (@time, @message, @answers, @questions, @status, @user_id, @category_id) 
-            RETURNING ticket_id, ticket_time, message, answers, questions_id, status, user_id, category_id");
+            INSERT INTO ticket (ticket_time, status, user_id, category_id) 
+            VALUES (@time, @status, @user_id, @category_id) 
+            RETURNING id, ticket_time, status, user_id, category_id");
         
         command.Parameters.AddWithValue("time", ticketDto.ticket_time);
-        command.Parameters.AddWithValue("message", ticketDto.message);
-        command.Parameters.AddWithValue("answers", ticketDto.answers);
-        command.Parameters.AddWithValue("questions", ticketDto.questions_id);
         command.Parameters.AddWithValue("status", ticketDto.status);
         command.Parameters.AddWithValue("user_id", ticketDto.user_id);
         command.Parameters.AddWithValue("category_id", ticketDto.category_id);
@@ -83,13 +71,10 @@ public static class TicketRoutes
                     reader.GetInt32(0),
                     reader.GetFieldValue<DateTime>(1),
                     reader.GetString(2),
-                    reader.GetString(3),
-                    reader.GetInt32(4),
-                    reader.GetString(5),
-                    reader.GetInt32(6),
-                    reader.GetInt32(7)
+                    reader.GetInt32(3),
+                    reader.GetInt32(4)
                 );
-                return TypedResults.Created($"/api/tickets/{ticket.ticket_id}", ticket);
+                return TypedResults.Created($"/api/tickets/{ticket.id}", ticket);
             }
             return TypedResults.BadRequest("Failed to create ticket");
         }
@@ -108,11 +93,11 @@ public static class TicketRoutes
         using var command = db.CreateCommand(@"
             UPDATE ticket
             SET status = @status
-            WHERE ticket_id = @ticket_id
-            RETURNING ticket_id, status");
+            WHERE id = @ticket_id
+            RETURNING id, status");
         
         command.Parameters.AddWithValue("status", newStatus);
-        command.Parameters.AddWithValue("ticket_id", ticketId);
+        command.Parameters.AddWithValue("id", ticketId);
 
         try
         {
