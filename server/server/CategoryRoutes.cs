@@ -5,8 +5,8 @@ namespace Server;
 public static class CategoryRoutes
 {
     public record Category(
-        int category_id,
-        string category_name,
+        int category_id
+        string category_name
         int company_id
     );
 
@@ -16,14 +16,14 @@ public static class CategoryRoutes
     /////////////////////////
 
     public record PostCategoryDTO(
-        int category_id,
-        string category_name,
+        int category_id
+        string category_name
         int company_id
     );
 
     public record DeleteCategoryDTO(
-        int category_id,
-        string category_name,
+        int category_id
+        string category_name
         int company_id
     );
 
@@ -80,14 +80,14 @@ public static class CategoryRoutes
     }
 
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveCategory(int categoryId, DeleteCategoryDTO DeleteDTO, NpgsqlDataSource db)
+    public static async Task<Results<Ok<string>, BadRequest<string>>> 
+    UpdateTicketStatus(int categoryId, UpdateStatusDTO statusDto, NpgsqlDataSource db)
     {
         
         using var command = db.CreateCommand(@"
             DELETE FROM categories WHERE category_id = @selected_category");
         
-        command.Parameters.AddWithValue("category_id", categoryId);
+        command.Parameters.AddWithValue("selected_category", selectedCategory);
 
         try
         {
