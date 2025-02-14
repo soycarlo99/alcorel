@@ -34,7 +34,7 @@ public static class CategoryRoutes
     public static async Task<List<Category>> GetCategories(NpgsqlDataSource db)
     {
         List<Category> result = new();
-        using var query = db.CreateCommand("SELECT * FROM categories");
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories");
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())

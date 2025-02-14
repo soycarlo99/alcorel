@@ -1,39 +1,29 @@
-import { useEffect } from "react"
+import { useEffect } from "react";
 
 export default function AdminView() {
-    useEffect(() => {
-        async function GetCategory() {
-            try {
-                const response = await fetch("/api/category");
-                const body = await response.json();
+  useEffect(() => {
+    async function GetCategory() {
+      try {
+        const response = await fetch("/api/category");
+        const body = await response.json();
 
-                console.log(body);
-            } catch (error) {
-                console.error(error)
-            }
+        console.log(body);
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-        }
+    GetCategory();
+  }, []);
 
-        GetCategory();
-
-    }, []);
-
-
-    return (
-        <>
-            <p>Add Category</p>
-            <input type="text" />
-            <button>Add</button>
-            <ul>
-                <p>Existing categories:</p>
-
-            </ul>
-
-
-
-        </>
-    )
+  return (
+    <>
+      <p>Add Category</p>
+      <input type="text" />
+      <button>Add</button>
+      <ul>
+        <p>Existing categories:</p>
+      </ul>
+    </>
+  );
 }
-
-
-
