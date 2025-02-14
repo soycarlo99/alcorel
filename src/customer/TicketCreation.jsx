@@ -5,7 +5,8 @@ export default function TicketCreation() {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("initialpassword");
+    const [password, setPassword] = useState("initialpassword");
+    const [message, setMessage] = useState("");
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -13,7 +14,12 @@ export default function TicketCreation() {
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-
+     const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
+    
+    
+    
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -21,7 +27,7 @@ export default function TicketCreation() {
     fetch("/api/createusers", {
       headers: { "Content-Type": "application/json" },
       method: "POST",
-      body: JSON.stringify({ name, email }),
+      body: JSON.stringify({ name, email, message }),
     }).then((response) => {
       if (response.ok) {
         // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300)
@@ -67,7 +73,10 @@ export default function TicketCreation() {
         <label>
           <input type="file" id="myFile" name="filename"></input>
         </label>
-        
+              <label>
+                  Enter your Message:
+          <input type="text" value={message} onChange={handleMessageChange}></input>
+        </label>
       </form>
       <form className="form" onSubmit={handleSubmit}>
         <button type="submit">Submit</button>

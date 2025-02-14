@@ -5,10 +5,10 @@ namespace Server;
 public static class UserRoutes
 {
     public record User(int Id, string Name);
-    
-    public record Ticket(int Id, string Message, int CategoryId );
     public record PostUserDTO(string Name, string Email, string Password, string admin_customer_employee, int company_id);
     public record CreationOfTicketDTO(string Name, string Email);
+
+
 
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
     {
@@ -51,24 +51,16 @@ public static class UserRoutes
         }
     }
 
+
+
+
+
+
     public static async Task<Results<Created<User>, BadRequest<string>>>
-
-
-
-
-
-
-
-
-
-
-
-
-
        CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
 
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name; INSERT INTO ticket (message, categoryId) VALUES (@message, @categoryId) ");
+        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
 
