@@ -1,5 +1,6 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 namespace Server;
 
 public static class CategoryRoutes
@@ -69,7 +70,7 @@ public static class CategoryRoutes
                 reader.GetString(1),
                 reader.GetInt32(2)
                 );
-                return TypedResults.Created($"/api/categories/{category.id}", category);
+                return TypedResults.Created($"/api/categories/{categoryDto.id}", category);
             }
             return TypedResults.BadRequest("Failed to create category");
         }
@@ -79,15 +80,14 @@ public static class CategoryRoutes
         }
     }
 
-
+public record CategoryidDTO(int categoryId);
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveCategory(int categoryId, DeleteCategoryDTO DeleteDTO, NpgsqlDataSource db)
+    RemoveCategory([FromRoute]int categoryId,[FromBody] DeleteCategoryDTO DeleteDTO, NpgsqlDataSource db)
     {
-        
         using var command = db.CreateCommand(@"
             DELETE FROM categories WHERE id = @selected_category");
         
-        command.Parameters.AddWithValue("id", categoryId);
+        command.Parameters.AddWithValue("selected_category", categoryId);
 
         try
         {
