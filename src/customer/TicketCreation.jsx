@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import "./TicketCreation.css";
 
 export default function TicketCreation() {
-  const [categories, setCategories] = useState([]);
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("initialpassword");
   const [message, setMessage] = useState("");
+  const [category_id, setCategory] = useState("");
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -17,6 +18,10 @@ export default function TicketCreation() {
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
   };
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
+  }
+  
 
 
 
@@ -27,15 +32,19 @@ export default function TicketCreation() {
     fetch("/api/createusers", {
       headers: { "Content-Type": "application/json" },
       method: "POST",
-      body: JSON.stringify({ name, email, message }),
+      body: JSON.stringify({ name, email, message, category_id }),
     }).then((response) => {
       if (response.ok) {
-        // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300)
+        // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300
         setName("");
         setEmail("");
+        setMessage("");
+        setCategory("");
       }
     });
   }
+
+  
   /*
     useEffect(() => {
     async function fetchCategories() {
@@ -64,23 +73,24 @@ export default function TicketCreation() {
             Enter your name:
             <input type="text" value={name} onChange={handleNameChange} />
           </label>
-
           <label>
             Enter your email:
             <input type="text" value={email} onChange={handleEmailChange} />
-          </label>
-
-          <label>
-            <input type="file" id="myFile" name="filename"></input>
           </label>
           <label>
             Enter your Message:
             <input type="text" value={message} onChange={handleMessageChange}></input>
         </label>
-        <label>
-            Enter your Message:
-            <input type="text" value={category_id} onChange={handleCategoryChange}></input>
-          </label>
+        <label for="pet-select">Choose a category:</label>
+
+        <select value={category_id} onChange={handleCategoryChange}>
+          <option>Please Choose an Option</option>
+          <option value="2">Delivery</option>
+          <option value="3">Software</option>
+          <option value="4">Hardware</option>
+          <option value="5">Tech Support</option>
+          <option value="6">Warehouse</option>
+        </select>
         </form>
         <form className="form" onSubmit={handleSubmit}>
           <button type="submit">Submit</button>

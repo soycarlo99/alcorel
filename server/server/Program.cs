@@ -4,9 +4,9 @@ using Server;
 var builder = WebApplication.CreateBuilder(args);
 
 string host = "localhost";
-string port = "5432";
+string port = "5433";
 string username = "postgres";
-string password = "abc123";
+string password = "postgres";
 string database = "alcorel";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");

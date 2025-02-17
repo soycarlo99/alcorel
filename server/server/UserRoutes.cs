@@ -58,12 +58,13 @@ public static class UserRoutes
 
 
 
-    public static async Task<Results<Created<User>, BadRequest<string>>>
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
        CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
 
     {
         using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING name, email");
-        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(message, category_id) VALUES(@message, @category_id) RETURNING message, category_id");
+        using var messageCommand = db.CreateCommand("INSERT INTO ticket_messages(message) VALUES(@message) RETURN message");
+        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(category_id) VALUES(@category_id) RETURNING category_id");
         userCommand.Parameters.AddWithValue("name", userDto.Name);
         userCommand.Parameters.AddWithValue("email", userDto.Email);
         ticketCommand.Parameters.AddWithValue("message", userDto.Message);
@@ -77,8 +78,9 @@ public static class UserRoutes
             {
                 var user = new CreationOfTicketDTO(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3));
 
-                return TypedResults.Created($"/api/createusers/{userDto.Category_id}", );
-
+                return TypedResults.Ok("Added successfuly");
+                
+                
             }
             else
             {
