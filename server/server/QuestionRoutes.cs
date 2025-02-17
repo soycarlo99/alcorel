@@ -1,5 +1,6 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace Server;
 
 public static class QuestionRoutes
@@ -10,17 +11,11 @@ public static class QuestionRoutes
         int category_id
     );
 
-
-
-
-
-
-
-    public static async Task<List<QuestionDTO>> GetQuestion(QuestionDTO QDTO, NpgsqlDataSource db)
+    public static async Task<List<QuestionDTO>> GetQuestion(int category_id, NpgsqlDataSource db)
     {
         List<QuestionDTO> result = new();
-        using var query = db.CreateCommand("SELECT (id, questions, category_id) FROM questions WHERE @category_id");
-        query.Parameters.AddWithValue("category_id", QDTO.id);
+        using var query = db.CreateCommand("SELECT id, questions, category_id FROM questions WHERE category_id = @category_id");
+        query.Parameters.AddWithValue("category_id", category_id);
         using var reader = await query.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -35,7 +30,3 @@ public static class QuestionRoutes
         return result;
     }
 }
-    
-    
-    
-    

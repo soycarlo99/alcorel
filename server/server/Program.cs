@@ -27,6 +27,6 @@ app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
 
 
 //Question APIs
-app.MapGet("/api/question", QuestionRoutes.GetQuestion);
+app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
 
 app.Run();
