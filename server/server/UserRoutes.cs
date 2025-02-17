@@ -7,7 +7,7 @@ public static class UserRoutes
 {
     public record User(int Id, string Name);
     public record PostUserDTO(string Name, string Email, string Password, string admin_customer_employee, int company_id);
-    public record CreationOfTicketDTO(string Name, string Email);
+    public record CreationOfTicketDTO(string Name, string Email, string Message, int Category_id);
 
     public record Ticket(string Message, int Category_id);
 
@@ -59,15 +59,15 @@ public static class UserRoutes
 
 
     public static async Task<Results<Created<User>, BadRequest<string>>>
-       CreationOfTicket(CreationOfTicketDTO userDto, Ticket ticketDTO, NpgsqlDataSource db)
+       CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
 
     {
-        using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
-        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(message, category_id) VALUES(@message, @category_id");
+        using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING name, email");
+        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(message, category_id) VALUES(@message, @category_id) RETURNING message, category_id");
         userCommand.Parameters.AddWithValue("name", userDto.Name);
         userCommand.Parameters.AddWithValue("email", userDto.Email);
-        ticketCommand.Parameters.AddWithValue("message", ticketDTO.Message);
-        ticketCommand.Parameters.AddWithValue("category_id", ticketDTO.Category_id);
+        ticketCommand.Parameters.AddWithValue("message", userDto.Message);
+        ticketCommand.Parameters.AddWithValue("category_id", userDto.Category_id);
 
         try
         {
@@ -75,9 +75,9 @@ public static class UserRoutes
             using var reader2 = await ticketCommand.ExecuteReaderAsync();
             if (await reader.ReadAsync() && await reader2.ReadAsync())
             {
-                var user = new User(reader.GetInt32(0), reader.GetString(1));
+                var user = new CreationOfTicketDTO(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3));
 
-                return TypedResults.Created($"/api/createusers/{user.Id}", user);
+                return TypedResults.Created($"/api/createusers/{userDto.Category_id}", );
 
             }
             else

@@ -76,6 +76,10 @@ export default function TicketCreation() {
           <label>
             Enter your Message:
             <input type="text" value={message} onChange={handleMessageChange}></input>
+        </label>
+        <label>
+            Enter your Message:
+            <input type="text" value={category_id} onChange={handleCategoryChange}></input>
           </label>
         </form>
         <form className="form" onSubmit={handleSubmit}>
