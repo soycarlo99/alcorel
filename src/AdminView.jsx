@@ -15,6 +15,17 @@ export default function AdminView() {
         console.error(error);
       }
     }
+    
+    async function PostCategories() {
+        try {
+            const response = await fetch("/api/PostCategories");
+            const body = await response.json();
+            setCategories(body);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
       GetCategory();
   }, []);
   
@@ -27,7 +38,7 @@ export default function AdminView() {
             <p>Existing categories:</p>
             <ul>
                 {categories.map((item, index) => (
-                    <li key={index}>{item.name}</li>
+                    <li key={index}>{item.category_name}</li>
                 ))}
             </ul>
         </div>

@@ -79,7 +79,7 @@ public static class CategoryRoutes
     }
 
 
-    public static async Task<Results<Created<CategoryId>, BadRequest<string>>>
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
     RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
@@ -88,12 +88,16 @@ public static class CategoryRoutes
 
         try
         {
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
             {
-                return TypedResults.Created($"/api/DeleteCategory/{categoryId}", categoryId);
+                return TypedResults.Ok($"Deleted {rowsAffected} category successfully");
             }
-            return TypedResults.BadRequest("Failed to remove category");
+            else
+            {
+                return TypedResults.Ok("No categories deleted");
+            }
         }
         catch (PostgresException ex)
         {
