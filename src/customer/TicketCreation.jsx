@@ -5,8 +5,8 @@ export default function TicketCreation() {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("initialpassword");
-    const [message, setMessage] = useState("");
+  const [password, setPassword] = useState("initialpassword");
+  const [message, setMessage] = useState("");
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -14,12 +14,12 @@ export default function TicketCreation() {
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-     const handleMessageChange = (event) => {
+  const handleMessageChange = (event) => {
     setMessage(event.target.value);
   };
-    
-    
-    
+
+
+
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -58,29 +58,29 @@ export default function TicketCreation() {
   };
 */
   return (
-    <main>
-      <form className="form">
-        <label>
-          Enter your name:
-          <input type="text" value={name} onChange={handleNameChange} />
-        </label>
+      <main>
+        <form className="form">
+          <label>
+            Enter your name:
+            <input type="text" value={name} onChange={handleNameChange} />
+          </label>
 
-        <label>
-          Enter your email:
-          <input type="text" value={email} onChange={handleEmailChange} />
-        </label>
+          <label>
+            Enter your email:
+            <input type="text" value={email} onChange={handleEmailChange} />
+          </label>
 
-        <label>
-          <input type="file" id="myFile" name="filename"></input>
-        </label>
-              <label>
-                  Enter your Message:
-          <input type="text" value={message} onChange={handleMessageChange}></input>
-        </label>
-      </form>
-      <form className="form" onSubmit={handleSubmit}>
-        <button type="submit">Submit</button>
-      </form>
-    </main>
+          <label>
+            <input type="file" id="myFile" name="filename"></input>
+          </label>
+          <label>
+            Enter your Message:
+            <input type="text" value={message} onChange={handleMessageChange}></input>
+          </label>
+        </form>
+        <form className="form" onSubmit={handleSubmit}>
+          <button type="submit">Submit</button>
+        </form>
+      </main>
   );
 }
