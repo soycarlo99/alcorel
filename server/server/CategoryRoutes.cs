@@ -1,6 +1,5 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 namespace Server;
 
 public static class CategoryRoutes
@@ -23,18 +22,17 @@ public static class CategoryRoutes
     );
 
     public record DeleteCategoryDTO(
-        int id,
-        string category_name,
-        int company_id
+        int id
     );
 
     /////////////////////////
     ///TheEnd!!!!!!!!!!!!!!!!
     /////////////////////////
 
-    public static async Task<List<Category>> GetCategories(NpgsqlDataSource db)
+    public record GetCategoriesDTO(int id, string category_name, int company_id);
+    public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db)
     {
-        List<Category> result = new();
+        List<GetCategoriesDTO> result = new();
         using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories");
         using var reader = await query.ExecuteReaderAsync();
         
@@ -80,12 +78,11 @@ public static class CategoryRoutes
         }
     }
 
-public record CategoryidDTO(int categoryId);
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveCategory([FromRoute]int categoryId,[FromBody] DeleteCategoryDTO DeleteDTO, NpgsqlDataSource db)
+
+    public static async Task<Results<Created<CategoryId>, BadRequest<string>>>
+    RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"
-            DELETE FROM categories WHERE id = @selected_category");
+        using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
         
         command.Parameters.AddWithValue("selected_category", categoryId);
 
@@ -94,7 +91,7 @@ public record CategoryidDTO(int categoryId);
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                return TypedResults.Ok($"Category removed");
+                return TypedResults.Created($"/api/DeleteCategory/{categoryId}", categoryId);
             }
             return TypedResults.BadRequest("Failed to remove category");
         }
