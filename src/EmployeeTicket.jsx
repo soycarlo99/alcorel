@@ -5,26 +5,32 @@ export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
 
   useEffect(() => {
-    async function fetchTicket() {
-      const response = await fetch("/api/tickets");
-      const body = await response.json();
-      console.log(body);
-      setTickets(body);
+    async function fetchTickets() {
+      try {
+        const response = await fetch("/api/DetailedTicket");
+        if (!response.ok) {
+          throw new Error(`status: ${response.status}`);
+        }
+        const body = await response.json();
+        setTickets(body);
+      } catch (error) {
+        console.error("Fetching tickets failed:", error);
+      }
     }
-    fetchTicket();
+    fetchTickets();
   }, []);
 
   return (
     <>
-      <h1>Employeee Tickets</h1>
+      <h1>Employee Tickets</h1>
       {tickets.map((ticket, index) => (
-        <div>
-          <h2>Ticket ID: {ticket.ticket_id}</h2>
-          <h3>Ticket time: {ticket.ticket_time}</h3>
-          <h3>Messages: {ticket.message}</h3>
-          <h3>Reasoning: {ticket.category_id}</h3>
-          <h3>Customer: {ticket.user_id}</h3>
+        <div key={index}>
+          <h2>Ticket ID: {ticket.ticketId}</h2>
+          <h3>Customer Name: {ticket.userName}</h3>
+          <h3>Category: {ticket.categoryName}</h3>
+          {/* <h3>Message: {ticket.message}</h3> */}
           <h3>Status: {ticket.status}</h3>
+          <h3>Date: {ticket.ticketTime}</h3>
         </div>
       ))}
     </>
