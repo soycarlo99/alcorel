@@ -1,6 +1,7 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
 namespace Server;
+using Microsoft.AspNetCore.Mvc;
 
 public static class UserRoutes
 {
@@ -8,6 +9,7 @@ public static class UserRoutes
     public record PostUserDTO(string Name, string Email, string Password, string admin_customer_employee, int company_id);
     public record CreationOfTicketDTO(string Name, string Email);
 
+    public record Ticket(string Message, int Category_id);
 
 
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
@@ -57,20 +59,26 @@ public static class UserRoutes
 
 
     public static async Task<Results<Created<User>, BadRequest<string>>>
-       CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
+       CreationOfTicket(CreationOfTicketDTO userDto, Ticket ticketDTO, NpgsqlDataSource db)
 
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
-        command.Parameters.AddWithValue("name", userDto.Name);
-        command.Parameters.AddWithValue("email", userDto.Email);
+        using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING user_id, name");
+        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(message, category_id) VALUES(@message, @category_id");
+        userCommand.Parameters.AddWithValue("name", userDto.Name);
+        userCommand.Parameters.AddWithValue("email", userDto.Email);
+        ticketCommand.Parameters.AddWithValue("message", ticketDTO.Message);
+        ticketCommand.Parameters.AddWithValue("category_id", ticketDTO.Category_id);
 
         try
         {
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            using var reader = await userCommand.ExecuteReaderAsync();
+            using var reader2 = await ticketCommand.ExecuteReaderAsync();
+            if (await reader.ReadAsync() && await reader2.ReadAsync())
             {
                 var user = new User(reader.GetInt32(0), reader.GetString(1));
+
                 return TypedResults.Created($"/api/createusers/{user.Id}", user);
+
             }
             else
             {
@@ -81,6 +89,7 @@ public static class UserRoutes
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
+
     }
 
 
