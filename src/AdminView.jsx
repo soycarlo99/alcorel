@@ -28,8 +28,9 @@ export default function AdminView() {
 
   return (
     <div>
-      <label htmlFor={categoryInput}>Add Category</label>
-      <form onsubmit={PostCategories} id={categoryInput} type="text" />
+      <p>Add Category</p>
+      <input type="text" />
+      <button>Add</button>
 
       <p>Existing categories:</p>
       <ul>
