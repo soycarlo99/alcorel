@@ -13,24 +13,40 @@ export default function AdminView() {
         console.error(error);
       }
     }
-
-    async function PostCategories() {
-      try {
-        const categoryInput = await fetch("/api/PostCategories");
-        const body = await response.json();
-        setCategories(body);
-      } catch (error) {
-        console.error(error);
-      }
-    }
     GetCategory();
   }, []);
 
+
+  function handleAddSubmit(event) {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    console.log(data);
+    data = Object.fromEntries(data);
+    console.log(data);
+    data = JSON.stringify(data);
+    console.log(data);
+    fetch("/api/postCategory", {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: data,
+    }).then((response) => {
+      if (response.ok) {
+        console.log("Category added succesfully")
+      }
+    });
+  }
+
+
+
   return (
     <div>
-      <form onsubmit="">
+      <form className="form" onSubmit={handleAddSubmit}>
+
         <label>Add Category: </label>
-        <input type="text"></input>
+        <input name="id" type="text" required />
+        <input name="category_name" type="text" required />
+        <input name="company_id" type="text" required />
+        <input type="submit" value="Submit" />
       </form>
       <p>Existing categories:</p>
       <ul>
