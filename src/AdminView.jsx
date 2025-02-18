@@ -28,10 +28,10 @@ export default function AdminView() {
 
   return (
     <div>
-      <p>Add Category</p>
-      <input type="text" />
-      <button>Add</button>
-
+      <form onsubmit="">
+        <label>Add Category: </label>
+        <input type="text"></input>
+      </form>
       <p>Existing categories:</p>
       <ul>
         {categories.map((item, index) => (
