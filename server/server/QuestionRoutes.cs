@@ -5,8 +5,21 @@ namespace Server;
 
 public static class QuestionRoutes
 {
+
+    public record Question(
+        int id,
+        string questions,
+        int category_id
+    );
+
+
     public record QuestionDTO(
         int id,
+        string questions,
+        int category_id
+    );
+
+    public record PostQuestionDTO(
         string questions,
         int category_id
     );
@@ -28,5 +41,37 @@ public static class QuestionRoutes
         }
 
         return result;
+    }
+
+
+    public static async Task<Results<Created<Question>, BadRequest<string>>> 
+        PostQuestions(PostQuestionDTO PostQuestionDTO, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand(@"
+            INSERT INTO questions (questions, category_id) 
+            VALUES (@questions, @category_id) 
+            RETURNING id, questions, category_id");
+        
+        command.Parameters.AddWithValue("questions", PostQuestionDTO.questions);
+        command.Parameters.AddWithValue("category_id", PostQuestionDTO.category_id);
+
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var question = new Question(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetInt32(2)
+                );
+                return TypedResults.Created($"/api/questions/{question.id}", question);
+            }
+            return TypedResults.BadRequest("Failed to add questions");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
     }
 }
