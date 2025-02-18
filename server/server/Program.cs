@@ -15,20 +15,31 @@ builder.Services.AddSingleton<NpgsqlDataSource>(db);
 
 var app = builder.Build();
 
+
+
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 app.MapPost("/api/users", UserRoutes.PostUser);
 app.MapPost("/api/login", UserRoutes.CheckCredentials);
 
+
+
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTicket);
 app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
+//app.MapPost("/api/ticketsJoin", TicketRoutes.GetTicketsJoined);
+app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
+
+
 
 
 //Question APIs
 app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
 app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
 app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
+
+
+
 
 app.Run();

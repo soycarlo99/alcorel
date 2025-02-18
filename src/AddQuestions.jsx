@@ -15,15 +15,12 @@ export default function AddQuestions() {
 
   async function fetchQuestions() {
     try {
-      const response = await fetch(
-        "api/questions/3",
-        /*Här behöver vi ändra 2 till en useState value som ändrar Categories ID:et med vad vill se!*/ {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      const response = await fetch(`api/questions/${category_id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+      });
       if (!response.ok) {
         throw new Error(`status: ${response.status}`);
       }
@@ -33,26 +30,30 @@ export default function AddQuestions() {
       console.error("Fetching questions failed:", error);
     }
   }
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
 
-  function handleAddSubmit(event) {
+  useEffect(() => {
+    if (category_id) {
+      fetchQuestions();
+    }
+  }, [category_id]);
+
+  async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
-    console.log(data);
     data = Object.fromEntries(data);
-    console.log(data);
     data = JSON.stringify(data);
-    fetch("/api/questions", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: data,
-    }).then((response) => {
+    try {
+      const response = await fetch("/api/questions", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: data,
+      });
       if (response.ok) {
-        //setQuestions("");
+        await fetchQuestions();
       }
-    });
+    } catch (error) {
+      console.error("Submission failed:", error);
+    }
   }
 
   function handleRemove(event) {
@@ -69,12 +70,11 @@ export default function AddQuestions() {
   return (
     <>
       <h1>Add/See questions</h1>
-      <form className="form" onSubmit={handleAddSubmit}>
-        <input name="questions" type="text" required />
-        <input type="submit" value="Submit" />
 
-        <select name="category_id" required>
-          <option value="">Please Choose an Option</option>
+      <div>
+        <label>Select Category to View:</label>
+        <select value={category_id} onChange={handleCategoryChange}>
+          <option value="">Choose a Category</option>
           <option value="1">Storage</option>
           <option value="2">Delivery</option>
           <option value="3">Software</option>
@@ -82,19 +82,36 @@ export default function AddQuestions() {
           <option value="5">Tech Support</option>
           <option value="6">Warehouse</option>
         </select>
+      </div>
+
+      <form className="form" onSubmit={handleAddSubmit}>
+        <input
+          name="questions"
+          type="text"
+          required
+          placeholder="New question"
+        />
+        <select name="category_id" required>
+          <option value="">Choose Category for Question</option>
+          <option value="1">Storage</option>
+          <option value="2">Delivery</option>
+          <option value="3">Software</option>
+          <option value="4">Hardware</option>
+          <option value="5">Tech Support</option>
+          <option value="6">Warehouse</option>
+        </select>
+        <input type="submit" value="Add Question" />
       </form>
 
-      {questionsList.map((question, index) => (
-        <div key={index}>
-          <h2>Question ID: {question.id}</h2>
+      {questionsList.map((question) => (
+        <div key={question.id}>
           <h3>Question: {question.questions}</h3>
-          <h3>Category ID: {question.category_id}</h3>
+          <p>Category ID: {question.category_id}</p>
           <form
-            className="form"
             onSubmit={handleRemove}
-            action={"/api/questions/" + question.id}
+            action={`/api/questions/${question.id}`}
           >
-            <input type="submit" value={"remove question nr: " + question.id} />
+            <input type="submit" value={`Remove Question ${question.id}`} />
           </form>
         </div>
       ))}
