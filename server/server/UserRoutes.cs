@@ -44,8 +44,9 @@ public static class UserRoutes
             {
                 var user = new User(reader.GetInt32(0), reader.GetString(1));
                 return TypedResults.Created($"/api/users/{user.Id}", user);
-            }
+            } else {
             return TypedResults.BadRequest("Failed to create user");
+            }
         }
         catch (PostgresException ex)
         {
@@ -63,28 +64,29 @@ public static class UserRoutes
 
     {
         using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING name, email");
-        using var messageCommand = db.CreateCommand("INSERT INTO ticket_messages(message) VALUES(@message) RETURN message");
-        using var ticketCommand = db.CreateCommand("INSERT INTO ticket(category_id) VALUES(@category_id) RETURNING category_id");
+        using var messageCommand = db.CreateCommand("INSERT INTO ticket_messages (message) VALUES(@message) RETURNING message");
+        using var ticketCommand = db.CreateCommand("INSERT INTO ticket (category_id) VALUES(@category_id) RETURNING category_id");
         userCommand.Parameters.AddWithValue("name", userDto.Name);
         userCommand.Parameters.AddWithValue("email", userDto.Email);
-        ticketCommand.Parameters.AddWithValue("message", userDto.Message);
+        messageCommand.Parameters.AddWithValue("message", userDto.Message);
         ticketCommand.Parameters.AddWithValue("category_id", userDto.Category_id);
 
         try
         {
             using var reader = await userCommand.ExecuteReaderAsync();
-            using var reader2 = await ticketCommand.ExecuteReaderAsync();
-            if (await reader.ReadAsync() && await reader2.ReadAsync())
+            using var readerMes = await messageCommand.ExecuteReaderAsync();
+            using var readerCat = await ticketCommand.ExecuteReaderAsync();
+            if (await reader.ReadAsync() && await readerMes.ReadAsync() && await readerCat.ReadAsync())
             {
-                var user = new CreationOfTicketDTO(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3));
+                var user = new CreationOfTicketDTO(reader.GetString(0), reader.GetString(1), readerMes.GetString(2), readerCat.GetInt32(3));
 
                 return TypedResults.Ok("Added successfuly");
-                
-                
+
+
             }
             else
             {
-                return TypedResults.BadRequest("User could not be created.");
+                return TypedResults.BadRequest($"Error:");
             }
         }
         catch (PostgresException ex)
