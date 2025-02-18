@@ -44,9 +44,8 @@ public static class UserRoutes
             {
                 var user = new User(reader.GetInt32(0), reader.GetString(1));
                 return TypedResults.Created($"/api/users/{user.Id}", user);
-            } else {
-            return TypedResults.BadRequest("Failed to create user");
             }
+            return TypedResults.BadRequest("Failed to create user");
         }
         catch (PostgresException ex)
         {
@@ -56,44 +55,47 @@ public static class UserRoutes
 
 
 
-
-
-
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-       CreationOfTicket(CreationOfTicketDTO userDto, NpgsqlDataSource db)
-
+    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db)
     {
-        using var userCommand = db.CreateCommand("INSERT INTO testuser (name, email) VALUES (@name, @email) RETURNING name, email");
-        using var messageCommand = db.CreateCommand("INSERT INTO ticket_messages (message) VALUES(@message) RETURNING message");
-        using var ticketCommand = db.CreateCommand("INSERT INTO ticket (category_id) VALUES(@category_id) RETURNING category_id");
-        userCommand.Parameters.AddWithValue("name", userDto.Name);
-        userCommand.Parameters.AddWithValue("email", userDto.Email);
-        messageCommand.Parameters.AddWithValue("message", userDto.Message);
-        ticketCommand.Parameters.AddWithValue("category_id", userDto.Category_id);
-
         try
         {
-            using var reader = await userCommand.ExecuteReaderAsync();
-            using var readerMes = await messageCommand.ExecuteReaderAsync();
-            using var readerCat = await ticketCommand.ExecuteReaderAsync();
-            if (await reader.ReadAsync() && await readerMes.ReadAsync() && await readerCat.ReadAsync())
+            // TODO(manuel): Starta er transaction här
+            // 1. kolla ifall en användare finns, om inte, skapa en
+            using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email) values ($1, $2) ON CONFLICT DO NOTHING RETURNING id");
+            insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
+            insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
+
+            var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
+
+            // 2. Skapa en ny ticket kopplat till användaren, och deras problem
+            if (insertUserResult is int userId)
             {
-                var user = new CreationOfTicketDTO(reader.GetString(0), reader.GetString(1), readerMes.GetString(2), readerCat.GetInt32(3));
+                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id) values($1, $2) RETURNING id");
+                insertTicketCommand.Parameters.AddWithValue(ticket_info.Category_id);
+                insertTicketCommand.Parameters.AddWithValue(userId);
 
-                return TypedResults.Ok("Added successfuly");
+                var insertTicketResult = await insertTicketCommand.ExecuteScalarAsync();
 
+                if (insertTicketResult is int ticketId)
+                {
+                    // 3. Skapa ett nytt ticket-message med användarens meddelande
+                    using var insertTicketMessageCommand = db.CreateCommand("INSERT INTO ticket_messages(ticket_id, message) values($1, $2)");
+                    insertTicketMessageCommand.Parameters.AddWithValue(ticketId);
+                    insertTicketMessageCommand.Parameters.AddWithValue(ticket_info.Message);
+                    await insertTicketMessageCommand.ExecuteNonQueryAsync();
 
+                    // Avsluta er transaction
+                    return TypedResults.Ok("Added successfully");
+                }
             }
-            else
-            {
-                return TypedResults.BadRequest($"Error:");
-            }
+            // This should never happen, since the ID we return from postgres will either happen, or it will be caugth as an exception by the try-catch
+            return TypedResults.BadRequest("Something went wrong");
         }
         catch (PostgresException ex)
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
-
     }
 
 
