@@ -44,28 +44,6 @@ export default function TicketCreation() {
     });
   }
 
-  
-  /*
-    useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await fetch("http://localhost:5001/api/categories");
-        const body = await response.json();
-        console.log("Fetched categories data:", body);
-        SetCategories(body);
-      } catch (error) {
-        console.error("Failed to fetch categories from database:", error);
-      }
-    }
-
-    [];
-  });
-
-  const listCategories = () => {
-    const myArray = ["apple", "banana", "orange"];
-    const myList = myArray.map((item) => <p>{item}</p>);
-  };
-*/
   return (
       <main>
         <form className="form">
@@ -85,6 +63,7 @@ export default function TicketCreation() {
 
         <select value={category_id} onChange={handleCategoryChange}>
           <option>Please Choose an Option</option>
+          <option value="1">Storage</option>
           <option value="2">Delivery</option>
           <option value="3">Software</option>
           <option value="4">Hardware</option>
