@@ -29,5 +29,6 @@ app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
 //Question APIs
 app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
 app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
+app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
 
 app.Run();

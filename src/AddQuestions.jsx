@@ -37,7 +37,7 @@ export default function AddQuestions() {
     fetchQuestions();
   }, []);
 
-  function handleSubmit(event) {
+  function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
     console.log(data);
@@ -55,10 +55,28 @@ export default function AddQuestions() {
     });
   }
 
+  function handleRemove(event) {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    console.log(data);
+    data = Object.fromEntries(data);
+    console.log(data);
+    data = JSON.stringify(data);
+    fetch("/api/questions/{id}", {
+      headers: { "Content-Type": "application/json" },
+      method: "DELETE",
+      body: data,
+    }).then((response) => {
+      if (response.ok) {
+        //setQuestions("");
+      }
+    });
+  }
+
   return (
     <>
       <h1>Add/See questions</h1>
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleAddSubmit}>
         <input name="questions" type="text" required />
         <input type="submit" value="Submit" />
 
@@ -75,6 +93,9 @@ export default function AddQuestions() {
 
       {questionsList.map((question, index) => (
         <div key={index}>
+          <form className="form" onSubmit={handleRemove}>
+            <input type="submit" value="remove questions ID: {question.id}" />
+          </form>
           <h2>Question ID: {question.id}</h2>
           <h3>Question: {question.questions}</h3>
           <h3>Category ID: {question.category_id}</h3>

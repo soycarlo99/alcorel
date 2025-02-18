@@ -24,6 +24,11 @@ public static class QuestionRoutes
         int category_id
     );
 
+
+    public record DeleteQuestionDTO(
+        int category_id
+    );
+
     public static async Task<List<QuestionDTO>> GetQuestion(int category_id, NpgsqlDataSource db)
     {
         List<QuestionDTO> result = new();
@@ -68,6 +73,34 @@ public static class QuestionRoutes
                 return TypedResults.Created($"/api/questions/{question.id}", question);
             }
             return TypedResults.BadRequest("Failed to add questions");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
+
+
+    public static async Task<Results<Ok<string>, BadRequest<string>>> 
+        DeleteQuestion(int id, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand(@"
+            DELETE from questions where id = @id");
+        
+        command.Parameters.AddWithValue("id", id);
+
+        try
+        {
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+                return TypedResults.Ok($"Deleted {rowsAffected} question(s) successfully");
+            }
+            else
+            {
+                return TypedResults.Ok("No question deleted");
+            }
         }
         catch (PostgresException ex)
         {
