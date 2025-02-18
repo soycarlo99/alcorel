@@ -33,7 +33,7 @@ public static class CategoryRoutes
     public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db)
     {
         List<GetCategoriesDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories");
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories"); //WHERE company_id = @company_id
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())
@@ -53,7 +53,7 @@ public static class CategoryRoutes
         using var command = db.CreateCommand(@"
             INSERT INTO categories (id, category_name, company_id) 
             VALUES (@id, @category_name, @company_id) 
-            RETURNING id, category_name, company_id");
+            RETURNING id, category_name, company_id");   //WHERE company_id = @company_id
         
         command.Parameters.AddWithValue("id", categoryDto.id);
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
@@ -82,7 +82,7 @@ public static class CategoryRoutes
     public static async Task<Results<Ok<string>, BadRequest<string>>>
     RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
+        using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");  //WHERE company_id = @company_id
         
         command.Parameters.AddWithValue("selected_category", categoryId);
 
