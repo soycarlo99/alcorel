@@ -82,12 +82,11 @@ public static class QuestionRoutes
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>> 
-        DeleteQuestion(int id, NpgsqlDataSource db)
+    DeleteQuestion(int id, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"
-            DELETE from questions where id = @id");
+        using var command = db.CreateCommand("DELETE from questions where id = $1");
         
-        command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue(id);
 
         try
         {

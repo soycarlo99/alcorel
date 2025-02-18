@@ -13,27 +13,27 @@ export default function AddQuestions() {
     setQuestions(event.target.value);
   };
 
-  useEffect(() => {
-    async function fetchQuestions() {
-      try {
-        const response = await fetch(
-          "api/questions/3",
-          /*Här behöver vi ändra 2 till en useState value som ändrar Categories ID:et med vad vill se!*/ {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+  async function fetchQuestions() {
+    try {
+      const response = await fetch(
+        "api/questions/3",
+        /*Här behöver vi ändra 2 till en useState value som ändrar Categories ID:et med vad vill se!*/ {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-        if (!response.ok) {
-          throw new Error(`status: ${response.status}`);
-        }
-        const body = await response.json();
-        setQuestionsList(body);
-      } catch (error) {
-        console.error("Fetching questions failed:", error);
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`status: ${response.status}`);
       }
+      const body = await response.json();
+      setQuestionsList(body);
+    } catch (error) {
+      console.error("Fetching questions failed:", error);
     }
+  }
+  useEffect(() => {
     fetchQuestions();
   }, []);
 
@@ -57,18 +57,11 @@ export default function AddQuestions() {
 
   function handleRemove(event) {
     event.preventDefault();
-    let data = new FormData(event.target);
-    console.log(data);
-    data = Object.fromEntries(data);
-    console.log(data);
-    data = JSON.stringify(data);
-    fetch("/api/questions/{id}", {
-      headers: { "Content-Type": "application/json" },
+    fetch(event.target.action, {
       method: "DELETE",
-      body: data,
     }).then((response) => {
       if (response.ok) {
-        //setQuestions("");
+        fetchQuestions();
       }
     });
   }
@@ -93,12 +86,16 @@ export default function AddQuestions() {
 
       {questionsList.map((question, index) => (
         <div key={index}>
-          <form className="form" onSubmit={handleRemove}>
-            <input type="submit" value="remove questions ID: {question.id}" />
-          </form>
           <h2>Question ID: {question.id}</h2>
           <h3>Question: {question.questions}</h3>
           <h3>Category ID: {question.category_id}</h3>
+          <form
+            className="form"
+            onSubmit={handleRemove}
+            action={"/api/questions/" + question.id}
+          >
+            <input type="submit" value={"remove question nr: " + question.id} />
+          </form>
         </div>
       ))}
     </>
