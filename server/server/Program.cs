@@ -34,7 +34,11 @@ app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
 
 
 
-//
+
+//Question APIs
+app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
+app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
+app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
 
 
 
