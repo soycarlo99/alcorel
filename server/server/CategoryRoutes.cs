@@ -51,11 +51,10 @@ public static class CategoryRoutes
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
-            INSERT INTO categories (id, category_name, company_id) 
-            VALUES (@id, @category_name, @company_id) 
+            INSERT INTO categories (category_name, company_id) 
+            VALUES (@category_name, @company_id) 
             RETURNING id, category_name, company_id");   //WHERE company_id = @company_id
         
-        command.Parameters.AddWithValue("id", categoryDto.id);
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
         command.Parameters.AddWithValue("company_id", categoryDto.company_id);
         try

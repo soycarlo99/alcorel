@@ -28,29 +28,43 @@ export default function AdminView() {
       body: data,
     }).then((response) => {
       if (response.ok) {
-        console.log("Category added succesfully")
+        console.log("Category Added Succesfully")
       }
     });
   }
 
-
+  function handleRemove(event) {
+    event.preventDefault();
+    fetch(event.target.action, {
+      method: "DELETE",
+    }).then((response) => {
+      if (response.ok) {
+        fetchQuestions();
+      }
+    });
+  }
 
   return (
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
 
         <label>Add Category: </label>
-        <input name="id" type="text" required />
+
         <input name="category_name" type="text" required />
         <input name="company_id" type="text" required />
         <input type="submit" value="Submit" />
       </form>
       <p>Existing categories:</p>
-      <ul>
-        {categories.map((item, index) => (
-          <li key={index}>{item.category_name}</li>
-        ))}
-      </ul>
+
+      {categories.map((item, index) => (
+        <div>
+          <h3 key={index}>{item.category_name}</h3>
+          <form onSubmit={handleRemove} action={`/api/DeleteCategory/${item.id}`}>
+            <input type="submit" value={`Remove Category ${item.id}`} />
+          </form>
+        </div>
+      ))}
+
     </div>
   );
 }
