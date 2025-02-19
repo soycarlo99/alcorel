@@ -3,11 +3,11 @@ using Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string host = "localhost";
-string port = "5433";
-string username = "postgres";
-string password = "";
-string database = "alcorel1";
+var host = builder.Configuration["PG_HOST"] ?? "localhost";
+var port = builder.Configuration["PG_PORT"] ?? "5432";
+var username = builder.Configuration["PG_USER"] ?? "postgres";
+var password = builder.Configuration["PG_PASSWORD"] ?? "postgres";
+var database = builder.Configuration["PG_DATABASE"] ?? "alco";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 
