@@ -20,14 +20,11 @@ export default function AdminView() {
   function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
-    console.log(data);
     data = Object.fromEntries(data);
-    console.log(data);
     data = JSON.stringify(data);
-    console.log(data);
     fetch("/api/postCategory", {
-      headers: { "Content-Type": "application/json" },
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: data,
     }).then((response) => {
       if (response.ok) {
