@@ -19,8 +19,8 @@ export default function TicketCreation() {
     setMessage(event.target.value);
   };
   const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  }
+  setCategory(parseInt(event.target.value, 10) || "");
+};
   
 
 
