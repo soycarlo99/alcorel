@@ -6,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 string host = "localhost";
 string port = "5433";
 string username = "postgres";
-string password = "postgres";
-string database = "alcorel";
+string password = "";
+string database = "alcorel1";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 
@@ -42,5 +42,9 @@ app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
 
 
 
+//Category APIs
+app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
+app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
+app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
 app.Run();
