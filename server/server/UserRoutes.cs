@@ -16,7 +16,7 @@ public static class UserRoutes
     {
         List<User> result = new();
 
-        using var query = db.CreateCommand("SELECT user_id, name FROM testuser");
+        using var query = db.CreateCommand("SELECT id, name FROM testuser");
         using var reader = await query.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -30,7 +30,7 @@ public static class UserRoutes
     public static async Task<Results<Created<User>, BadRequest<string>>>
     PostUser(PostUserDTO userDto, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING user_id, name");
+        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING id, name");
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
         command.Parameters.AddWithValue("password", userDto.Password);
@@ -119,7 +119,7 @@ public static class UserRoutes
         CheckCredentials(LoginDTO loginDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
-            SELECT user_id, name, email, admin_customer_employee
+            SELECT id, name, email, admin_customer_employee
             FROM testuser
             WHERE email = @email AND password = @password");
 
