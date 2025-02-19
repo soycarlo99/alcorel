@@ -4,11 +4,12 @@ namespace Server;
 
 public static class TicketRoutes
 {
+
     public record Ticket(
-        int id, 
-        DateTime? ticket_time, 
-        string status, 
-        int user_id, 
+        int id,
+        DateTime? ticket_time,
+        string status,
+        int user_id,
         int category_id
     );
 
@@ -49,8 +50,8 @@ public static class TicketRoutes
         List<Ticket> result = new();
         using var query = db.CreateCommand("SELECT id, ticket_time, status, user_id, category_id FROM ticket");
         using var reader = await query.ExecuteReaderAsync();
-        
-        while(await reader.ReadAsync())
+
+        while (await reader.ReadAsync())
         {
             result.Add(new(
                 reader.GetInt32(0),
@@ -63,14 +64,14 @@ public static class TicketRoutes
         return result;
     }
 
-    public static async Task<Results<Created<Ticket>, BadRequest<string>>> 
+    public static async Task<Results<Created<Ticket>, BadRequest<string>>>
         PostTicket(PostTicketDTO ticketDto, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"
-            INSERT INTO ticket (ticket_time, status, user_id, category_id) 
-            VALUES (@time, @status, @user_id, @category_id) 
-            RETURNING id, ticket_time, status, user_id, category_id");
-        
+            INSERT INTO ticket (ticket_time, message, answers, questions_id, status, user_id, category_id) 
+            VALUES (@time, @message, @answers, @questions, @status, @user_id, @category_id) 
+            RETURNING ticket_id, ticket_time, message, answers, questions_id, status, user_id, category_id");
+
         command.Parameters.AddWithValue("time", ticketDto.ticket_time);
         command.Parameters.AddWithValue("status", ticketDto.status);
         command.Parameters.AddWithValue("user_id", ticketDto.user_id);
@@ -99,17 +100,17 @@ public static class TicketRoutes
     }
 
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>> 
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
     UpdateTicketStatus(int ticketId, UpdateStatusDTO statusDto, NpgsqlDataSource db)
     {
         string newStatus = statusDto.Status;
-        
+
         using var command = db.CreateCommand(@"
             UPDATE ticket
             SET status = @status
-            WHERE id = @ticket_id
-            RETURNING id, status");
-        
+            WHERE ticket_id = @ticket_id
+            RETURNING ticket_id, status");
+
         command.Parameters.AddWithValue("status", newStatus);
         command.Parameters.AddWithValue("id", ticketId);
 
