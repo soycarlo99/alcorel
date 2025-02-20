@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
-export default function AdminView() {
+export default function EditCategories() {
   const [categories, setCategories] = useState([]);
-
+  
+  
   useEffect(() => {
     GetCategory();
   }, []);
@@ -17,6 +18,7 @@ export default function AdminView() {
       console.error(error);
     }
   }
+
 
   function handleAddSubmit(event) {
     event.preventDefault();
@@ -49,6 +51,7 @@ export default function AdminView() {
   return (
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
+
         <label>Add Category: </label>
 
         <input name="category_name" type="text" required />
@@ -68,6 +71,7 @@ export default function AdminView() {
           </form>
         </div>
       ))}
+
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import "./TicketCreation.css";
 
 export default function TicketCreation() {
-  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("initialpassword");
@@ -19,12 +17,8 @@ export default function TicketCreation() {
     setMessage(event.target.value);
   };
   const handleCategoryChange = (event) => {
-  setCategory(parseInt(event.target.value, 10) || "");
-};
-  
-
-
-
+    setCategory(parseInt(event.target.value, 10) || "");
+  };
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -45,19 +39,23 @@ export default function TicketCreation() {
   }
 
   return (
-      <main>
-        <form className="form">
-          <label>
-            Enter your name:
-            <input type="text" value={name} onChange={handleNameChange} />
-          </label>
-          <label>
-            Enter your email:
-            <input type="text" value={email} onChange={handleEmailChange} />
-          </label>
-          <label>
-            Enter your Message:
-            <input type="text" value={message} onChange={handleMessageChange}></input>
+    <main className="CreateTicket">
+      <form className="form">
+        <label>
+          Enter your name:
+          <input type="text" value={name} onChange={handleNameChange} />
+        </label>
+        <label>
+          Enter your email:
+          <input type="text" value={email} onChange={handleEmailChange} />
+        </label>
+        <label>
+          Enter your Message:
+          <textarea
+            type="text"
+            value={message}
+            onChange={handleMessageChange}
+          ></textarea>
         </label>
         <label for="pet-select">Choose a category:</label>
 
@@ -70,10 +68,10 @@ export default function TicketCreation() {
           <option value="5">Tech Support</option>
           <option value="6">Warehouse</option>
         </select>
-        </form>
-        <form className="form" onSubmit={handleSubmit}>
-          <button type="submit">Submit</button>
-        </form>
-      </main>
+      </form>
+      <form className="form" onSubmit={handleSubmit}>
+        <button type="submit">Submit</button>
+      </form>
+    </main>
   );
 }
