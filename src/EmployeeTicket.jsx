@@ -20,16 +20,24 @@ export default function EmployeeTicket() {
     fetchTickets();
   }, []);
 
+  
+  //tickets.sort().reverse()
+  console.log("tjena")
+ //console.log(tickets.ticketId)
+  console.log(tickets)
+
+  //console.log(SetTickets)
+  
   return (
     <>
       <div className="Tickets">
         <h1>Tickets</h1>
         <div className="Titles">
-          <h2>ID</h2>
-          <h2>Customer</h2>
-          <h2>Category</h2>
-          <h2>Status</h2>
-          <h2>Date</h2>
+          {/* <button type="button"  onClick={XXXX}>ID</button>*/}
+          <button>Customer</button>
+          <button>Category</button>
+          <button>Status</button>
+          <button>Date</button>
         </div>
 
         {tickets.map((ticket, index) => (
