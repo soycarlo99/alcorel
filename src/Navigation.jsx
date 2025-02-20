@@ -1,12 +1,12 @@
 import "./style.css";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 function Navigation() {
   return (
     <nav className="sidebar">
       <ul>
         <li>
-          <NavLink to="/AdminView" activeClassName="active">
+          <NavLink to="/EditCategories" activeClassName="active">
             Admin View
           </NavLink>
         </li>

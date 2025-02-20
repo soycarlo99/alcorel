@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function AdminView() {
+export default function EditCategories() {
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     async function GetCategory() {
@@ -16,7 +16,6 @@ export default function AdminView() {
     GetCategory();
   }, []);
 
-
   function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
@@ -28,7 +27,7 @@ export default function AdminView() {
       body: data,
     }).then((response) => {
       if (response.ok) {
-        console.log("Category Added Succesfully")
+        console.log("Category Added Succesfully");
       }
     });
   }
@@ -47,7 +46,6 @@ export default function AdminView() {
   return (
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
-
         <label>Add Category: </label>
 
         <input name="category_name" type="text" required />
@@ -59,12 +57,14 @@ export default function AdminView() {
       {categories.map((item, index) => (
         <div>
           <h3 key={index}>{item.category_name}</h3>
-          <form onSubmit={handleRemove} action={`/api/DeleteCategory/${item.id}`}>
+          <form
+            onSubmit={handleRemove}
+            action={`/api/DeleteCategory/${item.id}`}
+          >
             <input type="submit" value={`Remove Category ${item.id}`} />
           </form>
         </div>
       ))}
-
     </div>
   );
 }
