@@ -29,9 +29,8 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTicket);
 app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
-//app.MapPost("/api/ticketsJoin", TicketRoutes.GetTicketsJoined);
 app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
-
+app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketbyId);
 
 
 

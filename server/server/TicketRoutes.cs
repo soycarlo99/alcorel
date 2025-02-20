@@ -41,6 +41,16 @@ public static class TicketRoutes
 
     public record UpdateStatusDTO(string Status);
 
+    public record FullTicketViewDTO(
+      int ticketId,
+      DateTime TicketTime,
+      string Status,
+      string CategoryName,
+      string UserName
+      // List <messages> Messages,
+      // List <QuestionAnswer> QuestionAnswer
+      );
+
     /////////////////////////
     ///TheEnd!!!!!!!!!!!!!!!!
     /////////////////////////
@@ -162,7 +172,7 @@ public static class TicketRoutes
         using var command = db.CreateCommand(query);
         using var reader = await command.ExecuteReaderAsync();
 
-        while (await reader.ReadAsync())
+      while (await reader.ReadAsync())
         {
             string message = reader.IsDBNull(5) ? "No messages" : reader.GetString(5);
             string answer = reader.IsDBNull(7) ? "No answer provided" : reader.GetString(7);
@@ -182,4 +192,43 @@ public static class TicketRoutes
         }
         return result;
     }
+
+
+    public static async Task<List<FullTicketViewDTO>> GetTicketbyId(int id, NpgsqlDataSource db){
+
+        List<FullTicketViewDTO> result = new();
+      var ticketQuery = @"
+
+      SELECT
+          t.id AS ticket_id,
+          t.ticket_time,
+          t.status,
+          c.category_name,
+          u.name AS user_name
+          FROM ticket t 
+          JOIN Categories c ON t.category_id = c.id 
+          JOIN testuser u ON user_id = u.id 
+          WHERE t.id = @id
+          ";
+
+      using var command = db.CreateCommand(ticketQuery);
+      command.Parameters.AddWithValue("id", id);
+      using var reader = await command.ExecuteReaderAsync();
+
+
+      while(await reader.ReadAsync())
+
+            {
+              result.Add(new FullTicketViewDTO(
+              reader.GetInt32(0),
+              reader.GetFieldValue<DateTime>(1),
+              reader.GetString(2),
+              reader.GetString(3),
+              reader.GetString(4)
+              ));
+            }
+
+      return result;
+    }
+
 }
