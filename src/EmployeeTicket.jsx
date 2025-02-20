@@ -22,17 +22,30 @@ export default function EmployeeTicket() {
 
   return (
     <>
-      <h1>Employee Tickets</h1>
-      {tickets.map((ticket, index) => (
-        <div key={index}>
-          <h2>Ticket ID: {ticket.ticketId}</h2>
-          <h3>Customer Name: {ticket.userName}</h3>
-          <h3>Category: {ticket.categoryName}</h3>
-          {/* <h3>Message: {ticket.message}</h3> */}
-          <h3>Status: {ticket.status}</h3>
-          <h3>Date: {ticket.ticketTime}</h3>
+      <div className="Tickets">
+        <h1>Tickets</h1>
+        <div className="Titles">
+          <h2>ID</h2>
+          <h2>Customer</h2>
+          <h2>Category</h2>
+          <h2>Status</h2>
+          <h2>Date</h2>
         </div>
-      ))}
+
+        {tickets.map((ticket, index) => (
+          <Link
+            to={`/Ticket/${ticket.ticketId}`}
+            key={index}
+            className="TicketView"
+          >
+            <p>#{ticket.ticketId}</p>
+            <p>{ticket.userName}</p>
+            <p>{ticket.categoryName}</p>
+            <p className={`status ${ticket.status}`}>{ticket.status}</p>
+            <p>{ticket.ticketTime}</p>
+          </Link>
+        ))}
+      </div>
     </>
   );
 }
