@@ -4,6 +4,17 @@ import { Link } from "react-router-dom";
 export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
 
+
+const handleSortID = () => {
+    const sorted = [...tickets].sort((a, b) => {
+  return a.ticketId - b.ticketId;
+    });
+  setTickets(sorted)
+  sorted(true)
+};
+  
+  
+
   useEffect(() => {
     async function fetchTickets() {
       try {
@@ -20,20 +31,13 @@ export default function EmployeeTicket() {
     fetchTickets();
   }, []);
 
-  
-  //tickets.sort().reverse()
-  console.log("tjena")
- //console.log(tickets.ticketId)
-  console.log(tickets)
 
-  //console.log(SetTickets)
-  
   return (
     <>
       <div className="Tickets">
         <h1>Tickets</h1>
         <div className="Titles">
-          {/* <button type="button"  onClick={XXXX}>ID</button>*/}
+          <button type="button"  onClick={handleSortID}>ID</button>
           <button>Customer</button>
           <button>Category</button>
           <button>Status</button>
