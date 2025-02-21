@@ -4,9 +4,53 @@ import { Link } from "react-router-dom";
 export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
   const [ticketsId, setTicketsId] = useState(true);
+  const [ticketsDate, setTicketsDate] = useState(true);
 
 
-   function toggleTicketsId() {
+
+///function sort date
+
+
+  function toggleTicketsDate() {
+    if(ticketsDate === true) {
+      setTicketsDate(false);
+      handleSortDate()
+    } else if (ticketsDate === false) {
+      setTicketsDate(true);
+      handleSortDate1()
+    }
+  }
+
+
+  const handleSortDate = () => {
+    const sorted = [...tickets].sort();
+    console.log(sorted);
+    //const sorted = [...tickets].sort((a, b) => {
+    // return a.categoryName - b.categoryName;
+      //return a.ticketId - b.ticketId;
+   // });
+   //setTickets(sorted)
+  };
+
+  const handleSortDate1 = () => {
+
+  //  const sorted1 = [...tickets].sort((a, b) => {
+  //    return a.categoryName - b.categoryName;
+      //   return b.ticketId - a.ticketId;
+  //  });
+  //  setTickets(sorted1)
+  };
+
+
+
+
+
+
+
+
+///function sort ticket id
+
+  function toggleTicketsId() {
     if(ticketsId === true) {
       setTicketsId(false);
       handleSortID()
@@ -59,7 +103,7 @@ const handleSortID = () => {
           <button>Customer</button>
           <button>Category</button>
           <button>Status</button>
-          <button>Date</button>
+          <button type="button"  onClick={toggleTicketsDate}>Date</button>
         </div>
 
         {tickets.map((ticket, index) => (
