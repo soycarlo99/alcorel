@@ -7,6 +7,9 @@ export default function EmployeeTicket() {
   const [ticketsStatus, setTicketsStatus] = useState(true);
   const [ticketsCategory, setTicketsCategory] = useState(true);
   const [ticketsDate, setTicketsDate] = useState(true);
+
+	const [query, setQuery] = useState('');
+
   console.log(tickets);
 
 
@@ -113,6 +116,10 @@ export default function EmployeeTicket() {
     fetchTickets();
   }, []);
 
+  const filteredResults = tickets.filter(ticket =>
+    ticket.status.toLowerCase().includes(query.toLowerCase())
+  );
+
   return (
     <>
       <div className="Tickets">
@@ -125,13 +132,19 @@ export default function EmployeeTicket() {
           <button type="button" onClick={toggleTicketsCategory}>
             Category ↕️
           </button>
-          <button>Status</button>
+          <input
+				type="text"
+				placeholder="Status"
+				value={query}
+				onChange={(e) => setQuery(e.target.value)}
+			/>
           <button type="button" onClick={toggleTicketsDate}>
             Date ↕️
           </button>
+          
         </div>
 
-        {tickets.map((ticket, index) => (
+        {filteredResults.map((ticket, index) => (
           <Link
             to={`/Ticket/${ticket.ticketId}`}
             key={index}
