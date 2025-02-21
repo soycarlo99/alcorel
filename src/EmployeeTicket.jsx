@@ -3,12 +3,20 @@ import { Link } from "react-router-dom";
 
 export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
+  const [ticketsId, setTicketsId] = useState(true);
 
-  handleSortID = true;
+
+   function toggleTicketsId() {
+    if(ticketsId === true) {
+      setTicketsId(false);
+      handleSortID()
+    } else if (ticketsId === false) {
+      setTicketsId(true);
+      handleSortID1()
+    }
+  }
 
 const handleSortID = () => {
-  handleSortID = false;
-  handleSortID1 = true;
   const sorted = [...tickets].sort((a, b) => {
   return a.ticketId - b.ticketId;
     });
@@ -16,21 +24,14 @@ const handleSortID = () => {
   };  
 
   const handleSortID1 = () => {
-    handleSortID1 = false;
-    handleSortID = true;
+
     const sorted1 = [...tickets].sort((a, b) => {
   return b.ticketId - a.ticketId;
     });
   setTickets(sorted1)
   };  
 
-  function toggleSortId() {  
-    if(handleSortID === true) {
-      handleSortID()
-    } else if (handleSortID1 = true) {
-      handleSortID1()
-    }
-  }
+
 
   useEffect(() => {
     async function fetchTickets() {
@@ -54,7 +55,7 @@ const handleSortID = () => {
       <div className="Tickets">
         <h1>Tickets</h1>
         <div className="Titles">
-          <button type="button"  onClick={toggleSortId}>ID</button>
+          <button type="button"  onClick={toggleTicketsId}>ID</button>
           <button>Customer</button>
           <button>Category</button>
           <button>Status</button>
