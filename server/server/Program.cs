@@ -15,8 +15,6 @@ builder.Services.AddSingleton<NpgsqlDataSource>(db);
 
 var app = builder.Build();
 
-
-
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/users", UserRoutes.PostUser);

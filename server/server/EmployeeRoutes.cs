@@ -18,7 +18,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        string admin_customer_employee,
+        user_role admin_customer_employee,
         int company_id
     );
 
@@ -32,7 +32,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        string admin_customer_employee,
+        user_role admin_customer_employee,
         int company_id
     );
 
@@ -42,7 +42,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        string admin_customer_employee,
+        user_role admin_customer_employee,
         int company_id
     );
 
@@ -92,20 +92,32 @@ public static class EmployeeRoutes
         command.Parameters.AddWithValue("email", EmployeeDto.email);
         command.Parameters.AddWithValue("password", EmployeeDto.password);
         command.Parameters.AddWithValue("pending_confirmed", EmployeeDto.pending_confirmed);
-        command.Parameters.AddWithValue("admin_customer_employee", EmployeeDto.admin_customer_employee);
+        command.Parameters.AddWithValue("admin_customer_employee", EmployeeDto.admin_customer_employee.ToString());
         command.Parameters.AddWithValue("company_id", EmployeeDto.company_id);
         try
         {
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
+              var userRoleString = reader.GetString(4);
+              if (Enum.TryParse(userRoleString, out user_role userRole))
+            {
+
                 var employee = new Employee(
                 reader.GetInt32(0),
                 reader.GetString(1),
                 reader.GetString(2),
-                reader.GetInt32(3)
+                reader.GetString(3),
+                EmployeeDto.pending_confirmed,
+                userRole,
+                reader.GetInt32(5)
                 );
-                return TypedResults.Created($"/api/Employee/{EmployeeDto.id}", employee);
+                return TypedResults.Created($"/api/Employee/{employee.id}", employee);
+            }
+              else
+              {
+                return TypedResults.BadRequest("Invalid role value from database");
+              }
             }
             return TypedResults.BadRequest("Failed to create employee");
         }
@@ -119,7 +131,7 @@ public static class EmployeeRoutes
     public static async Task<Results<Ok<string>, BadRequest<string>>>
     RemoveEmployee(int Id, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"DELETE FROM testuser WHERE id = @selected_employee");  //WHERE company_id = @company_id
+        using var command = db.CreateCommand(@"DELETE FROM testuser WHERE id = @selected_employee");
         
         command.Parameters.AddWithValue("selected_employee", Id);
 
