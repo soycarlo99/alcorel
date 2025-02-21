@@ -93,7 +93,7 @@ export default function TicketDetails() {
           {ticket.messages.length > 0 ? (
             ticket.messages.map((msg, idx) => (
               <div key={idx} className="message">
-                <p>{msg.message}</p>
+                <textarea readOnly>{msg.message}</textarea>
                 <small>{new Date(msg.timestamp).toLocaleString()}</small>
               </div>
             ))
