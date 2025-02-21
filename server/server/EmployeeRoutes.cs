@@ -65,7 +65,9 @@ public static class EmployeeRoutes
         List<GetEmployeeDTO> result = new();
         using var query = db.CreateCommand("SELECT id, name, email, password, pending_confirmed, company_id FROM testuser WHERE admin_customer_employee = 'employee'");
         using var reader = await query.ExecuteReaderAsync();
-        
+       
+  
+
         while(await reader.ReadAsync())
         {
             result.Add(new(
@@ -98,27 +100,19 @@ public static class EmployeeRoutes
         {
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
-            {
-              var userRoleString = reader.GetString(4);
-              if (Enum.TryParse(userRoleString, out user_role userRole))
-            {
-
+            { 
                 var employee = new Employee(
                 reader.GetInt32(0),
                 reader.GetString(1),
                 reader.GetString(2),
                 reader.GetString(3),
-                EmployeeDto.pending_confirmed,
-                userRole,
-                reader.GetInt32(5)
+                reader.GetBoolean(4),
+                Enum.Parse<user_role>(reader.GetString(5)),
+                reader.GetInt32(6)
                 );
                 return TypedResults.Created($"/api/Employee/{employee.id}", employee);
             }
-              else
-              {
-                return TypedResults.BadRequest("Invalid role value from database");
-              }
-            }
+
             return TypedResults.BadRequest("Failed to create employee");
         }
         catch (PostgresException ex)
