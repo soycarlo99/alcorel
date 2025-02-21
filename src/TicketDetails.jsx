@@ -93,8 +93,9 @@ export default function TicketDetails() {
           {ticket.messages.length > 0 ? (
             ticket.messages.map((msg, idx) => (
               <div key={idx} className="message">
-                <textarea readOnly>{msg.message}</textarea>
-                <small>{new Date(msg.timestamp).toLocaleString()}</small>
+                
+                <small className="messageTime">{new Date(msg.timestamp).toLocaleString()}</small>
+                <pre readOnly className="messageTextarea">{msg.message}</pre>
               </div>
             ))
           ) : (
