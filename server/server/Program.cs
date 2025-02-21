@@ -46,4 +46,8 @@ app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
+//Message APIs
+app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
+
+
 app.Run();
