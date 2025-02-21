@@ -21,24 +21,23 @@ export default function TicketDetails() {
         });
     }
 
-    function fetchMessage() {
-      fetch(`/api/${id}/message`)
-        .then((response) => {
-          if (!response.ok) throw new Error("Message not found");
-          return response.json();
-        })
-        .then((data) => {
-          setTicket(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching message:", error);
-        });
-    }
+    // function fetchMessage() {
+    //   fetch(`/api/${id}/message`)
+    //     .then((response) => {
+    //       if (!response.ok) throw new Error("Message not found");
+    //       return response.json();
+    //     })
+    //     .then((data) => {
+    //       setTicket(data);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching message:", error);
+    //     });
+    // }
 
     // fetchMessage();
     fetchTicket();
-  }, [id, handleAddSubmit]);
-
+  }, [handleAddSubmit]);
 
   async function handleAddSubmit(event) {
     event.preventDefault();
@@ -52,11 +51,25 @@ export default function TicketDetails() {
         body: data,
       });
       if (response.ok) {
-        await fetchTicket();
-
+        //await fetchTicket();
       }
     } catch (error) {
       console.error("Submission failed:", error);
+    }
+
+    const statusdata = JSON.stringify({ status: "active" });
+    // data = JSON.stringify(data);
+    try {
+      const response = await fetch(`/api/tickets/${id}/status`, {
+        headers: { "Content-Type": "application/json" },
+        method: "PUT",
+        body: statusdata,
+      });
+      if (response.ok) {
+        console.log("status updated");
+      }
+    } catch (error) {
+      console.error("updating status failed:", error);
     }
   }
 
@@ -93,9 +106,12 @@ export default function TicketDetails() {
           {ticket.messages.length > 0 ? (
             ticket.messages.map((msg, idx) => (
               <div key={idx} className="message">
-                
-                <small className="messageTime">{new Date(msg.timestamp).toLocaleString()}</small>
-                <pre readOnly className="messageTextarea">{msg.message}</pre>
+                <small className="messageTime">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </small>
+                <pre readOnly className="messageTextarea">
+                  {msg.message}
+                </pre>
               </div>
             ))
           ) : (
@@ -112,9 +128,7 @@ export default function TicketDetails() {
               <button type="submit">Send Reply</button>
             </form>
           </div>
-
         </div>
-
       ) : (
         <p>No ticket found</p>
       )}

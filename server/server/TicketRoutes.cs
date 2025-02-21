@@ -128,11 +128,11 @@ public static class TicketRoutes
         using var command = db.CreateCommand(@"
             UPDATE ticket
             SET status = @status
-            WHERE ticket_id = @ticket_id
-            RETURNING ticket_id, status");
+            WHERE id = @ticket_id
+            RETURNING id, status");
 
         command.Parameters.AddWithValue("status", newStatus);
-        command.Parameters.AddWithValue("id", ticketId);
+        command.Parameters.AddWithValue("ticket_id", ticketId);
 
         try
         {
