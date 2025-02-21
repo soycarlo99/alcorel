@@ -126,7 +126,9 @@ export default function EmployeeTicket() {
             Category ↕️
           </button>
           <button>Status</button>
-          <button>Date</button>
+          <button type="button" onClick={toggleTicketsDate}>
+            Date ↕️
+          </button>
         </div>
 
         {tickets.map((ticket, index) => (
