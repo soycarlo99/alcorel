@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 export default function TicketDetails() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     function fetchTicket() {
@@ -19,8 +20,45 @@ export default function TicketDetails() {
           console.error("Error fetching ticket:", error);
         });
     }
+
+    function fetchMessage() {
+      fetch(`/api/${id}/message`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Message not found");
+          return response.json();
+        })
+        .then((data) => {
+          setTicket(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching message:", error);
+        });
+    }
+
+    // fetchMessage();
     fetchTicket();
-  }, [id]);
+  }, [id, handleAddSubmit]);
+
+
+  async function handleAddSubmit(event) {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    data = Object.fromEntries(data);
+    data = JSON.stringify(data);
+    try {
+      const response = await fetch(`/api/${id}/message`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: data,
+      });
+      if (response.ok) {
+        await fetchTicket();
+
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+    }
+  }
 
   return (
     <>
@@ -62,7 +100,20 @@ export default function TicketDetails() {
           ) : (
             <p>No messages</p>
           )}
+          <div>
+            <form className="form" onSubmit={handleAddSubmit}>
+              <textarea
+                name="message"
+                type="text"
+                required
+                placeholder="Reply ... "
+              />
+              <button type="submit">Send Reply</button>
+            </form>
+          </div>
+
         </div>
+
       ) : (
         <p>No ticket found</p>
       )}
