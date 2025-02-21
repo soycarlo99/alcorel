@@ -4,78 +4,98 @@ import { Link } from "react-router-dom";
 export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
   const [ticketsId, setTicketsId] = useState(true);
+  const [ticketsStatus, setTicketsStatus] = useState(true);
+  const [ticketsCategory, setTicketsCategory] = useState(true);
   const [ticketsDate, setTicketsDate] = useState(true);
+  console.log(tickets);
+
+
+  //FOR SORTING ON STATUS
+  
 
 
 
-///function sort date
+  //FOR SOTRTING ON CATEGORY
 
-
-  function toggleTicketsDate() {
-    if(ticketsDate === true) {
-      setTicketsDate(false);
-      handleSortDate()
-    } else if (ticketsDate === false) {
-      setTicketsDate(true);
-      handleSortDate1()
+  function toggleTicketsCategory() {
+    if (ticketsCategory === true) {
+      console.log(ticketsCategory);
+      setTicketsCategory(false);
+      handleSortCategory();
+    } else if (ticketsCategory === false) {
+      console.log(ticketsCategory);
+      setTicketsCategory(true);
+      handleSortCategory1();
     }
   }
 
+  const handleSortCategory = () => {
+    const sorted = [...tickets].sort((a, b) => {
+      return a.categoryName.localeCompare(b.categoryName);
+    });
+    setTickets(sorted);
+  };
+
+  const handleSortCategory1 = () => {
+    const sorted1 = [...tickets].sort((a, b) => {
+      return b.categoryName.localeCompare(a.categoryName);
+    });
+    setTickets(sorted1);
+  };
+
+  //FOR SORTING BY DATE
+  function toggleTicketsDate() {
+    if (ticketsDate === true) {
+      setTicketsDate(false);
+      handleSortDate();
+    } else if (ticketsDate === false) {
+      setTicketsDate(true);
+      handleSortDate1();
+    }
+  }
 
   const handleSortDate = () => {
-    const sorted = [...tickets].sort();
-    console.log(sorted);
-    //const sorted = [...tickets].sort((a, b) => {
-    // return a.categoryName - b.categoryName;
-      //return a.ticketId - b.ticketId;
-   // });
-   //setTickets(sorted)
+    const sorted = [...tickets].sort((a, b) => {
+      var dateA = new Date(a.ticketTime).getTime();
+      var dateB = new Date(b.ticketTime).getTime();
+      return dateB - dateA;
+    });
+    setTickets(sorted);
   };
 
   const handleSortDate1 = () => {
-
-  //  const sorted1 = [...tickets].sort((a, b) => {
-  //    return a.categoryName - b.categoryName;
-      //   return b.ticketId - a.ticketId;
-  //  });
-  //  setTickets(sorted1)
+    const sorted1 = [...tickets].sort((a, b) => {
+      var dateA = new Date(a.ticketTime).getTime();
+      var dateB = new Date(b.ticketTime).getTime();
+      return dateA - dateB;
+    });
+    setTickets(sorted1);
   };
 
-
-
-
-
-
-
-
-///function sort ticket id
-
+  //FOR SORTING BY ID
   function toggleTicketsId() {
-    if(ticketsId === true) {
+    if (ticketsId === true) {
       setTicketsId(false);
-      handleSortID()
+      handleSortID();
     } else if (ticketsId === false) {
       setTicketsId(true);
-      handleSortID1()
+      handleSortID1();
     }
   }
 
-const handleSortID = () => {
-  const sorted = [...tickets].sort((a, b) => {
-  return a.ticketId - b.ticketId;
+  const handleSortID = () => {
+    const sorted = [...tickets].sort((a, b) => {
+      return a.ticketId - b.ticketId;
     });
-  setTickets(sorted)
-  };  
+    setTickets(sorted);
+  };
 
   const handleSortID1 = () => {
-
     const sorted1 = [...tickets].sort((a, b) => {
-  return b.ticketId - a.ticketId;
+      return b.ticketId - a.ticketId;
     });
-  setTickets(sorted1)
-  };  
-
-
+    setTickets(sorted1);
+  };
 
   useEffect(() => {
     async function fetchTickets() {
@@ -93,17 +113,20 @@ const handleSortID = () => {
     fetchTickets();
   }, []);
 
-
   return (
     <>
       <div className="Tickets">
         <h1>Tickets</h1>
         <div className="Titles">
-          <button type="button"  onClick={toggleTicketsId}>ID</button>
+          <button type="button" onClick={toggleTicketsId}>
+            ID ↕️
+          </button>
           <button>Customer</button>
-          <button>Category</button>
+          <button type="button" onClick={toggleTicketsCategory}>
+            Category ↕️
+          </button>
           <button>Status</button>
-          <button type="button"  onClick={toggleTicketsDate}>Date</button>
+          <button>Date</button>
         </div>
 
         {tickets.map((ticket, index) => (
