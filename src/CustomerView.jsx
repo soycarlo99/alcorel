@@ -21,6 +21,25 @@ export default function CustomerView() {
         });
     }
 
+    async function fetchQuestions() {
+      try {
+        const response = await fetch(`api/questions/${category_id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`status: ${response.status}`);
+        }
+        const body = await response.json();
+        setQuestionsList(body);
+      } catch (error) {
+        console.error("Fetching questions failed:", error);
+      }
+    }
+
+    fetchQuestions();
     fetchTicket();
   }, [handleAddSubmit]);
 
