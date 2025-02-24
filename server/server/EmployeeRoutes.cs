@@ -42,7 +42,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        user_role admin_customer_employee,
+        string admin_customer_employee,
         int company_id
     );
 
@@ -126,11 +126,11 @@ public static async Task<Results<Created<Employee>, BadRequest<string>>>
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveEmployee(int Id, NpgsqlDataSource db)
+    RemoveEmployee(int testuserId, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"DELETE FROM testuser WHERE id = @selected_employee");
         
-        command.Parameters.AddWithValue("selected_employee", Id);
+        command.Parameters.AddWithValue("selected_employee", testuserId);
 
         try
         {

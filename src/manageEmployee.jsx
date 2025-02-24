@@ -11,7 +11,7 @@ export default function ManageEmployees() {
     try {
       const response = await fetch("/api/GetEmployee");
       const body = await response.json();
-      setCategories(body);
+      SetEmployee(body);
       console.log(body);
     } catch (error) {
       console.error(error);
@@ -22,14 +22,20 @@ export default function ManageEmployees() {
     event.preventDefault();
     let data = new FormData(event.target);
     data = Object.fromEntries(data);
+    data.pending_confirmed = event.target.pending_confirmed.checked;
+    if (!data.role) {
+      data.role = "employee";
+    }
+    console.log(data);
     data = JSON.stringify(data);
+    console.log(data);
     fetch("/api/PostEmployee", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: data,
     }).then((response) => {
       if (response.ok) {
-        GetCategory();
+        GetEmployee();
         console.log("Employee Added Succesfully");
       }
     });
@@ -50,15 +56,19 @@ export default function ManageEmployees() {
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
         <label>Add Employee: </label>
-
+        <p>Name: </p>
         <input name="name" type="text" required />
+        <p>Email: </p>
         <input name="email" type="email" required />
-        <input name="password" type="text" required />
+        <p>password: </p>
+        <input name="password" type="password" required />
+        <input name="pending_confirmed" type="hidden" />
+        <input name="admin_customer_employee" type="hidden" value="employee" />
+        <p>company_id: </p>
         <input name="company_id" type="text" required />
         <input type="submit" value="Submit" />
       </form>
       <p>Existing employees:</p>
-
       {employee.map((item, index) => (
         <div>
           <h3 key={index}>{item.name}</h3>
@@ -66,7 +76,7 @@ export default function ManageEmployees() {
             onSubmit={handleRemove}
             action={`/api/DeleteEmployee/${item.id}`}
           >
-            <input type="submit" value={`Remove Employee ${item.id}`} />
+            <input type="submit" value={`Eliminate ${item.name}`} />
           </form>
         </div>
       ))}

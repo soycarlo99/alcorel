@@ -7,7 +7,7 @@ function Navigation() {
       <ul>
         <li>
           <NavLink to="/EditCategories" activeClassName="active">
-            Admin View
+            Edit Categories
           </NavLink>
         </li>
         <li>
@@ -23,6 +23,11 @@ function Navigation() {
         <li>
           <NavLink to="/AddQuestions" activeClassName="active">
             Add Questions
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/ManageEmployee" activeClassName="active">
+            Manage Employee
           </NavLink>
         </li>
       </ul>

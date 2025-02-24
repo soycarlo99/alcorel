@@ -8,6 +8,7 @@ import TicketCreation from "./customer/TicketCreation";
 import EmployeeTicket from "./EmployeeTicket";
 import Navigation from "./Navigation";
 import "./style.css";
+import ManageEmployees from "./manageEmployee";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/EditCategories" element={<EditCategories />} />
             <Route path="/EmployeeTicket" element={<EmployeeTicket />} />
             <Route path="/AddQuestions" element={<AddQuestions />} />
+            <Route path="/ManageEmployee" element={<ManageEmployees />} />
           </Routes>
         </div>
       </div>
