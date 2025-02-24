@@ -57,6 +57,7 @@ public static class TicketRoutes
     );
 
     public record QuestionAnswer(
+        int qid,
         string Question,
         string Answer
     );
@@ -229,7 +230,7 @@ public static class TicketRoutes
 
         var questionAnswers = new List<QuestionAnswer>();
         using var qaCmd = db.CreateCommand(@"
-            SELECT q.questions, txa.answer 
+            SELECT q.id, q.questions, txa.answer 
             FROM ticketxquestion txa
             JOIN questions q ON txa.question_id = q.id
             WHERE txa.ticket_id = @id
@@ -239,8 +240,9 @@ public static class TicketRoutes
         while (await qaReader.ReadAsync())
         {
             questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetString(0),
-                qaReader.GetString(1)
+                qaReader.GetInt32(0),
+                qaReader.GetString(1),
+                qaReader.GetString(2)
             ));
         }
 

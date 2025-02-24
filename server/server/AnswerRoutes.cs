@@ -12,28 +12,27 @@ public static class AnswerRoutes
     );
 
     public record PostAnswerDTO(
-    int ticketId,
-    int questionId,
+    // int ticketId,
+    // int questionId,
     string answer
     );
 
-    public static async Task<Results<Created<Answer>, BadRequest<string>>>
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
     PostAnswer(int ticketId, int questionId, PostAnswerDTO PostAnswerDTO, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"INSERT INTO ticketxquestion (ticket_id, question_id, answer) VALUES ($1, $2, $3) ");
-        command.Parameters.AddWithValue("ticket_id", PostAnswerDTO.ticketId);
-        command.Parameters.AddWithValue("question_id", PostAnswerDTO.questionId);
-        command.Parameters.AddWithValue("answer", PostAnswerDTO.answer);
+        using var command = db.CreateCommand(@"INSERT INTO ticketxquestion (ticket_id, question_id, answer) VALUES ($1, $2, $3)");
+        command.Parameters.AddWithValue(ticketId);
+        command.Parameters.AddWithValue(questionId);
+        command.Parameters.AddWithValue(PostAnswerDTO.answer);
 
         try
         {
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            int rowseffected = await command.ExecuteNonQueryAsync();
+            if (rowseffected > 0)
             {
-           
-                return TypedResults.Created($"/api/{answer.ticketId}/{answer.questionId}/postAnswer", Answer);
+                return TypedResults.Ok("The answer added succesfully");
             }
-            return TypedResults.BadRequest("Failed to add questions");
+            return TypedResults.BadRequest("Failed to add Answer");
         }
         catch (PostgresException ex)
         {
