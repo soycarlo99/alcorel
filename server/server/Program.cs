@@ -29,9 +29,8 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTicket);
 app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
-//app.MapPost("/api/ticketsJoin", TicketRoutes.GetTicketsJoined);
 app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
-
+app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
 
 
 
@@ -46,5 +45,9 @@ app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
 app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
+
+//Message APIs
+app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
+
 
 app.Run();
