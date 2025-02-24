@@ -14,10 +14,10 @@ export default function EmployeeTicket() {
 
 
   //FOR SORTING ON STATUS
+
+
+
   
-
-
-
   //FOR SOTRTING ON CATEGORY
 
   function toggleTicketsCategory() {
@@ -129,9 +129,12 @@ export default function EmployeeTicket() {
             ID ↕️
           </button>
           <button>Customer</button>
-          <button type="button" onClick={toggleTicketsCategory}>
-            Category ↕️
-          </button>
+          <input
+				type="text"
+				placeholder="Category"
+				value={query}
+				onChange={(e) => setQuery(e.target.value)}
+			/>
           <input
 				type="text"
 				placeholder="Status"
