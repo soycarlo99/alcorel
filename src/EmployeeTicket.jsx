@@ -8,12 +8,13 @@ export default function EmployeeTicket() {
   const [ticketsCategory, setTicketsCategory] = useState(true);
   const [ticketsDate, setTicketsDate] = useState(true);
 
-	const [query, setQuery] = useState('');
-
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('');
+  
   console.log(tickets);
 
 
-  //FOR SORTING ON STATUS
+  
 
 
 
@@ -116,10 +117,19 @@ export default function EmployeeTicket() {
     fetchTickets();
   }, []);
 
+
+  
+  
+  
   const filteredResults = tickets.filter(ticket =>
-    ticket.status.toLowerCase().includes(query.toLowerCase())
+      ticket.categoryName.toLowerCase().includes(category.toLowerCase()) &&
+      ticket.status.toLowerCase().includes(query.toLowerCase())
   );
 
+
+  
+  
+  
   return (
     <>
       <div className="Tickets">
@@ -132,8 +142,8 @@ export default function EmployeeTicket() {
           <input
 				type="text"
 				placeholder="Category"
-				value={query}
-				onChange={(e) => setQuery(e.target.value)}
+				value={category}
+				onChange={(e) => setCategory(e.target.value)}
 			/>
           <input
 				type="text"
@@ -153,14 +163,22 @@ export default function EmployeeTicket() {
             key={index}
             className="TicketView"
           >
+
+
+
+            
+       
+            
             <p>#{ticket.ticketId}</p>
             <p>{ticket.userName}</p>
             <p>{ticket.categoryName}</p>
             <p className={`status ${ticket.status}`}>{ticket.status}</p>
             <p>{ticket.ticketTime}</p>
           </Link>
+              
         ))}
       </div>
+      
     </>
   );
 }
