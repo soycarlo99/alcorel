@@ -73,6 +73,23 @@ export default function TicketDetails() {
     }
   }
 
+  async function handleToSolved(event) {
+    const statusdata = JSON.stringify({ status: "solved" });
+    // data = JSON.stringify(data);
+    try {
+      const response = await fetch(`/api/tickets/${id}/status`, {
+        headers: { "Content-Type": "application/json" },
+        method: "PUT",
+        body: statusdata,
+      });
+      if (response.ok) {
+        console.log("status updated");
+      }
+    } catch (error) {
+      console.error("updating status failed:", error);
+    }
+  }
+
   return (
     <>
       {ticket ? (
@@ -118,6 +135,9 @@ export default function TicketDetails() {
             <p>No messages</p>
           )}
           <div>
+            <button className="MarkAsSolved" onClick={() => handleToSolved()}>
+              Mark as solved
+            </button>
             <form className="form" onSubmit={handleAddSubmit}>
               <textarea
                 name="message"
