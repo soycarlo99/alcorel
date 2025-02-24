@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router";
 
 import EditCategories from "./EditCategories";
 import AddQuestions from "./AddQuestions";
@@ -8,6 +8,7 @@ import TicketCreation from "./customer/TicketCreation";
 import EmployeeTicket from "./EmployeeTicket";
 import Navigation from "./Navigation";
 import "./style.css";
+import TicketDetails from "./TicketDetails";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/EditCategories" element={<EditCategories />} />
             <Route path="/EmployeeTicket" element={<EmployeeTicket />} />
             <Route path="/AddQuestions" element={<AddQuestions />} />
+            <Route path="/Ticket/:id" element={<TicketDetails />} />
           </Routes>
         </div>
       </div>
