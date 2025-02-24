@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router";
 import { BrowserRouter, Routes, Route, useParams } from "react-router";
 
 import EditCategories from "./EditCategories";

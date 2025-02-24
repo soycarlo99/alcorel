@@ -5,28 +5,33 @@ namespace Server;
 public static class AnswerRoutes
 {
 
-    public static async Task<Results<Created<Answer>, BadRequest<string>>>
-    PostAnswer(PostAnswerDTO PostAnswerDTO, NpgsqlDataSource db)
-    {
-        using var command = db.CreateCommand(@"
-            INSERT INTO questions (questions, category_id) 
-            VALUES (@questions, @category_id) 
-            RETURNING id, questions, category_id");
+    public record Answer(
+    int ticketId,
+    int questionId,
+    string answer
+    );
 
-        command.Parameters.AddWithValue("questions", PostAnswerDTO.questions);
-        command.Parameters.AddWithValue("category_id", PostAnswerDTO.category_id);
+    public record PostAnswerDTO(
+    int ticketId,
+    int questionId,
+    string answer
+    );
+
+    public static async Task<Results<Created<Answer>, BadRequest<string>>>
+    PostAnswer(int ticketId, int questionId, PostAnswerDTO PostAnswerDTO, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand(@"INSERT INTO ticketxquestion (ticket_id, question_id, answer) VALUES ($1, $2, $3) ");
+        command.Parameters.AddWithValue("ticket_id", PostAnswerDTO.ticketId);
+        command.Parameters.AddWithValue("question_id", PostAnswerDTO.questionId);
+        command.Parameters.AddWithValue("answer", PostAnswerDTO.answer);
 
         try
         {
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                var question = new Question(
-                    reader.GetInt32(0),
-                    reader.GetString(1),
-                    reader.GetInt32(2)
-                );
-                return TypedResults.Created($"/api/questions/{question.id}", question);
+           
+                return TypedResults.Created($"/api/{answer.ticketId}/{answer.questionId}/postAnswer", Answer);
             }
             return TypedResults.BadRequest("Failed to add questions");
         }
