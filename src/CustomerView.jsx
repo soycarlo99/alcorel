@@ -58,6 +58,25 @@ export default function CustomerView() {
     }
   }
 
+  async function handleAnswerSubmit(event, questionId) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const answer = formData.get("answer");
+
+    try {
+      const response = await fetch(`/api/${id}/${questionId}/postAnswer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer }),
+      });
+      if (response.ok) {
+        console.log("Answer sent");
+      }
+    } catch (error) {
+      console.error("Answer submission failed:", error);
+    }
+  }
+
   return (
     <>
       {ticket ? (
@@ -79,7 +98,10 @@ export default function CustomerView() {
                   <strong>Q:</strong> {qa.question}
                 </p>
                 <strong>A:</strong>
-                <form className="form" onSubmit={handleAddSubmit}>
+                <form
+                  className="form"
+                  onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
+                >
                   <input name="answer" type="text" required />
                   <p>{qa.qid}</p>
                   <input type="submit" value="Submit" />
