@@ -18,7 +18,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        user_role admin_customer_employee,
+        string admin_customer_employee,
         int company_id
     );
 
@@ -32,7 +32,7 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        user_role admin_customer_employee,
+        string admin_customer_employee,
         int company_id
     );
 
@@ -82,44 +82,47 @@ public static class EmployeeRoutes
         return result;
     }
 
-    public static async Task<Results<Created<Employee>, BadRequest<string>>> 
-        PostEmployee(PostEmployeeDTO EmployeeDto, NpgsqlDataSource db)
-    {
-        using var command = db.CreateCommand(@"
-            INSERT INTO testuser (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
-            VALUES (@name, @email, @password, @pending_confirmed, @admin_customer_employee, @company_id) 
-            RETURNING id, name, password, company_id");
+public static async Task<Results<Created<Employee>, BadRequest<string>>> 
+    PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db)
+{
+    using var command = db.CreateCommand(@"
+        INSERT INTO testuser 
+            (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
+        VALUES 
+            (@name, @email, @password, @pending_confirmed, @role::user_role, @company_id) 
+        RETURNING 
+            id, name, email, password, pending_confirmed, admin_customer_employee, company_id");
 
-        command.Parameters.AddWithValue("name", EmployeeDto.name);
-        command.Parameters.AddWithValue("email", EmployeeDto.email);
-        command.Parameters.AddWithValue("password", EmployeeDto.password);
-        command.Parameters.AddWithValue("pending_confirmed", EmployeeDto.pending_confirmed);
-        command.Parameters.AddWithValue("admin_customer_employee", EmployeeDto.admin_customer_employee.ToString());
-        command.Parameters.AddWithValue("company_id", EmployeeDto.company_id);
-        try
-        {
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            { 
-                var employee = new Employee(
+    command.Parameters.AddWithValue("name", employeeDto.name);
+    command.Parameters.AddWithValue("email", employeeDto.email);
+    command.Parameters.AddWithValue("password", employeeDto.password);
+    command.Parameters.AddWithValue("pending_confirmed", employeeDto.pending_confirmed);
+    command.Parameters.AddWithValue("role", employeeDto.admin_customer_employee);
+    command.Parameters.AddWithValue("company_id", employeeDto.company_id);
+
+    try
+    {
+        using var reader = await command.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        { 
+            var employee = new Employee(
                 reader.GetInt32(0),
                 reader.GetString(1),
                 reader.GetString(2),
                 reader.GetString(3),
                 reader.GetBoolean(4),
-                Enum.Parse<user_role>(reader.GetString(5)),
+                reader.GetString(5), 
                 reader.GetInt32(6)
-                );
-                return TypedResults.Created($"/api/Employee/{employee.id}", employee);
-            }
-
-            return TypedResults.BadRequest("Failed to create employee");
+            );
+            return TypedResults.Created($"/api/Employee/{employee.id}", employee);
         }
-        catch (PostgresException ex)
-        {
-            return TypedResults.BadRequest($"Database error: {ex.Message}");
-        }
+        return TypedResults.BadRequest("Failed to create employee");
     }
+    catch (PostgresException ex)
+    {
+        return TypedResults.BadRequest($"Database error: {ex.Message}");
+    }
+}
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
