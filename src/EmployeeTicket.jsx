@@ -4,23 +4,15 @@ import { Link } from "react-router-dom";
 export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
   const [ticketsId, setTicketsId] = useState(true);
-  const [ticketsStatus, setTicketsStatus] = useState(true);
-  const [ticketsCategory, setTicketsCategory] = useState(true);
   const [ticketsDate, setTicketsDate] = useState(true);
 
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('');
-  
+  const [statusQuery, setStatusQuery] = useState("");
+  const [categoryQuery, setCategoryQuery] = useState("");
+
   console.log(tickets);
 
-
-  
-
-
-
-  
   //FOR SOTRTING ON CATEGORY
-
+  /*
   function toggleTicketsCategory() {
     if (ticketsCategory === true) {
       console.log(ticketsCategory);
@@ -46,6 +38,7 @@ export default function EmployeeTicket() {
     });
     setTickets(sorted1);
   };
+*/
 
   //FOR SORTING BY DATE
   function toggleTicketsDate() {
@@ -117,19 +110,12 @@ export default function EmployeeTicket() {
     fetchTickets();
   }, []);
 
-
-  
-  
-  
-  const filteredResults = tickets.filter(ticket =>
-      ticket.categoryName.toLowerCase().includes(category.toLowerCase()) &&
-      ticket.status.toLowerCase().includes(query.toLowerCase())
+  const filteredResults = tickets.filter(
+    (ticket) =>
+      ticket.status.toLowerCase().includes(statusQuery.toLowerCase()) &&
+      ticket.categoryName.toLowerCase().includes(categoryQuery.toLowerCase())
   );
 
-
-  
-  
-  
   return (
     <>
       <div className="Tickets">
@@ -140,21 +126,25 @@ export default function EmployeeTicket() {
           </button>
           <button>Customer</button>
           <input
-				type="text"
-				placeholder="Category"
-				value={category}
-				onChange={(e) => setCategory(e.target.value)}
-			/>
-          <input
-				type="text"
-				placeholder="Status"
-				value={query}
-				onChange={(e) => setQuery(e.target.value)}
-			/>
+            type="text"
+            placeholder="Category"
+            value={categoryQuery}
+            onChange={(e) => setCategoryQuery(e.target.value)}
+          />
+          <select
+            value={statusQuery}
+            onChange={(e) => setStatusQuery(e.target.value)}
+          >
+            <option value="">Status</option>
+            <option value="active">active</option>
+            <option value="waiting">waiting</option>
+            <option value="close">close</option>
+            <option value="solved">solved</option>
+
+          </select>
           <button type="button" onClick={toggleTicketsDate}>
             Date ↕️
           </button>
-          
         </div>
 
         {filteredResults.map((ticket, index) => (
@@ -163,22 +153,14 @@ export default function EmployeeTicket() {
             key={index}
             className="TicketView"
           >
-
-
-
-            
-       
-            
             <p>#{ticket.ticketId}</p>
             <p>{ticket.userName}</p>
             <p>{ticket.categoryName}</p>
             <p className={`status ${ticket.status}`}>{ticket.status}</p>
             <p>{ticket.ticketTime}</p>
           </Link>
-              
         ))}
       </div>
-      
     </>
   );
 }
