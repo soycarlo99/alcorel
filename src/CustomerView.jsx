@@ -1,0 +1,125 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+
+export default function CustomerView() {
+  const { id } = useParams();
+  const [ticket, setTicket] = useState(null);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    function fetchTicket() {
+      fetch(`/api/ticket/${id}`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Ticket not found");
+          return response.json();
+        })
+        .then((data) => {
+          setTicket(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching ticket:", error);
+        });
+    }
+
+    fetchTicket();
+  }, [handleAddSubmit]);
+
+  async function handleAddSubmit(event) {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    data = Object.fromEntries(data);
+    data = JSON.stringify(data);
+    try {
+      const response = await fetch(`/api/${id}/message`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: data,
+      });
+      if (response.ok) {
+        //await fetchTicket();
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+    }
+
+    const statusdata = JSON.stringify({ status: "active" });
+    // data = JSON.stringify(data);
+    try {
+      const response = await fetch(`/api/tickets/${id}/status`, {
+        headers: { "Content-Type": "application/json" },
+        method: "PUT",
+        body: statusdata,
+      });
+      if (response.ok) {
+        console.log("status updated");
+      }
+    } catch (error) {
+      console.error("updating status failed:", error);
+    }
+  }
+
+  return (
+    <>
+      {ticket ? (
+        <div className="ticket-details">
+          <h1>Ticket #{ticket.ticketId}</h1>
+          <p>
+            Status:{" "}
+            <span className={`status ${ticket.status}`}>{ticket.status}</span>
+          </p>
+          <p>Customer: {ticket.userName}</p>
+          <p>Category: {ticket.categoryName}</p>
+          <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
+
+          <h2>Questions & Answers</h2>
+          {ticket.questionAnswers.length > 0 ? (
+            ticket.questionAnswers.map((qa, idx) => (
+              <div key={idx} className="qa">
+                <p>
+                  <strong>Q:</strong> {qa.question}
+                </p>
+                <strong>A:</strong>
+                <form className="form" onSubmit={handleAddSubmit}>
+                  <input name="answer" type="text" required />
+                  <p>{qa.qid}</p>
+                  <input type="submit" value="Submit" />
+                </form>
+              </div>
+            ))
+          ) : (
+            <p>No Q&A found</p>
+          )}
+
+          <h2>Messages</h2>
+          {ticket.messages.length > 0 ? (
+            ticket.messages.map((msg, idx) => (
+              <div key={idx} className="message">
+                <small className="messageTime">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </small>
+                <pre readOnly className="messageTextarea">
+                  {msg.message}
+                </pre>
+              </div>
+            ))
+          ) : (
+            <p>No messages</p>
+          )}
+          <div>
+            <form className="form" onSubmit={handleAddSubmit}>
+              <textarea
+                name="message"
+                type="text"
+                required
+                placeholder="Reply ... "
+              />
+              <button type="submit">Send Reply</button>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <p>No ticket found</p>
+      )}
+    </>
+  );
+}

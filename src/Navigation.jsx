@@ -25,6 +25,11 @@ function Navigation() {
             Add Questions
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/CustomerView" activeclassname="active">
+            Customer View (reply)
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
