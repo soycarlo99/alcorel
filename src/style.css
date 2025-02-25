@@ -70,6 +70,8 @@ body {
 }
 
 .form input[type="text"],
+.form input[type="email"],
+.form input[type="password"],
 .form textarea,
 .form select {
   padding: 12px;
@@ -97,7 +99,8 @@ body {
   cursor: pointer;
 }
 
-.form button[type="submit"] {
+.form button[type="submit"],
+.form input[type="submit"] {
   background-color: #2ecc71;
   color: white;
   padding: 14px 20px;
@@ -167,7 +170,39 @@ body {
 }
 
 /* Den gör att chideren of .Tickets får också de här properties */
-.Tickets > * > * {
+.Tickets>*>* {
   text-align: left;
   padding: 5px;
+}
+
+#ElimButton {
+  background-color: red;
+  color: white;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 2px;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#ResetPassButton {
+  background-color: rgb(34, 138, 207);
+  color: white;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 2px;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.ExistingEmployeeCard {
+  margin: 10px
+}
+
+#employees {
+  margin: 0px
 }

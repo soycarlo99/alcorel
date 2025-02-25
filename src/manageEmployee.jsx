@@ -37,6 +37,7 @@ export default function ManageEmployees() {
       if (response.ok) {
         GetEmployee();
         console.log("Employee Added Succesfully");
+        document.getElementById("forum").reset();
       }
     });
   }
@@ -54,7 +55,7 @@ export default function ManageEmployees() {
 
   return (
     <div>
-      <form className="form" onSubmit={handleAddSubmit}>
+      <form id="forum" className="form" onSubmit={handleAddSubmit}>
         <label>Add Employee: </label>
         <p>Name: </p>
         <input name="name" type="text" required />
@@ -68,15 +69,16 @@ export default function ManageEmployees() {
         <input name="company_id" type="text" required />
         <input type="submit" value="Submit" />
       </form>
-      <p>Existing employees:</p>
+      <h3>Existing employees:</h3>
       {employee.map((item, index) => (
-        <div>
-          <h3 key={index}>{item.name}</h3>
+        <div className="ExistingEmployeeCard">
+          <h3 id="employees" key={index}>{item.name}</h3>
           <form
             onSubmit={handleRemove}
             action={`/api/DeleteEmployee/${item.id}`}
           >
-            <input type="submit" value={`Eliminate ${item.name}`} />
+            <input id="ElimButton" type="submit" value={`Eliminate ${item.name}`} />
+            <input id="ResetPassButton" type="submit" value={'Reset Password'} />
           </form>
         </div>
       ))}
