@@ -95,23 +95,37 @@ export default function TicketDetails() {
       {ticket ? (
         <div className="ticket-details">
           <h1>Ticket #{ticket.ticketId}</h1>
-          <p>
-            Status:{" "}
-            <span className={`status ${ticket.status}`}>{ticket.status}</span>
-          </p>
-          <p>Customer: {ticket.userName}</p>
-          <p>Category: {ticket.categoryName}</p>
-          <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
+          <div className="TicketHeader">
+            <p>
+              Status:{" "}
+              <span className={`status ${ticket.status}`}>{ticket.status}</span>
+            </p>
+            <p>
+              Customer: <strong>{ticket.userName}</strong>{" "}
+            </p>
+            <p>
+              Category: <strong>{ticket.categoryName}</strong>
+            </p>
+            <p>
+              Created:{" "}
+              <strong>{new Date(ticket.ticketTime).toLocaleString()}</strong>
+            </p>
+          </div>
 
           <h2>Questions & Answers</h2>
           {ticket.questionAnswers.length > 0 ? (
             ticket.questionAnswers.map((qa, idx) => (
               <div key={idx} className="qa">
-                <p>
+                <p className="QuestionStyle">
                   <strong>Q:</strong> {qa.question}
                 </p>
                 <p>
-                  <strong>A:</strong> {qa.answer}
+                  <strong>A:</strong>{" "}
+                  {qa.answer ? (
+                    <p className="yesReply">{qa.answer}</p>
+                  ) : (
+                    <p className="noReply">No replies yet</p>
+                  )}
                 </p>
               </div>
             ))

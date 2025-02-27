@@ -39,7 +39,7 @@ export default function CustomerView() {
       }
     }
 
-    fetchQuestions();
+    //fetchQuestions();
     fetchTicket();
   }, [handleAddSubmit]);
 
@@ -101,29 +101,31 @@ export default function CustomerView() {
       {ticket ? (
         <div className="ticket-details">
           <h1>Ticket #{ticket.ticketId}</h1>
-          <p>
-            Status:{" "}
-            <span className={`status ${ticket.status}`}>{ticket.status}</span>
-          </p>
-          <p>Customer: {ticket.userName}</p>
-          <p>Category: {ticket.categoryName}</p>
-          <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
+          <div className="TicketHeader">
+            <p>
+              Status:{" "}
+              <span className={`status ${ticket.status}`}>{ticket.status}</span>
+            </p>
+            <p>Customer: {ticket.userName}</p>
+            <p>Category: {ticket.categoryName}</p>
+            <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
+          </div>
 
           <h2>Questions & Answers</h2>
           {ticket.questionAnswers.length > 0 ? (
             ticket.questionAnswers.map((qa, idx) => (
               <div key={idx} className="qa">
-                <p>
+                <p className="QuestionStyle">
                   <strong>Q:</strong> {qa.question}
                 </p>
-                <strong>A:</strong>
                 <form
                   className="form"
                   onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
                 >
                   <input name="answer" type="text" required />
-                  <p>{qa.qid}</p>
-                  <input type="submit" value="Submit" />
+                  <button type="submit" value="Submit">
+                    Send answer
+                  </button>
                 </form>
               </div>
             ))
