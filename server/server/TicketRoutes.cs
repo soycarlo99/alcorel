@@ -57,8 +57,10 @@ public static class TicketRoutes
     );
 
     public record QuestionAnswer(
+        int qid,
         string Question,
-        string Answer
+        string? Answer,
+        int CategoryId
     );
 
     /////////////////////////
@@ -229,18 +231,22 @@ public static class TicketRoutes
 
         var questionAnswers = new List<QuestionAnswer>();
         using var qaCmd = db.CreateCommand(@"
-            SELECT q.questions, txa.answer 
-            FROM ticketxquestion txa
-            JOIN questions q ON txa.question_id = q.id
-            WHERE txa.ticket_id = @id
+            SELECT q.id, q.questions, txa.answer, c.id AS category_id
+            FROM ticket t
+            JOIN categories c ON t.category_id = c.id
+            JOIN questions q ON q.category_id = c.id
+            LEFT JOIN ticketxquestion txa ON txa.question_id = q.id AND txa.ticket_id = t.id
+            WHERE t.id = @id
         ");
         qaCmd.Parameters.AddWithValue("id", id);
         using var qaReader = await qaCmd.ExecuteReaderAsync();
         while (await qaReader.ReadAsync())
         {
             questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetString(0),
-                qaReader.GetString(1)
+                qaReader.GetInt32(0),  
+                qaReader.GetString(1), 
+                qaReader.IsDBNull(2) ? null : qaReader.GetString(2), 
+                qaReader.GetInt32(3) 
             ));
         }
 

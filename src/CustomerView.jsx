@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-export default function TicketDetails() {
+export default function CustomerView() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [message, setMessage] = useState(null);
@@ -21,21 +21,25 @@ export default function TicketDetails() {
         });
     }
 
-    // function fetchMessage() {
-    //   fetch(`/api/${id}/message`)
-    //     .then((response) => {
-    //       if (!response.ok) throw new Error("Message not found");
-    //       return response.json();
-    //     })
-    //     .then((data) => {
-    //       setTicket(data);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching message:", error);
-    //     });
-    // }
+    async function fetchQuestions() {
+      try {
+        const response = await fetch(`api/questions/${category_id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`status: ${response.status}`);
+        }
+        const body = await response.json();
+        setQuestionsList(body);
+      } catch (error) {
+        console.error("Fetching questions failed:", error);
+      }
+    }
 
-    // fetchMessage();
+    //fetchQuestions();
     fetchTicket();
   }, [handleAddSubmit]);
 
@@ -73,20 +77,22 @@ export default function TicketDetails() {
     }
   }
 
-  async function handleToSolved(event) {
-    const statusdata = JSON.stringify({ status: "solved" });
-    // data = JSON.stringify(data);
+  async function handleAnswerSubmit(event, questionId) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const answer = formData.get("answer");
+
     try {
-      const response = await fetch(`/api/tickets/${id}/status`, {
+      const response = await fetch(`/api/${id}/${questionId}/postAnswer`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        method: "PUT",
-        body: statusdata,
+        body: JSON.stringify({ answer }),
       });
       if (response.ok) {
-        console.log("status updated");
+        console.log("Answer sent");
       }
     } catch (error) {
-      console.error("updating status failed:", error);
+      console.error("Answer submission failed:", error);
     }
   }
 
@@ -100,16 +106,9 @@ export default function TicketDetails() {
               Status:{" "}
               <span className={`status ${ticket.status}`}>{ticket.status}</span>
             </p>
-            <p>
-              Customer: <strong>{ticket.userName}</strong>{" "}
-            </p>
-            <p>
-              Category: <strong>{ticket.categoryName}</strong>
-            </p>
-            <p>
-              Created:{" "}
-              <strong>{new Date(ticket.ticketTime).toLocaleString()}</strong>
-            </p>
+            <p>Customer: {ticket.userName}</p>
+            <p>Category: {ticket.categoryName}</p>
+            <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
           </div>
 
           <h2>Questions & Answers</h2>
@@ -119,14 +118,15 @@ export default function TicketDetails() {
                 <p className="QuestionStyle">
                   <strong>Q:</strong> {qa.question}
                 </p>
-                <p>
-                  <strong>A:</strong>{" "}
-                  {qa.answer ? (
-                    <p className="yesReply">{qa.answer}</p>
-                  ) : (
-                    <p className="noReply">No replies yet</p>
-                  )}
-                </p>
+                <form
+                  className="form"
+                  onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
+                >
+                  <input name="answer" type="text" required />
+                  <button type="submit" value="Submit">
+                    Send answer
+                  </button>
+                </form>
               </div>
             ))
           ) : (
@@ -149,9 +149,6 @@ export default function TicketDetails() {
             <p>No messages</p>
           )}
           <div>
-            <button className="MarkAsSolved" onClick={() => handleToSolved()}>
-              Mark as solved
-            </button>
             <form className="form" onSubmit={handleAddSubmit}>
               <textarea
                 name="message"

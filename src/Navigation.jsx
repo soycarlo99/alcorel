@@ -6,7 +6,7 @@ function Navigation() {
     <nav className="sidebar">
       <ul>
         <li>
-          <NavLink to="/EditCategories" activeClassName="active">
+          <NavLink to="/EditCategories" activeclassname="active">
             Edit Categories
           </NavLink>
         </li>
@@ -28,6 +28,11 @@ function Navigation() {
         <li>
           <NavLink to="/ManageEmployee" activeclassname="active">
             Manage Employee
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/CustomerView" activeclassname="active">
+            Customer View (reply)
           </NavLink>
         </li>
       </ul>
