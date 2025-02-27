@@ -72,13 +72,18 @@ export default function ManageEmployees() {
       <h3>Existing employees:</h3>
       {employee.map((item, index) => (
         <div className="ExistingEmployeeCard">
-          <h3 id="employees" key={index}>{item.name}</h3>
+          <h3 id="employees" key={index}>
+            {item.name}
+          </h3>
           <form
             onSubmit={handleRemove}
             action={`/api/DeleteEmployee/${item.id}`}
           >
-            <input id="ElimButton" type="submit" value={`Eliminate ${item.name}`} />
-            <input id="ResetPassButton" type="submit" value={'Reset Password'} />
+            <input
+              id="ElimButton"
+              type="submit"
+              value={`Eliminate ${item.name}`}
+            />
           </form>
         </div>
       ))}

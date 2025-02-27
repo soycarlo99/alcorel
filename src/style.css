@@ -181,7 +181,7 @@ body {
 }
 
 /* Den gör att chideren of .Tickets får också de här properties */
-.Tickets>*>* {
+.Tickets > * > * {
   text-align: left;
   padding: 5px;
 }
@@ -191,11 +191,12 @@ body {
   color: white;
   padding: 7px 10px;
   border: none;
-  border-radius: 2px;
+  border-radius: 10px;
   font-size: 15px;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   transition: background-color 0.3s ease;
+  margin-top: 5px;
 }
 
 #ResetPassButton {
@@ -211,11 +212,11 @@ body {
 }
 
 .ExistingEmployeeCard {
-  margin: 10px
+  margin: 10px;
 }
 
 #employees {
-  margin: 0px
+  margin: 0px;
 }
 .messageTextarea {
   width: 30%;
