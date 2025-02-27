@@ -5,6 +5,7 @@ export default function CustomerView() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [message, setMessage] = useState(null);
+  const [answered, setAnswered] = useState({});
 
   useEffect(() => {
     function fetchTicket() {
@@ -55,7 +56,6 @@ export default function CustomerView() {
         body: data,
       });
       if (response.ok) {
-        //await fetchTicket();
       }
     } catch (error) {
       console.error("Submission failed:", error);
@@ -90,6 +90,7 @@ export default function CustomerView() {
       });
       if (response.ok) {
         console.log("Answer sent");
+        setAnswered((prev) => ({ ...prev, [questionId]: true }));
       }
     } catch (error) {
       console.error("Answer submission failed:", error);
@@ -122,8 +123,13 @@ export default function CustomerView() {
                   className="form"
                   onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
                 >
-                  <input name="answer" type="text" required />
-                  <button type="submit" value="Submit">
+                  <input name="answer" type="text" value={qa.answer} required />
+                  <button
+                    className="sendAnswer"
+                    name="sendAnswer"
+                    type="submit"
+                    disabled={answered[qa.qid]}
+                  >
                     Send answer
                   </button>
                 </form>
