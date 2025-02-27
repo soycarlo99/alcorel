@@ -196,7 +196,6 @@ body {
   cursor: pointer;
   padding: 10px;
   transition: background-color 0.3s ease;
-  margin-top: 5px;
 }
 
 #ResetPassButton {
@@ -268,4 +267,10 @@ pre {
   padding: 10px 10px;
   border-radius: 10px;
   background-color: rgba(0, 214, 18, 0.41);
+}
+
+.sendAnswer:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }
