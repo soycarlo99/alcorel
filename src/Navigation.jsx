@@ -11,22 +11,22 @@ function Navigation() {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/EmployeeTicket" activeClassName="active">
+          <NavLink to="/EmployeeTicket" activeclassname="active">
             Employee Tickets
           </NavLink>
         </li>
         <li>
-          <NavLink exact to="/" activeClassName="active">
+          <NavLink exact to="/" activeclassname="active">
             Create Ticket
           </NavLink>
         </li>
         <li>
-          <NavLink to="/AddQuestions" activeClassName="active">
+          <NavLink to="/AddQuestions" activeclassname="active">
             Add Questions
           </NavLink>
         </li>
         <li>
-          <NavLink to="/ManageEmployee" activeClassName="active">
+          <NavLink to="/ManageEmployee" activeclassname="active">
             Manage Employee
           </NavLink>
         </li>
