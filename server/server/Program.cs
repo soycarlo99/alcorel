@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
-var password = builder.Configuration["PG_PASSWORD"] ?? "martinsson123";
+var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
 var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
 
 NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
@@ -51,5 +51,9 @@ app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory)
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
 app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 
+//Employee APIs
+app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
+app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
+app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 
 app.Run();
