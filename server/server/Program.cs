@@ -49,5 +49,9 @@ app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory)
 //Message APIs
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
 
+//Employee APIs
+app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
+app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
+app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 
 app.Run();

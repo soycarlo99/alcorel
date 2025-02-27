@@ -6,8 +6,8 @@ function Navigation() {
     <nav className="sidebar">
       <ul>
         <li>
-          <NavLink to="/EditCategories" activeclassname="active">
-            Admin View
+          <NavLink to="/EditCategories" activeClassName="active">
+            Edit Categories
           </NavLink>
         </li>
         <li>
@@ -23,6 +23,11 @@ function Navigation() {
         <li>
           <NavLink to="/AddQuestions" activeclassname="active">
             Add Questions
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/ManageEmployee" activeclassname="active">
+            Manage Employee
           </NavLink>
         </li>
       </ul>
