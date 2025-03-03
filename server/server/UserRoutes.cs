@@ -53,6 +53,7 @@ public static class UserRoutes
         }
     }
 
+    //ADD COMPANY ____--__-----_____-----______------___-
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
@@ -67,8 +68,8 @@ public static class UserRoutes
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
-            
-            
+
+
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
             if (insertUserResult is int userId)
             {
