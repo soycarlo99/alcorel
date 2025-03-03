@@ -1,28 +1,35 @@
 using Npgsql;
 using Server;
 
-var builder = WebApplication.CreateBuilder(args);
 
+var builder = WebApplication.CreateBuilder(args);
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
 var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
 var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
 
-NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
+var dataSourceBuilder = new NpgsqlDataSourceBuilder($"Host={host};Port={port};Username={username};Password={password};Database={database}");
+dataSourceBuilder.EnableUnmappedTypes();
+var databaseBuilder = dataSourceBuilder.Build();
 
-builder.Services.AddSingleton<NpgsqlDataSource>(db);
+builder.Services.AddSingleton<NpgsqlDataSource>(databaseBuilder);
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => { options.Cookie.IsEssential = true; });
 
 var app = builder.Build();
+
+app.UseSession();
 
 
 
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/users", UserRoutes.PostUser);
-app.MapPost("/api/login", UserRoutes.CheckCredentials);
+//app.MapPost("/api/login", UserRoutes.CheckCredentials);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
-
+app.MapPost("/api/login", UserRoutes.Post);
 
 
 //Ticket APIs
