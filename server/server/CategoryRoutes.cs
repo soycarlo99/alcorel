@@ -47,6 +47,26 @@ public static class CategoryRoutes
         return result;
     }
 
+    public record GetCategoriesByIdDTO(int id, string category_name, int company_id);
+    public static async Task<List<GetCategoriesDTO>> GetCategoriesById(int categoryId, NpgsqlDataSource db)
+    {
+        List<GetCategoriesDTO> result = new();
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1"); 
+
+        query.Parameters.AddWithValue(categoryId);
+        using var reader = await query.ExecuteReaderAsync();
+        
+        while(await reader.ReadAsync())
+        {
+            result.Add(new(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetInt32(2)
+            ));
+        }
+        return result;
+    }
+
     public static async Task<Results<Created<Category>, BadRequest<string>>> 
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db)
     {

@@ -70,6 +70,8 @@ body {
 }
 
 .form input[type="text"],
+.form input[type="email"],
+.form input[type="password"],
 .form textarea,
 .form select {
   padding: 12px;
@@ -97,7 +99,8 @@ body {
   cursor: pointer;
 }
 
-.form button[type="submit"] {
+.form button[type="submit"],
+.form input[type="submit"] {
   background-color: #2ecc71;
   color: white;
   padding: 14px 20px;
@@ -183,6 +186,37 @@ body {
   padding: 5px;
 }
 
+#ElimButton {
+  background-color: red;
+  color: white;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+#ResetPassButton {
+  background-color: rgb(34, 138, 207);
+  color: white;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 2px;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.ExistingEmployeeCard {
+  margin: 10px;
+}
+
+#employees {
+  margin: 0px;
+}
 .messageTextarea {
   width: 30%;
   height: fit-content;
@@ -199,4 +233,44 @@ body {
 
 pre {
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.QuestionStyle {
+  display: inline-block;
+  background-color: rgba(159, 159, 159, 0.28);
+  padding: 10px 10px;
+  border-radius: 15px;
+  size-adjust: initial;
+  margin-top: 15px;
+}
+
+.qa p {
+  margin-top: 0px;
+}
+
+.TicketHeader {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+.noReply {
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: rgba(215, 67, 0, 0.55);
+}
+
+.yesReply {
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: rgba(0, 214, 18, 0.41);
+}
+
+.sendAnswer:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }
