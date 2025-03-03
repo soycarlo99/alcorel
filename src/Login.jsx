@@ -4,7 +4,8 @@ import {BrowserRouter, Routes, Route, useNavigate} from 'react-router'
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+let navigate = useNavigate();
+  
   function handleLogin(event) {
     event.preventDefault();
 
@@ -15,8 +16,8 @@ export default function Login() {
     }).then((response) => {
       if (response.ok) {
         response.text().then(location => {navigate(location.slice(1,-1))});
-        setEmail("");
-        setPassword("");
+        //setEmail("");
+        //setPassword("");
       }
     });
   }
@@ -41,7 +42,7 @@ export default function Login() {
         />
       </div>
       <div>
-        <button onChange={handleLogin}>Login</button>
+        <button onClick={handleLogin}>Login</button>
       </div>
     </>
   );
