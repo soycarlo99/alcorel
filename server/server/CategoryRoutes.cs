@@ -30,10 +30,18 @@ public static class CategoryRoutes
     /////////////////////////
 
     public record GetCategoriesDTO(int id, string category_name, int company_id);
-    public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db)
+    public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db, HttpContext ctx)
     {
+
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return new List<GetCategoriesDTO>();
+        }
         List<GetCategoriesDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories"); //WHERE company_id = @company_id
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE company_id = $1");//WHERE company_id = @company_id
+
+        query.Parameters.AddWithValue(companyId);
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())
