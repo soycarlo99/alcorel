@@ -54,13 +54,10 @@ app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
-<<<<<<< HEAD
-=======
 //Message APIs
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
 app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 
->>>>>>> bef1d7343bfeea6cca7a81b7933e4ab3e86aa08c
 //Employee APIs
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
