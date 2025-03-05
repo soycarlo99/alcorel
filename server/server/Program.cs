@@ -45,8 +45,10 @@ app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
+//Employee APIs
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
+app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
 
 app.Run();
