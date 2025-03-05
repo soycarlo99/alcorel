@@ -65,8 +65,6 @@ export default function ManageEmployees() {
         <input name="password" type="password" required />
         <input name="pending_confirmed" type="hidden" />
         <input name="admin_customer_employee" type="hidden" value="employee" />
-        <p>company_id: </p>
-        <input name="company_id" type="text" required />
         <input type="submit" value="Submit" />
       </form>
       <h3>Existing employees:</h3>
