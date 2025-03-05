@@ -162,4 +162,30 @@ public static async Task<Results<Created<Employee>, BadRequest<string>>>
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
     }
+
+     public static async Task<Results<Ok<string>, BadRequest<string>>>
+    ResetPassword(int testuserId, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = 'hej' WHERE id = @selected_employee");
+        
+        command.Parameters.AddWithValue("selected_employee", testuserId);
+
+        try
+        {
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+                return TypedResults.Ok($"Updated {rowsAffected} employee successfully");
+            }
+            else
+            {
+                return TypedResults.Ok("No employees password updated");
+            }
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 }
