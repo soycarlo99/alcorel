@@ -16,33 +16,31 @@ export default function CustomerView() {
         })
         .then((data) => {
           setTicket(data);
+          if (data && data.email) {
+            login(data);
+          }
         })
         .catch((error) => {
           console.error("Error fetching ticket:", error);
         });
     }
 
-    async function fetchQuestions() {
-      try {
-        const response = await fetch(`api/questions/${category_id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`status: ${response.status}`);
-        }
-        const body = await response.json();
-        setQuestionsList(body);
-      } catch (error) {
-        console.error("Fetching questions failed:", error);
-      }
-    }
-
-    //fetchQuestions();
     fetchTicket();
-  }, [handleAddSubmit]);
+  }, [id]);
+
+  function login(ticket) {
+    fetch("/api/customersesh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: ticket.email }),
+    }).then((response) => {
+      if (response.ok) {
+        console.log("ok!");
+      } else {
+        console.error("response not ok");
+      }
+    });
+  }
 
   async function handleAddSubmit(event) {
     event.preventDefault();

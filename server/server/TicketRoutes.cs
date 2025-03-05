@@ -47,6 +47,7 @@ public static class TicketRoutes
         string Status,
         string CategoryName,
         string UserName,
+        string Email,
         List<TicketMessage> Messages,
         List<QuestionAnswer> QuestionAnswers
     );
@@ -201,7 +202,7 @@ public static class TicketRoutes
     public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketById(int id, NpgsqlDataSource db)
     {
         var ticketQuery = @"
-            SELECT t.id, t.ticket_time, t.status, c.category_name, u.name 
+            SELECT t.id, t.ticket_time, t.status, c.category_name, u.name, u.email
             FROM ticket t
             JOIN categories c ON t.category_id = c.id
             JOIN testuser u ON t.user_id = u.id
@@ -220,7 +221,8 @@ public static class TicketRoutes
             TicketTime = ticketReader.GetDateTime(1),
             Status = ticketReader.GetString(2),
             CategoryName = ticketReader.GetString(3),
-            UserName = ticketReader.GetString(4)
+            UserName = ticketReader.GetString(4),
+            Email = ticketReader.GetString(5)
         };
 
         var messages = new List<TicketMessage>();
@@ -264,6 +266,7 @@ public static class TicketRoutes
             ticket.Status,
             ticket.CategoryName,
             ticket.UserName,
+            ticket.Email,
             messages,
             questionAnswers
         );

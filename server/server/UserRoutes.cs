@@ -196,15 +196,15 @@ public static class UserRoutes
 
 
 
-    public record Credentials(string Email, string Password);
+    public record Credentials(string Email, string? Password);
     public record LoginResponse(string redirectPath, int companyId);
 
     public static async Task<Results<Ok<LoginResponse>, BadRequest>>
     Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1 and password = $2");
-        cmd.Parameters.AddWithValue(credentials.Email);
-        cmd.Parameters.AddWithValue(credentials.Password);
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = @email and password = @password");
+        cmd.Parameters.AddWithValue("@email",credentials.Email);
+        cmd.Parameters.AddWithValue("@password", credentials.Password);
         using var reader = await cmd.ExecuteReaderAsync();
 
         if(await reader.ReadAsync())
@@ -242,4 +242,39 @@ public static class UserRoutes
             return TypedResults.BadRequest();
         }
     }
+
+
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
+    CustomerVisit(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+    {
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1");
+        cmd.Parameters.AddWithValue(credentials.Email);
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        if(await reader.ReadAsync())
+        {
+            var role = reader.GetFieldValue<UserRole>(1);
+            var companyId = reader.GetInt32(2);
+            
+            ctx.Session.SetString("name", reader.GetString(0));
+            ctx.Session.SetInt32("role", (int)role);
+            ctx.Session.SetInt32("companyId", companyId);
+
+            string location = "";
+            switch(role)
+            {
+                case UserRole.customer:
+                {
+                    location = "/customer/dashboard";
+                } break;
+            }
+            
+            return TypedResults.Ok(new LoginResponse(location, companyId));
+        }
+        else
+        {
+            return TypedResults.BadRequest();
+        }
+    }
+
 }
