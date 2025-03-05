@@ -181,7 +181,7 @@ body {
 }
 
 /* Den gör att chideren of .Tickets får också de här properties */
-.Tickets>*>* {
+.Tickets > * > * {
   text-align: left;
   padding: 5px;
 }
@@ -191,10 +191,10 @@ body {
   color: white;
   padding: 7px 10px;
   border: none;
-  border-radius: 2px;
+  border-radius: 10px;
   font-size: 15px;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   transition: background-color 0.3s ease;
 }
 
@@ -211,11 +211,11 @@ body {
 }
 
 .ExistingEmployeeCard {
-  margin: 10px
+  margin: 10px;
 }
 
 #employees {
-  margin: 0px
+  margin: 0px;
 }
 .messageTextarea {
   width: 30%;
@@ -233,4 +233,44 @@ body {
 
 pre {
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.QuestionStyle {
+  display: inline-block;
+  background-color: rgba(159, 159, 159, 0.28);
+  padding: 10px 10px;
+  border-radius: 15px;
+  size-adjust: initial;
+  margin-top: 15px;
+}
+
+.qa p {
+  margin-top: 0px;
+}
+
+.TicketHeader {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+.noReply {
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: rgba(215, 67, 0, 0.55);
+}
+
+.yesReply {
+  display: inline-block;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: rgba(0, 214, 18, 0.41);
+}
+
+.sendAnswer:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }

@@ -57,8 +57,10 @@ public static class TicketRoutes
     );
 
     public record QuestionAnswer(
+        int qid,
         string Question,
-        string Answer
+        string? Answer,
+        int CategoryId
     );
 
     /////////////////////////
@@ -149,8 +151,13 @@ public static class TicketRoutes
         }
     }
 
-    public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db)
+    public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db, HttpContext ctx)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null){
+          return new List<DetailedTicket>();
+        }
+
         List<DetailedTicket> result = new();
         string query = @"
             SELECT
@@ -165,9 +172,12 @@ public static class TicketRoutes
                 Categories c ON t.category_id = c.id
                     JOIN
                 testuser u ON t.user_id = u.id
+            WHERE
+                u.company_id = @companyId
             ORDER BY t.ticket_time DESC;";
 
         using var command = db.CreateCommand(query);
+        command.Parameters.AddWithValue("companyId", companyId);
         using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -229,18 +239,22 @@ public static class TicketRoutes
 
         var questionAnswers = new List<QuestionAnswer>();
         using var qaCmd = db.CreateCommand(@"
-            SELECT q.questions, txa.answer 
-            FROM ticketxquestion txa
-            JOIN questions q ON txa.question_id = q.id
-            WHERE txa.ticket_id = @id
+            SELECT q.id, q.questions, txa.answer, c.id AS category_id
+            FROM ticket t
+            JOIN categories c ON t.category_id = c.id
+            JOIN questions q ON q.category_id = c.id
+            LEFT JOIN ticketxquestion txa ON txa.question_id = q.id AND txa.ticket_id = t.id
+            WHERE t.id = @id
         ");
         qaCmd.Parameters.AddWithValue("id", id);
         using var qaReader = await qaCmd.ExecuteReaderAsync();
         while (await qaReader.ReadAsync())
         {
             questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetString(0),
-                qaReader.GetString(1)
+                qaReader.GetInt32(0),  
+                qaReader.GetString(1), 
+                qaReader.IsDBNull(2) ? null : qaReader.GetString(2), 
+                qaReader.GetInt32(3) 
             ));
         }
 

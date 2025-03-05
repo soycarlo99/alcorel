@@ -9,20 +9,27 @@ var username = builder.Configuration["PG_USER"] ?? "postgres";
 var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
 var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
 
-NpgsqlDataSource db = NpgsqlDataSource.Create($"Host={host};Port={port};Username={username};Password={password};Database={database}");
+var dataSourceBuilder = new NpgsqlDataSourceBuilder($"Host={host};Port={port};Username={username};Password={password};Database={database}");
+dataSourceBuilder.EnableUnmappedTypes();
+var databaseBuilder = dataSourceBuilder.Build();
 
-builder.Services.AddSingleton<NpgsqlDataSource>(db);
+builder.Services.AddSingleton<NpgsqlDataSource>(databaseBuilder);
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => { options.Cookie.IsEssential = true; });
 
 var app = builder.Build();
+
+app.UseSession();
 
 
 
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/users", UserRoutes.PostUser);
-app.MapPost("/api/login", UserRoutes.CheckCredentials);
+//app.MapPost("/api/login", UserRoutes.CheckCredentials);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
-
+app.MapPost("/api/login", UserRoutes.Post);
 
 
 //Ticket APIs
@@ -43,6 +50,7 @@ app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
 
 //Category APIs
 app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
+app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
@@ -50,6 +58,7 @@ app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory)
 =======
 //Message APIs
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
+app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 
 >>>>>>> bef1d7343bfeea6cca7a81b7933e4ab3e86aa08c
 //Employee APIs

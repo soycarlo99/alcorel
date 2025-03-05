@@ -10,11 +10,6 @@ public static class CategoryRoutes
         int company_id
     );
 
-
-    /////////////////////////
-    ///Våran DTOs grabbar!!!!
-    /////////////////////////
-
     public record PostCategoryDTO(
         int id,
         string category_name,
@@ -25,15 +20,38 @@ public static class CategoryRoutes
         int id
     );
 
-    /////////////////////////
-    ///TheEnd!!!!!!!!!!!!!!!!
-    /////////////////////////
-
     public record GetCategoriesDTO(int id, string category_name, int company_id);
-    public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db)
+    public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db, HttpContext ctx)
+    {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return new List<GetCategoriesDTO>();
+        }
+        
+        List<GetCategoriesDTO> result = new();
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE company_id = @companyId");
+        query.Parameters.AddWithValue("companyId", companyId);
+        using var reader = await query.ExecuteReaderAsync();
+        
+        while(await reader.ReadAsync())
+        {
+            result.Add(new(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetInt32(2)
+            ));
+        }
+        return result;
+    }
+
+    public record GetCategoriesByIdDTO(int id, string category_name, int company_id);
+    public static async Task<List<GetCategoriesDTO>> GetCategoriesById(int categoryId, NpgsqlDataSource db)
     {
         List<GetCategoriesDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories"); //WHERE company_id = @company_id
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1"); 
+
+        query.Parameters.AddWithValue(categoryId);
         using var reader = await query.ExecuteReaderAsync();
         
         while(await reader.ReadAsync())
@@ -48,12 +66,18 @@ public static class CategoryRoutes
     }
 
     public static async Task<Results<Created<Category>, BadRequest<string>>> 
-        PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db)
+        PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db, HttpContext ctx)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null || companyId != categoryDto.company_id)
+        {
+            return TypedResults.BadRequest("Unauthorized or invalid company ID");
+        }
+        
         using var command = db.CreateCommand(@"
             INSERT INTO categories (category_name, company_id) 
             VALUES (@category_name, @company_id) 
-            RETURNING id, category_name, company_id");   //WHERE company_id = @company_id
+            RETURNING id, category_name, company_id");
         
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
         command.Parameters.AddWithValue("company_id", categoryDto.company_id);
@@ -64,10 +88,10 @@ public static class CategoryRoutes
             {
                 var category = new Category(
                     reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetInt32(2)
+                    reader.GetString(1),
+                    reader.GetInt32(2)
                 );
-                return TypedResults.Created($"/api/categories/{categoryDto.id}", category);
+                return TypedResults.Created($"/api/categories/{category.id}", category);
             }
             return TypedResults.BadRequest("Failed to create category");
         }
@@ -77,11 +101,10 @@ public static class CategoryRoutes
         }
     }
 
-
     public static async Task<Results<Ok<string>, BadRequest<string>>>
     RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
-        using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");  //WHERE company_id = @company_id
+        using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
         
         command.Parameters.AddWithValue("selected_category", categoryId);
 
