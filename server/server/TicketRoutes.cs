@@ -41,6 +41,26 @@ public static class TicketRoutes
 
     public record UpdateStatusDTO(string Status);
 
+    public record FullTicketDetails(
+        int TicketId,
+        DateTime TicketTime,
+        string Status,
+        string CategoryName,
+        string UserName,
+        List<TicketMessage> Messages,
+        List<QuestionAnswer> QuestionAnswers
+    );
+
+    public record TicketMessage(
+        string Message,
+        DateTime Timestamp
+    );
+
+    public record QuestionAnswer(
+        string Question,
+        string Answer
+    );
+
     /////////////////////////
     ///TheEnd!!!!!!!!!!!!!!!!
     /////////////////////////
@@ -108,11 +128,11 @@ public static class TicketRoutes
         using var command = db.CreateCommand(@"
             UPDATE ticket
             SET status = @status
-            WHERE ticket_id = @ticket_id
-            RETURNING ticket_id, status");
+            WHERE id = @ticket_id
+            RETURNING id, status");
 
         command.Parameters.AddWithValue("status", newStatus);
-        command.Parameters.AddWithValue("id", ticketId);
+        command.Parameters.AddWithValue("ticket_id", ticketId);
 
         try
         {
@@ -138,48 +158,103 @@ public static class TicketRoutes
                 t.ticket_time,
                 t.status,
                 c.category_name,
-                u.name AS user_name,
-                tm.message,
-                tm.timestamp AS message_timestamp,
-                tqa.answer,
-                q.questions AS answer_question
+                u.name AS user_name
             FROM
                 Ticket t
                     JOIN
                 Categories c ON t.category_id = c.id
                     JOIN
                 testuser u ON t.user_id = u.id
-                    LEFT JOIN
-                ticket_messages tm ON t.id = tm.ticket_id
-                    LEFT JOIN
-                TicketXQuestion tqa ON t.id = tqa.ticket_id
-                    LEFT JOIN
-                questions q ON tqa.question_id = q.id
-            ORDER BY
-                tm.timestamp ASC,
-                tqa.question_id ASC;";
+            ORDER BY t.ticket_time DESC;";
 
         using var command = db.CreateCommand(query);
         using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            string message = reader.IsDBNull(5) ? "No messages" : reader.GetString(5);
-            string answer = reader.IsDBNull(7) ? "No answer provided" : reader.GetString(7);
-            string answerQuestion = reader.IsDBNull(8) ? "No question provided" : reader.GetString(8);
-
             result.Add(new DetailedTicket(
-                reader.GetInt32(0),
+                reader.GetInt32(0), 
                 reader.GetFieldValue<DateTime>(1),
                 reader.GetString(2),
                 reader.GetString(3),
                 reader.GetString(4),
-                message,
-                reader.IsDBNull(6) ? (DateTime?)null : reader.GetFieldValue<DateTime>(6),
-                answer,
-                answerQuestion
+                "", 
+                null,
+                "", 
+                "" 
             ));
         }
         return result;
     }
+
+
+    public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketById(int id, NpgsqlDataSource db)
+    {
+        var ticketQuery = @"
+            SELECT t.id, t.ticket_time, t.status, c.category_name, u.name 
+            FROM ticket t
+            JOIN categories c ON t.category_id = c.id
+            JOIN testuser u ON t.user_id = u.id
+            WHERE t.id = @id";
+        
+        using var ticketCmd = db.CreateCommand(ticketQuery);
+        ticketCmd.Parameters.AddWithValue("id", id);
+        using var ticketReader = await ticketCmd.ExecuteReaderAsync();
+        
+        if (!await ticketReader.ReadAsync())
+            return TypedResults.NotFound();
+
+        var ticket = new 
+        {
+            Id = ticketReader.GetInt32(0),
+            TicketTime = ticketReader.GetDateTime(1),
+            Status = ticketReader.GetString(2),
+            CategoryName = ticketReader.GetString(3),
+            UserName = ticketReader.GetString(4)
+        };
+
+        var messages = new List<TicketMessage>();
+        using var messagesCmd = db.CreateCommand(
+            "SELECT message, timestamp FROM ticket_messages WHERE ticket_id = @id ORDER BY timestamp"
+        );
+        messagesCmd.Parameters.AddWithValue("id", id);
+        using var messagesReader = await messagesCmd.ExecuteReaderAsync();
+        while (await messagesReader.ReadAsync())
+        {
+            messages.Add(new TicketMessage(
+                messagesReader.GetString(0),
+                messagesReader.GetDateTime(1)
+            ));
+        }
+
+        var questionAnswers = new List<QuestionAnswer>();
+        using var qaCmd = db.CreateCommand(@"
+            SELECT q.questions, txa.answer 
+            FROM ticketxquestion txa
+            JOIN questions q ON txa.question_id = q.id
+            WHERE txa.ticket_id = @id
+        ");
+        qaCmd.Parameters.AddWithValue("id", id);
+        using var qaReader = await qaCmd.ExecuteReaderAsync();
+        while (await qaReader.ReadAsync())
+        {
+            questionAnswers.Add(new QuestionAnswer(
+                qaReader.GetString(0),
+                qaReader.GetString(1)
+            ));
+        }
+
+        var fullDetails = new FullTicketDetails(
+            ticket.Id,
+            ticket.TicketTime,
+            ticket.Status,
+            ticket.CategoryName,
+            ticket.UserName,
+            messages,
+            questionAnswers
+        );
+
+        return TypedResults.Ok(fullDetails);
+  }
+
 }
