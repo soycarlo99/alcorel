@@ -32,8 +32,8 @@ public static class EmployeeRoutes
         string email,
         string password,
         bool pending_confirmed,
-        string admin_customer_employee,
-        int company_id
+        string admin_customer_employee
+        // int company_id
     );
 
     public record DeleteEmployeeDTO(
@@ -60,10 +60,17 @@ public static class EmployeeRoutes
     /////////////////////////
 
 
-    public static async Task<List<GetEmployeeDTO>> GetEmployee(NpgsqlDataSource db)
+    public static async Task<List<GetEmployeeDTO>> GetEmployee(NpgsqlDataSource db, HttpContext ctx)
     {
+      int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return new List<GetEmployeeDTO>();
+        }
+
         List<GetEmployeeDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, name, email, password, pending_confirmed, company_id FROM testuser WHERE admin_customer_employee = 'employee'");
+        using var query = db.CreateCommand("SELECT id, name, email, password, pending_confirmed, company_id FROM testuser WHERE admin_customer_employee = 'employee' AND company_id = @companyId");
+        query.Parameters.AddWithValue("companyId", companyId);
         using var reader = await query.ExecuteReaderAsync();
        
   
@@ -83,8 +90,13 @@ public static class EmployeeRoutes
     }
 
 public static async Task<Results<Created<Employee>, BadRequest<string>>> 
-    PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db)
+    PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db, HttpContext ctx)
 {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return TypedResults.BadRequest("You don't have a company ID");
+        }
     using var command = db.CreateCommand(@"
         INSERT INTO testuser 
             (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
@@ -98,7 +110,7 @@ public static async Task<Results<Created<Employee>, BadRequest<string>>>
     command.Parameters.AddWithValue("password", employeeDto.password);
     command.Parameters.AddWithValue("pending_confirmed", employeeDto.pending_confirmed);
     command.Parameters.AddWithValue("role", employeeDto.admin_customer_employee);
-    command.Parameters.AddWithValue("company_id", employeeDto.company_id);
+    command.Parameters.AddWithValue("company_id", companyId);
 
     try
     {
@@ -143,6 +155,32 @@ public static async Task<Results<Created<Employee>, BadRequest<string>>>
             else
             {
                 return TypedResults.Ok("No employees deleted");
+            }
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
+
+     public static async Task<Results<Ok<string>, BadRequest<string>>>
+    ResetPassword(int testuserId, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = 'hej' WHERE id = @selected_employee");
+        
+        command.Parameters.AddWithValue("selected_employee", testuserId);
+
+        try
+        {
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+                return TypedResults.Ok($"Updated {rowsAffected} employee successfully");
+            }
+            else
+            {
+                return TypedResults.Ok("No employees password updated");
             }
         }
         catch (PostgresException ex)

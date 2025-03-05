@@ -151,8 +151,13 @@ public static class TicketRoutes
         }
     }
 
-    public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db)
+    public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db, HttpContext ctx)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null){
+          return new List<DetailedTicket>();
+        }
+
         List<DetailedTicket> result = new();
         string query = @"
             SELECT
@@ -167,9 +172,12 @@ public static class TicketRoutes
                 Categories c ON t.category_id = c.id
                     JOIN
                 testuser u ON t.user_id = u.id
+            WHERE
+                u.company_id = @companyId
             ORDER BY t.ticket_time DESC;";
 
         using var command = db.CreateCommand(query);
+        command.Parameters.AddWithValue("companyId", companyId);
         using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())

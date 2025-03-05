@@ -53,6 +53,22 @@ export default function ManageEmployees() {
     });
   }
 
+  function handleResetPassword(event) {
+    event.preventDefault();
+    let data = JSON.stringify(EventTarget.data);
+    console.log(EventTarget.data)
+    fetch(event.target.action, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: data,
+    }).then((response) => {
+      if (response.ok) {
+        console.log(response)
+        GetEmployee();
+      }
+    });
+
+  }
   return (
     <div>
       <form id="forum" className="form" onSubmit={handleAddSubmit}>
@@ -65,25 +81,20 @@ export default function ManageEmployees() {
         <input name="password" type="password" required />
         <input name="pending_confirmed" type="hidden" />
         <input name="admin_customer_employee" type="hidden" value="employee" />
-        <p>company_id: </p>
-        <input name="company_id" type="text" required />
         <input type="submit" value="Submit" />
       </form>
       <h3>Existing employees:</h3>
       {employee.map((item, index) => (
         <div className="ExistingEmployeeCard">
-          <h3 id="employees" key={index}>
-            {item.name}
-          </h3>
+          <h3 id="employees" key={index}>{item.name}</h3>
           <form
             onSubmit={handleRemove}
             action={`/api/DeleteEmployee/${item.id}`}
           >
-            <input
-              id="ElimButton"
-              type="submit"
-              value={`Eliminate ${item.name}`}
-            />
+            <input id="ElimButton" type="submit" value={`Eliminate ${item.name}`} />
+          </form>
+          <form name="resetpassword" onSubmit={handleResetPassword} action={`/api/ResetPassword/${item.id}`}>
+            <input id="ResetPassButton" type="submit" value={'ResetPassword'} />
           </form>
         </div>
       ))}

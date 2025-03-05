@@ -1,49 +1,52 @@
-import { useEffect, useState } from "react";
-import {BrowserRouter, Routes, Route, useNavigate} from 'react-router'
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-let navigate = useNavigate();
-  
-  function handleLogin(event) {
+export default function LoginPage() {
+  let navigate = useNavigate();
+
+  function login(event) {
     event.preventDefault();
+    const form = event.target;
+    let data = new FormData(form);
+    data = Object.fromEntries(data);
+    data = JSON.stringify(data);
 
-    fetch("/api/login", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({ email, password }),
+    fetch(form.action, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: form.method,
+      body: data,
     }).then((response) => {
       if (response.ok) {
-        response.text().then(location => {navigate(location.slice(1,-1))});
-        //setEmail("");
-        //setPassword("");
+        response.text().then((location) => {
+          navigate(location.slice(1, -1));
+        });
+      } else {
+        console.error("response not ok");
       }
     });
   }
 
   return (
-    <>
-      <h1>Tjena Edvin!</h1>
-      <div>
+    <main>
+      <form
+        name="login-form"
+        onSubmit={login}
+        action="/api/login"
+        method="POST"
+      >
         <input
-          type="text"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div>
+          type="email"
+          name="email"
+          placeholder="Please enter your email"
+        ></input>
         <input
-          type="text"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <div>
-        <button onClick={handleLogin}>Login</button>
-      </div>
-    </>
+          type="password"
+          name="password"
+          placeholder="Please enter your password"
+        ></input>
+        <input type="submit" value="Login"></input>
+      </form>
+    </main>
   );
 }
