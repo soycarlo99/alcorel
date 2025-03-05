@@ -1,14 +1,15 @@
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Diagnostics;
 namespace Server;
-using Microsoft.AspNetCore.Mvc;
 
-public enum UserRole
-{
-    admin,
-    customer,
-    employee
-}
+
+    public enum UserRole
+    {
+        admin,
+        customer,
+        employee
+    }
 
 public static class UserRoutes
 {
@@ -63,19 +64,20 @@ public static class UserRoutes
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db)
+    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx)
     {
         try
         {
             // TODO(manuel): Starta er transaction här
             // 1. kolla ifall en användare finns, om inte, skapa en
-            using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email) values ($1, $2) ON CONFLICT DO NOTHING RETURNING id");
+            using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id");
             insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
+            insertUserCommand.Parameters.AddWithValue(ctx.Session.GetInt32("company_id"));
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
-
-
+            
+            
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
             if (insertUserResult is int userId)
             {
@@ -148,89 +150,96 @@ public static class UserRoutes
         }
     }
 
-    public record GetAllDTO(int Id, string Name, UserRole UserRole);
-    public static async Task<Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>>
-    GetAll(NpgsqlDataSource db, HttpContext ctx)
-    {
 
-        if (ctx.Session.IsAvailable &&
-        ctx.Session.GetInt32("role") is int role &&
-        Enum.IsDefined(typeof(UserRole), role))
+
+
+
+        public record GetAllDTO(int Id, string Name, UserRole UserRole);
+        public static async Task<Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>>
+        GetAll(NpgsqlDataSource db, HttpContext ctx)
         {
-            if ((UserRole)role == UserRole.admin)
-            {
-                List<GetAllDTO> users = new();
 
-                var cmd = db.CreateCommand("select id, name, admin_customer_employee from testuser");
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+            if(ctx.Session.IsAvailable && 
+               ctx.Session.GetInt32("role") is int role &&
+               Enum.IsDefined(typeof(UserRole), role))
+            {
+                if((UserRole)role == UserRole.admin)
                 {
-                    users.Add(new(
-                        reader.GetInt32(0),
-                        reader.GetString(1),
-                    (UserRole)reader.GetInt32(2)
-                    ));
+                    Console.WriteLine(ctx.Session.GetInt32("company_id"));
+
+                    List<GetAllDTO> users = new();
+
+                    var cmd = db.CreateCommand("select id, name, admin_customer_employee from testuser");
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        users.Add(new(
+                                    reader.GetInt32(0),
+                                    reader.GetString(1),
+                                    reader.GetFieldValue<UserRole>(2)
+                                    ));
+                    }
+
+                    return TypedResults.Ok(users);
                 }
-                return TypedResults.Ok(users);
+                else
+                {
+                    return TypedResults.Forbid();
+                }
             }
             else
             {
-                return TypedResults.Forbid();
+                return TypedResults.Unauthorized();
             }
+        }
 
-        }
-        else
-        {
-            return TypedResults.Unauthorized();
-        }
-    }
+
 
 
     public record Credentials(string Email, string Password);
-    public static async Task<Results<Ok<string>, BadRequest>>
+    public record LoginResponse(string redirectPath, int companyId);
+
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
     Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee from testuser where email = $1 and password = $2");
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1 and password = $2");
         cmd.Parameters.AddWithValue(credentials.Email);
         cmd.Parameters.AddWithValue(credentials.Password);
         using var reader = await cmd.ExecuteReaderAsync();
 
-        if (await reader.ReadAsync())
+        if(await reader.ReadAsync())
         {
-            var roleValue = reader.GetFieldValue<UserRole>(1);
+            var role = reader.GetFieldValue<UserRole>(1);
+            var companyId = reader.GetInt32(2);
+            
             ctx.Session.SetString("name", reader.GetString(0));
-            ctx.Session.SetInt32("role", (int)roleValue);
+            ctx.Session.SetInt32("role", (int)role);
+            ctx.Session.SetInt32("companyId", companyId);
 
             string location = "";
-            switch (roleValue)
+            switch(role)
             {
                 case UserRole.customer:
-                    {
-                        location = "/customer/dashboard";
-                    }
-                    break;
+                {
+                    location = "/customer/dashboard";
+                } break;
 
                 case UserRole.employee:
-                    {
-                        location = "/employee/dashboard";
-                    }
-                    break;
+                {
+                    location = "/employee/dashboard";
+                } break;
 
                 case UserRole.admin:
-                    {
-                        location = "/admin/dashboard";
-                    }
-                    break;
+                {
+                    location = "/admin/dashboard";
+                } break;
             }
-            return TypedResults.Ok(location);
+            
+            return TypedResults.Ok(new LoginResponse(location, companyId));
         }
         else
         {
             return TypedResults.BadRequest();
         }
-
     }
-
-
-
 }

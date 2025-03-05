@@ -11,7 +11,7 @@ import "./style.css";
 import ManageEmployees from "./manageEmployee";
 import TicketDetails from "./TicketDetails";
 import CustomerView from "./CustomerView";
-import Login from "./Login";
+import LoginPage from "./Login";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -27,7 +27,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/ManageEmployee" element={<ManageEmployees />} />
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:id" element={<CustomerView />} />
-            <Route path="/Login" element={<Login />} />
+            <Route path="/Login" element={<LoginPage />} />
           </Routes>
         </div>
       </div>

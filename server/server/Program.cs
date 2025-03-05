@@ -1,8 +1,8 @@
 using Npgsql;
 using Server;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
