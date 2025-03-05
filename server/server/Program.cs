@@ -1,8 +1,8 @@
 using Npgsql;
 using Server;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
@@ -22,12 +22,14 @@ var app = builder.Build();
 
 app.UseSession();
 
+
+
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/users", UserRoutes.PostUser);
 //app.MapPost("/api/login", UserRoutes.CheckCredentials);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
-
+app.MapPost("/api/login", UserRoutes.Post);
 
 
 //Ticket APIs
@@ -60,9 +62,5 @@ app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
-
-//proto APIs
-app.MapGet("/api/usersproto", UserRoutes.GetAll);
-app.MapPost("/api/login", UserRoutes.Post);
 
 app.Run();
