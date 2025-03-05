@@ -26,9 +26,9 @@ export default function ManageEmployees() {
     if (!data.role) {
       data.role = "employee";
     }
-    console.log(data);
+
     data = JSON.stringify(data);
-    console.log(data);
+
     fetch("/api/PostEmployee", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -53,6 +53,22 @@ export default function ManageEmployees() {
     });
   }
 
+  function handleResetPassword(event) {
+    event.preventDefault();
+    let data = JSON.stringify(EventTarget.data);
+    console.log(EventTarget.data)
+    fetch(event.target.action, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: data,
+    }).then((response) => {
+      if (response.ok) {
+        console.log(response)
+        GetEmployee();
+      }
+    });
+
+  }
   return (
     <div>
       <form id="forum" className="form" onSubmit={handleAddSubmit}>
@@ -78,7 +94,9 @@ export default function ManageEmployees() {
             action={`/api/DeleteEmployee/${item.id}`}
           >
             <input id="ElimButton" type="submit" value={`Eliminate ${item.name}`} />
-            <input id="ResetPassButton" type="submit" value={'Reset Password'} />
+          </form>
+          <form name="resetpassword" onSubmit={handleResetPassword} action={`/api/ResetPassword/${item.id}`}>
+            <input id="ResetPassButton" type="submit" value={'ResetPassword'} />
           </form>
         </div>
       ))}
