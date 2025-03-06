@@ -18,7 +18,33 @@ builder.Services.AddSingleton<NpgsqlDataSource>(databaseBuilder);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => { options.Cookie.IsEssential = true; });
 
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
+if (emailSettings != null)
+{
+    builder.Services.AddSingleton(emailSettings);
+}
+else
+{
+    throw new InvalidOperationException("Email settings are not configured properly.");
+}
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 var app = builder.Build();
+
+app.MapPost("/api/email", SendEmail);
+
+static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
+{
+    Console.WriteLine("SendEmail is called..Sending email");
+
+    await email.SendEmailAsync(request.To, request.Subject, request.Body);
+
+    Console.WriteLine("Email sent to: " + request.To + " with subject: " + request.Subject + " and body: " + request.Body);
+    return Results.Ok(new { message = "Email sent." });
+}
+
+await app.RunAsync();
 
 app.UseSession();
 
