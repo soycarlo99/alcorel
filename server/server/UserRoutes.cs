@@ -66,6 +66,11 @@ public static class UserRoutes
     public static async Task<Results<Ok<string>, BadRequest<string>>>
     CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return TypedResults.BadRequest("You don't have a company ID");
+        }
         try
         {
             // TODO(manuel): Starta er transaction här
@@ -73,17 +78,20 @@ public static class UserRoutes
             using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id");
             insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
-            insertUserCommand.Parameters.AddWithValue(ctx.Session.GetInt32("company_id"));
+            insertUserCommand.Parameters.AddWithValue(companyId.Value);
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
             
             
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
+            string accessToken = Guid.NewGuid().ToString("N");
+        
             if (insertUserResult is int userId)
             {
-                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id) values($1, $2) RETURNING id");
+                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id, access_token) values($1, $2, $3) RETURNING id");
                 insertTicketCommand.Parameters.AddWithValue(ticket_info.Category_id);
                 insertTicketCommand.Parameters.AddWithValue(userId);
+                insertTicketCommand.Parameters.AddWithValue(accessToken);
 
                 var insertTicketResult = await insertTicketCommand.ExecuteScalarAsync();
 
@@ -99,7 +107,7 @@ public static class UserRoutes
                     return TypedResults.Ok("Added successfully");
                 }
             }
-            // This should never happen, since the ID we return from postgres will either happen, or it will be caugth as an exception by the try-catch
+
             return TypedResults.BadRequest("Something went wrong");
         }
         catch (PostgresException ex)

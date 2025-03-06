@@ -1,76 +1,145 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export default function TicketCreation() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("initialpassword");
   const [message, setMessage] = useState("");
   const [category_id, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("/api/GetCategory")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.length > 0) {
+          setCategories(data);
+        }
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, []);
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
+
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
+
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
   };
+
   const handleCategoryChange = (event) => {
     setCategory(parseInt(event.target.value, 10) || "");
   };
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setIsSubmitting(true);
+    setFeedback("");
 
-    fetch("/api/createusers", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({ name, email, message, category_id }),
-    }).then((response) => {
+    try {
+      const response = await fetch("/api/createusers", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({
+          Name: name,
+          Email: email,
+          Message: message,
+          Category_id: category_id,
+        }),
+      });
+
       if (response.ok) {
-        // .ok typ lika med if(response.status_code >= 200 && response.status_code < 300
+        const result = await response.text();
+        setFeedback("Ticket created successfully!");
+
         setName("");
         setEmail("");
         setMessage("");
         setCategory("");
+
+        if (result.includes("Access URL:")) {
+          const accessUrl = result.split("Access URL:")[1].trim();
+          setTimeout(() => {
+            navigate(accessUrl);
+          }, 1500);
+        }
+      } else {
+        setFeedback("Failed to create ticket. Please try again.");
       }
-    });
+    } catch (error) {
+      console.error("Error:", error);
+      setFeedback("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <main className="CreateTicket">
-      <form className="form">
+      {feedback && (
+        <div
+          className={
+            feedback.includes("success") ? "success-message" : "error-message"
+          }
+        >
+          {feedback}
+        </div>
+      )}
+
+      <form className="form" onSubmit={handleSubmit}>
         <label>
           Enter your name:
-          <input type="text" value={name} onChange={handleNameChange} />
+          <input
+            type="text"
+            value={name}
+            onChange={handleNameChange}
+            required
+          />
         </label>
+
         <label>
           Enter your email:
-          <input type="text" value={email} onChange={handleEmailChange} />
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            required
+          />
         </label>
+
         <label>
           Enter your Message:
           <textarea
-            type="text"
             value={message}
             onChange={handleMessageChange}
+            required
           ></textarea>
         </label>
-        <label for="pet-select">Choose a category:</label>
 
-        <select value={category_id} onChange={handleCategoryChange}>
-          <option>Please Choose an Option</option>
-          <option value="1">Storage</option>
-          <option value="2">Delivery</option>
-          <option value="3">Software</option>
-          <option value="4">Hardware</option>
-          <option value="5">Tech Support</option>
-          <option value="6">Warehouse</option>
+        <label htmlFor="category-select">Choose a category:</label>
+        <select
+          id="category-select"
+          value={category_id}
+          onChange={handleCategoryChange}
+          required
+        >
+          <option value="">Please Choose an Option</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.category_name}
+            </option>
+          ))}
         </select>
-      </form>
-      <form className="form" onSubmit={handleSubmit}>
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </button>
       </form>
     </main>
   );
