@@ -30,6 +30,7 @@ app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/login", UserRoutes.CheckCredentials);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
+app.MapGet("/api/GetCompany", CompanyRoutes.GetCompany);
 
 
 //Ticket APIs

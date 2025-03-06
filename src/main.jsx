@@ -28,6 +28,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:id" element={<CustomerView />} />
             <Route path="/Login" element={<LoginPage />} />
+            <Route path="/Company" element={<Company />} />
           </Routes>
         </div>
       </div>
