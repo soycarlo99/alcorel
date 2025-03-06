@@ -200,8 +200,7 @@ public static class UserRoutes
     public record Credentials(string Email, string Password);
     public record LoginResponse(string redirectPath, int companyId);
 
-    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
-    Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>> Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
     {
         var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1 and password = $2");
         cmd.Parameters.AddWithValue(credentials.Email);
@@ -232,7 +231,7 @@ public static class UserRoutes
 
                 case UserRole.admin:
                 {
-                    location = "/admin/dashboard";
+                    location = "/AdminDashboard";
                 } break;
             }
             
