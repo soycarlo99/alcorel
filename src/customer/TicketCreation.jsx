@@ -8,7 +8,6 @@ export default function TicketCreation() {
   const [category_id, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +40,6 @@ export default function TicketCreation() {
   async function handleSubmit(event) {
     event.preventDefault();
     setIsSubmitting(true);
-    setFeedback("");
 
     try {
       const response = await fetch("/api/createusers", {
@@ -63,19 +61,9 @@ export default function TicketCreation() {
         setEmail("");
         setMessage("");
         setCategory("");
-
-        if (result.includes("Access URL:")) {
-          const accessUrl = result.split("Access URL:")[1].trim();
-          setTimeout(() => {
-            navigate(accessUrl);
-          }, 1500);
-        }
-      } else {
-        setFeedback("Failed to create ticket. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
-      setFeedback("An error occurred. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,16 +71,6 @@ export default function TicketCreation() {
 
   return (
     <main className="CreateTicket">
-      {feedback && (
-        <div
-          className={
-            feedback.includes("success") ? "success-message" : "error-message"
-          }
-        >
-          {feedback}
-        </div>
-      )}
-
       <form className="form" onSubmit={handleSubmit}>
         <label>
           Enter your name:

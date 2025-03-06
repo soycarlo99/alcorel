@@ -5,6 +5,7 @@ export default function CustomerView() {
   const { token } = useParams();
   const [ticket, setTicket] = useState(null);
   const [answered, setAnswered] = useState({});
+  const [rating, setRating] = useState(null);
 
   useEffect(() => {
     function fetchTicket() {
@@ -80,6 +81,24 @@ export default function CustomerView() {
     }
   }
 
+  async function SendFeedback() {
+    try {
+      const response = await fetch(
+        `/api/sendRating/${rating}/${ticket.ticketId}`,
+        {
+          headers: { "Content-Type": "application/json" },
+          method: "PUT",
+          body: statusdata,
+        },
+      );
+      if (response.ok) {
+        console.log("status updated");
+      }
+    } catch (error) {
+      console.error("updating status failed:", error);
+    }
+  }
+
   if (!ticket) return <p>Loading ticket...</p>;
 
   return (
@@ -94,7 +113,22 @@ export default function CustomerView() {
         <p>Category: {ticket.categoryName}</p>
         <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
       </div>
-
+      {ticket.status == "solved" ? (
+        <div>
+          <p>
+            <select value="Rate the experience please">
+              <option value="">Rate the experience please</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </p>
+        </div>
+      ) : (
+        <p></p>
+      )}
       <h2>Questions & Answers</h2>
       {ticket.questionAnswers?.length > 0 ? (
         ticket.questionAnswers.map((qa, idx) => (
@@ -125,7 +159,6 @@ export default function CustomerView() {
       ) : (
         <p>No Q&A found</p>
       )}
-
       <h2>Messages</h2>
       {ticket.messages?.length > 0 ? (
         ticket.messages.map((msg, idx) => (
@@ -139,7 +172,6 @@ export default function CustomerView() {
       ) : (
         <p>No messages</p>
       )}
-
       <form className="form" onSubmit={handleAddSubmit}>
         <textarea name="message" required placeholder="Reply..." />
         <button type="submit">Send Reply</button>

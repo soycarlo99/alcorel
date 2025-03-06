@@ -89,4 +89,8 @@ app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
 
+//Feedback APIs
+app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
+//app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
+
 app.Run();
