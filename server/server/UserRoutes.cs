@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 namespace Server;
+
+using Microsoft.AspNetCore.Http;
+
 
 
 public enum UserRole
@@ -11,6 +15,8 @@ public enum UserRole
     employee
 }
 
+
+
 public static class UserRoutes
 {
     public record User(int Id, string Name);
@@ -18,7 +24,7 @@ public static class UserRoutes
     public record CreationOfTicketDTO(string Name, string Email, string Message, int Category_id);
 
     public record Ticket(string Message, int Category_id);
-
+    record VerifyDTO(string Password, string Hash);
 
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
     {
@@ -199,50 +205,74 @@ public static class UserRoutes
     public record Credentials(string Email, string Password);
     public record LoginResponse(string redirectPath, int companyId);
 
-    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
-    Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+
+    public static async Task<IResult>
+    Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx, PasswordHasher<string> hasher)
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1 and password = $2");
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id, password from testuser where email = $1");
         cmd.Parameters.AddWithValue(credentials.Email);
-        cmd.Parameters.AddWithValue(credentials.Password);
+
         using var reader = await cmd.ExecuteReaderAsync();
+
+
 
         if (await reader.ReadAsync())
         {
             var role = reader.GetFieldValue<UserRole>(1);
             var companyId = reader.GetInt32(2);
+            string hashedPassword = reader.GetString(3);
+            var verifyResult = hasher.VerifyHashedPassword("", hashedPassword, credentials.Password);
+            Console.WriteLine(verifyResult);
+            if (verifyResult == PasswordVerificationResult.Failed)
+            {
+                Console.WriteLine("NOT cracked");
+                return TypedResults.BadRequest();
 
+            }
+            //   if (verifyResult == PasswordVerificationResult.Success)
+
+            Console.WriteLine(hashedPassword);
             ctx.Session.SetString("name", reader.GetString(0));
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
+            ctx.Session.SetString("password", hashedPassword);
 
-            string location = "";
-            switch (role)
             {
-                case UserRole.customer:
-                    {
-                        location = "/customer/dashboard";
-                    }
-                    break;
 
-                case UserRole.employee:
-                    {
-                        location = "/employee/dashboard";
-                    }
-                    break;
+                string location = "";
+                switch (role)
 
-                case UserRole.admin:
-                    {
-                        location = "/admin/dashboard";
-                    }
-                    break;
+                {
+
+
+
+                    case UserRole.customer:
+                        {
+                            location = "/customer/dashboard";
+                        }
+                        break;
+
+                    case UserRole.employee:
+                        {
+                            location = "/employee/dashboard";
+                        }
+                        break;
+
+                    case UserRole.admin:
+                        {
+                            location = "/admin/dashboard";
+                        }
+                        break;
+                }
+                Console.WriteLine(credentials.Password);
+                return TypedResults.Ok(new LoginResponse(location, companyId));
+
             }
-
-            return TypedResults.Ok(new LoginResponse(location, companyId));
         }
         else
         {
             return TypedResults.BadRequest();
         }
     }
+
 }
