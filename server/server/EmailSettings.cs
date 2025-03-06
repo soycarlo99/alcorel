@@ -1,4 +1,4 @@
-namespace server.Config;
+namespace Server;
 
 public record EmailSettings(
     string SmtpServer, 

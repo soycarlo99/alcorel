@@ -106,8 +106,12 @@ public static class UserRoutes
                     // Avsluta er transaction
                     return TypedResults.Ok("Added successfully");
                 }
+                await SendEmail(request.To "albin.a.martinsson@gmail.com", request.Subject "Welcome to alcorel!", request.Body "<h1>TEST HEJ2</h1>");
             }
-
+:while (true)
+{
+    
+}
             return TypedResults.BadRequest("Something went wrong");
         }
         catch (PostgresException ex)

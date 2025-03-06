@@ -31,6 +31,9 @@ else
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
+//await app.RunAsync();
+
+app.UseSession();
 
 app.MapPost("/api/email", SendEmail);
 
@@ -43,11 +46,6 @@ static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
     Console.WriteLine("Email sent to: " + request.To + " with subject: " + request.Subject + " and body: " + request.Body);
     return Results.Ok(new { message = "Email sent." });
 }
-
-await app.RunAsync();
-
-app.UseSession();
-
 
 
 //User APIs

@@ -1,4 +1,4 @@
-namespace server.Classes;
+namespace Server;
 
 public record EmailRequest(
     string To,
