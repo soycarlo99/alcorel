@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using Server;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<PasswordHasher<string>>();
 
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
