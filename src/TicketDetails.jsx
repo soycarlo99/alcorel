@@ -21,21 +21,6 @@ export default function TicketDetails() {
         });
     }
 
-    // function fetchMessage() {
-    //   fetch(`/api/${id}/message`)
-    //     .then((response) => {
-    //       if (!response.ok) throw new Error("Message not found");
-    //       return response.json();
-    //     })
-    //     .then((data) => {
-    //       setTicket(data);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching message:", error);
-    //     });
-    // }
-
-    // fetchMessage();
     fetchTicket();
   }, [handleAddSubmit]);
 
@@ -51,14 +36,13 @@ export default function TicketDetails() {
         body: data,
       });
       if (response.ok) {
-        //await fetchTicket();
+        document.getElementById("replyform").reset();
       }
     } catch (error) {
       console.error("Submission failed:", error);
     }
 
     const statusdata = JSON.stringify({ status: "active" });
-    // data = JSON.stringify(data);
     try {
       const response = await fetch(`/api/tickets/${id}/status`, {
         headers: { "Content-Type": "application/json" },
@@ -75,7 +59,6 @@ export default function TicketDetails() {
 
   async function handleToSolved(event) {
     const statusdata = JSON.stringify({ status: "solved" });
-    // data = JSON.stringify(data);
     try {
       const response = await fetch(`/api/tickets/${id}/status`, {
         headers: { "Content-Type": "application/json" },
@@ -152,7 +135,7 @@ export default function TicketDetails() {
             <button className="MarkAsSolved" onClick={() => handleToSolved()}>
               Mark as solved
             </button>
-            <form className="form" onSubmit={handleAddSubmit}>
+            <form className="form" id="replyform" onSubmit={handleAddSubmit}>
               <textarea
                 name="message"
                 type="text"
