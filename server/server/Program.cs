@@ -32,7 +32,12 @@ app.MapGet("/api/users", UserRoutes.GetUsers);
 //app.MapPost("/api/login", UserRoutes.CheckCredentials);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
-
+app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
+app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
+app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) => {
+    ctx.Session.SetInt32("companyId", companyId);
+    return TypedResults.Ok(new { success = true });
+});
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
@@ -41,14 +46,10 @@ app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
 app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
 app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
 
-
-
 //Question APIs
 app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
 app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
 app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
-
-
 
 //Category APIs
 app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);

@@ -1,5 +1,5 @@
 import "./style.css";
-import {NavLink, Route} from "react-router";
+import { NavLink, Route } from "react-router";
 import LoginPage from "./Login.jsx";
 
 function Navigation() {
@@ -39,6 +39,11 @@ function Navigation() {
         <li>
           <NavLink to="/Login" activeclassname="active">
             Log-in
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/company/2" activeclassname="active">
+            Green future corp.
           </NavLink>
         </li>
       </ul>

@@ -1,21 +1,18 @@
-using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 namespace Server;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 
 
 
-public enum UserRole
-{
-    admin,
-    customer,
-    employee
-}
-
-
+    public enum UserRole
+    {
+        admin,
+        customer,
+        employee
+    }
 
 public static class UserRoutes
 {
@@ -67,12 +64,16 @@ public static class UserRoutes
         }
     }
 
-    //ADD COMPANY ____--__-----_____-----______------___-
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
     CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return TypedResults.BadRequest("You don't have a company ID");
+        }
         try
         {
             // TODO(manuel): Starta er transaction här
@@ -80,17 +81,20 @@ public static class UserRoutes
             using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id");
             insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
-            insertUserCommand.Parameters.AddWithValue(ctx.Session.GetInt32("company_id"));
+            insertUserCommand.Parameters.AddWithValue(companyId.Value);
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
-
-
+            
+            
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
+            string accessToken = Guid.NewGuid().ToString("N");
+        
             if (insertUserResult is int userId)
             {
-                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id) values($1, $2) RETURNING id");
+                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id, access_token) values($1, $2, $3) RETURNING id");
                 insertTicketCommand.Parameters.AddWithValue(ticket_info.Category_id);
                 insertTicketCommand.Parameters.AddWithValue(userId);
+                insertTicketCommand.Parameters.AddWithValue(accessToken);
 
                 var insertTicketResult = await insertTicketCommand.ExecuteScalarAsync();
 
@@ -161,49 +165,49 @@ public static class UserRoutes
 
 
 
-    public record GetAllDTO(int Id, string Name, UserRole UserRole);
-    public static async Task<Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>>
-    GetAll(NpgsqlDataSource db, HttpContext ctx)
-    {
-
-        if (ctx.Session.IsAvailable &&
-           ctx.Session.GetInt32("role") is int role &&
-           Enum.IsDefined(typeof(UserRole), role))
+        public record GetAllDTO(int Id, string Name, UserRole UserRole);
+        public static async Task<Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>>
+        GetAll(NpgsqlDataSource db, HttpContext ctx)
         {
-            if ((UserRole)role == UserRole.admin)
+
+            if(ctx.Session.IsAvailable && 
+               ctx.Session.GetInt32("role") is int role &&
+               Enum.IsDefined(typeof(UserRole), role))
             {
-                Console.WriteLine(ctx.Session.GetInt32("company_id"));
-
-                List<GetAllDTO> users = new();
-
-                var cmd = db.CreateCommand("select id, name, admin_customer_employee from testuser");
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                if((UserRole)role == UserRole.admin)
                 {
-                    users.Add(new(
-                                reader.GetInt32(0),
-                                reader.GetString(1),
-                                reader.GetFieldValue<UserRole>(2)
-                                ));
-                }
+                    Console.WriteLine(ctx.Session.GetInt32("company_id"));
 
-                return TypedResults.Ok(users);
+                    List<GetAllDTO> users = new();
+
+                    var cmd = db.CreateCommand("select id, name, admin_customer_employee from testuser");
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        users.Add(new(
+                                    reader.GetInt32(0),
+                                    reader.GetString(1),
+                                    reader.GetFieldValue<UserRole>(2)
+                                    ));
+                    }
+
+                    return TypedResults.Ok(users);
+                }
+                else
+                {
+                    return TypedResults.Forbid();
+                }
             }
             else
             {
-                return TypedResults.Forbid();
+                return TypedResults.Unauthorized();
             }
         }
-        else
-        {
-            return TypedResults.Unauthorized();
-        }
-    }
 
 
 
 
-    public record Credentials(string Email, string Password);
+    public record Credentials(string Email, string? Password);
     public record LoginResponse(string redirectPath, int companyId);
 
 
@@ -214,9 +218,7 @@ public static class UserRoutes
         cmd.Parameters.AddWithValue(credentials.Email);
 
         using var reader = await cmd.ExecuteReaderAsync();
-
-
-
+        
         if (await reader.ReadAsync())
         {
             var role = reader.GetFieldValue<UserRole>(1);
@@ -230,45 +232,66 @@ public static class UserRoutes
                 return TypedResults.BadRequest();
 
             }
-            //   if (verifyResult == PasswordVerificationResult.Success)
 
             Console.WriteLine(hashedPassword);
             ctx.Session.SetString("name", reader.GetString(0));
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
 
-
+            string location = "";
+            switch(role)
             {
-
-                string location = "";
-                switch (role)
-
+                case UserRole.customer:
                 {
+                    location = "/customer/dashboard";
+                } break;
 
+                case UserRole.employee:
+                {
+                    location = "/employee/dashboard";
+                } break;
 
-
-                    case UserRole.customer:
-                        {
-                            location = "/customer/dashboard";
-                        }
-                        break;
-
-                    case UserRole.employee:
-                        {
-                            location = "/employee/dashboard";
-                        }
-                        break;
-
-                    case UserRole.admin:
-                        {
-                            location = "/admin/dashboard";
-                        }
-                        break;
-                }
-                Console.WriteLine(credentials.Password);
-                return TypedResults.Ok(new LoginResponse(location, companyId));
-
+                case UserRole.admin:
+                {
+                    location = "/admin/dashboard";
+                } break;
             }
+            
+            return TypedResults.Ok(new LoginResponse(location, companyId));
+        }
+        else
+        {
+            return TypedResults.BadRequest();
+        }
+    }
+
+
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
+    CustomerVisit(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+    {
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1");
+        cmd.Parameters.AddWithValue(credentials.Email);
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        if(await reader.ReadAsync())
+        {
+            var role = reader.GetFieldValue<UserRole>(1);
+            var companyId = reader.GetInt32(2);
+            
+            ctx.Session.SetString("name", reader.GetString(0));
+            ctx.Session.SetInt32("role", (int)role);
+            ctx.Session.SetInt32("companyId", companyId);
+
+            string location = "";
+            switch(role)
+            {
+                case UserRole.customer:
+                {
+                    location = "/customer/dashboard";
+                } break;
+            }
+            
+            return TypedResults.Ok(new LoginResponse(location, companyId));
         }
         else
         {
