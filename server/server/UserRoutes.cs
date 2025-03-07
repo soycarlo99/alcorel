@@ -67,6 +67,7 @@ public static class UserRoutes
         }
     }
 
+    //ADD COMPANY ____--__-----_____-----______------___-
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
