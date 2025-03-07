@@ -47,6 +47,21 @@ function Navigation() {
           </NavLink>
         </li>
       </ul>
+      <div
+        style={{
+          marginTop: "30px",
+          paddingTop: "20px",
+          borderTop: "1px solid #e0e0e0",
+          textAlign: "center",
+          fontSize: "12px",
+          color: "#7f8c8d",
+        }}
+      >
+        Powered by{" "}
+        <span style={{ fontWeight: "bold" }}>
+          Alcorel<sup>&reg;</sup>
+        </span>
+      </div>
     </nav>
   );
 }
