@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using Server;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<PasswordHasher<string>>();
 
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
@@ -55,9 +57,11 @@ app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
 
+
 //Message APIs
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
 app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
+
 
 //Employee APIs
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
