@@ -7,12 +7,14 @@ import AddQuestions from "./AddQuestions";
 import TicketCreation from "./customer/TicketCreation";
 import EmployeeTicket from "./EmployeeTicket";
 import Navigation from "./Navigation";
+import "./style.css";
 import ManageEmployees from "./manageEmployee";
 import TicketDetails from "./TicketDetails";
 import CustomerView from "./CustomerView";
 import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
+import AdminDashboard from "./AdminDashboard";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -30,6 +32,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:token" element={<CustomerView />} />
             <Route path="/Login" element={<LoginPage />} />
+            <Route path="/AdminDashboard" element={<AdminDashboard/>} />
           </Routes>
         </div>
       </div>
