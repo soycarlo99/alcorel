@@ -235,7 +235,7 @@ public static class UserRoutes
             ctx.Session.SetString("name", reader.GetString(0));
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
-            ctx.Session.SetString("password", hashedPassword);
+
 
             {
 
