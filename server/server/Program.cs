@@ -58,7 +58,8 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
 app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
 app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
-app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) => {
+app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
+{
     ctx.Session.SetInt32("companyId", companyId);
     return TypedResults.Ok(new { success = true });
 });
@@ -92,5 +93,10 @@ app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
+app.MapGet("/api/session/companyId", (HttpContext ctx) =>
+{
+    var companyId = ctx.Session.GetInt32("companyId");
+    return TypedResults.Ok(new { companyId = companyId });
+});
 
 app.Run();
