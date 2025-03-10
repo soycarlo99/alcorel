@@ -93,4 +93,10 @@ app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
 
+//Sign-up APIs
+app.MapPost("api/signup", UserRoutes.SignUpAdmin);
+
+
+
+
 app.Run();

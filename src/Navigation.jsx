@@ -37,6 +37,11 @@ function Navigation() {
           </NavLink>
         </li>
         <li>
+          <NavLink to="/Alcorel" activeclassname="active">
+            AlcoRel Landing page
+          </NavLink>
+        </li>
+        <li>
           <NavLink to="/Login" activeclassname="active">
             Log-in
           </NavLink>

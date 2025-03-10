@@ -406,3 +406,11 @@ pre {
     padding: 20px;
   }
 }
+
+.moto {
+  background-color: rgba(100, 27, 100, 0.4);
+  padding: 25px;
+  border-radius: 20px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}

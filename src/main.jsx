@@ -15,6 +15,7 @@ import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
 import AdminDashboard from "./AdminDashboard";
+import Alcorel from "./Alcorel";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -32,7 +33,8 @@ createRoot(document.getElementById("root")).render(
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:token" element={<CustomerView />} />
             <Route path="/Login" element={<LoginPage />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard/>} />
+            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route path="/Alcorel" element={<Alcorel />} />
           </Routes>
         </div>
       </div>

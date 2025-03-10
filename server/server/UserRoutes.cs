@@ -345,4 +345,36 @@ public static class UserRoutes
         }
     }
 
+    SignUpAdminDTO(
+        string CompanyName,
+        string Email,
+        string AdminName,
+        string orgNumber,
+        string Passwordm
+        )
+
+    SignUpAdmin(PostUserDTO userDto, NpgsqlDataSource db)
+    {
+        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING id, name");
+        command.Parameters.AddWithValue("name", userDto.Name);
+        command.Parameters.AddWithValue("email", userDto.Email);
+        command.Parameters.AddWithValue("password", userDto.Password);
+        command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
+        command.Parameters.AddWithValue("company_id", userDto.company_id);
+
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var user = new User(reader.GetInt32(0), reader.GetString(1));
+                return TypedResults.Created($"/api/users/{user.Id}", user);
+            }
+            return TypedResults.BadRequest("Failed to create user");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 }
