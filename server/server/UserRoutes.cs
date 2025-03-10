@@ -2,6 +2,9 @@ using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 namespace Server;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+
 
 
     public enum UserRole
@@ -18,7 +21,7 @@ public static class UserRoutes
     public record CreationOfTicketDTO(string Name, string Email, string Message, int Category_id);
 
     public record Ticket(string Message, int Category_id);
-
+    record VerifyDTO(string Password, string Hash);
 
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
     {
@@ -61,12 +64,16 @@ public static class UserRoutes
         }
     }
 
-    //ADD COMPANY ____--__-----_____-----______------___-
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx)
+    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx, IEmailService emailService)
     {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        if (companyId == null)
+        {
+            return TypedResults.BadRequest("You don't have a company ID");
+        }
         try
         {
             // TODO(manuel): Starta er transaction här
@@ -74,17 +81,63 @@ public static class UserRoutes
             using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id");
             insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
-            insertUserCommand.Parameters.AddWithValue(ctx.Session.GetInt32("company_id"));
+            insertUserCommand.Parameters.AddWithValue(companyId.Value);
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
             
             
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
+            string accessToken = Guid.NewGuid().ToString("N");
+            await emailService.SendEmailAsync(
+    to: ticket_info.Email,
+    subject: "Welcome to Alcorel - Support Ticket Confirmation",
+    body: $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+            <div style='text-align: center; margin-bottom: 20px;'>
+                <h1 style='color: #2c3e50;'>Hi {ticket_info.Name}, Thank You for Contacting Us</h1>
+            </div>
+            
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                Thank you for reaching out to our customer support team. We've received your inquiry and are working on it.
+            </p>
+            
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                To help us serve you better, please answer a few additional questions by clicking the link below:
+            </p>
+            
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='http://localhost:5173/Customerview/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                    Complete Additional Questions
+                </a>
+<p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                if the button doesn't work click on the link below:
+            </p>
+                <a href='http://localhost:5173/Customerview/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                   www.alcorel.com/customerservice 
+                </a>
+
+            </div>
+            
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                Your responses will help us address your concerns more effectively. We appreciate your cooperation.
+            </p>
+            
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                We'll get back to you as soon as possible.
+            </p>
+            
+            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
+                Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
+            </div>
+        </div>
+    "
+);
             if (insertUserResult is int userId)
             {
-                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id) values($1, $2) RETURNING id");
+                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id, access_token) values($1, $2, $3) RETURNING id");
                 insertTicketCommand.Parameters.AddWithValue(ticket_info.Category_id);
                 insertTicketCommand.Parameters.AddWithValue(userId);
+                insertTicketCommand.Parameters.AddWithValue(accessToken);
 
                 var insertTicketResult = await insertTicketCommand.ExecuteScalarAsync();
 
@@ -99,6 +152,9 @@ public static class UserRoutes
                     // Avsluta er transaction
                     return TypedResults.Ok("Added successfully");
                 }
+
+            
+            return TypedResults.Ok("Added successfully");
             }
             // This should never happen, since the ID we return from postgres will either happen, or it will be caugth as an exception by the try-catch
             return TypedResults.BadRequest("Something went wrong");
@@ -197,21 +253,33 @@ public static class UserRoutes
 
 
 
-    public record Credentials(string Email, string Password);
+    public record Credentials(string Email, string? Password);
     public record LoginResponse(string redirectPath, int companyId);
 
-    public static async Task<Results<Ok<LoginResponse>, BadRequest>> Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
-    {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1 and password = $2");
-        cmd.Parameters.AddWithValue(credentials.Email);
-        cmd.Parameters.AddWithValue(credentials.Password);
-        using var reader = await cmd.ExecuteReaderAsync();
 
-        if(await reader.ReadAsync())
+    public static async Task<IResult>
+    Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx, PasswordHasher<string> hasher)
+    {
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id, password from testuser where email = $1");
+        cmd.Parameters.AddWithValue(credentials.Email);
+
+        using var reader = await cmd.ExecuteReaderAsync();
+        
+        if (await reader.ReadAsync())
         {
             var role = reader.GetFieldValue<UserRole>(1);
             var companyId = reader.GetInt32(2);
-            
+            string hashedPassword = reader.GetString(3);
+            var verifyResult = hasher.VerifyHashedPassword("", hashedPassword, credentials.Password);
+            Console.WriteLine(verifyResult);
+            if (verifyResult == PasswordVerificationResult.Failed)
+            {
+                Console.WriteLine("NOT cracked");
+                return TypedResults.BadRequest();
+
+            }
+
+            Console.WriteLine(hashedPassword);
             ctx.Session.SetString("name", reader.GetString(0));
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
@@ -231,7 +299,7 @@ public static class UserRoutes
 
                 case UserRole.admin:
                 {
-                    location = "/AdminDashboard";
+                    location = "/admin/dashboard";
                 } break;
             }
             
@@ -242,4 +310,39 @@ public static class UserRoutes
             return TypedResults.BadRequest();
         }
     }
+
+
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
+    CustomerVisit(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+    {
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1");
+        cmd.Parameters.AddWithValue(credentials.Email);
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        if(await reader.ReadAsync())
+        {
+            var role = reader.GetFieldValue<UserRole>(1);
+            var companyId = reader.GetInt32(2);
+            
+            ctx.Session.SetString("name", reader.GetString(0));
+            ctx.Session.SetInt32("role", (int)role);
+            ctx.Session.SetInt32("companyId", companyId);
+
+            string location = "";
+            switch(role)
+            {
+                case UserRole.customer:
+                {
+                    location = "/customer/dashboard";
+                } break;
+            }
+            
+            return TypedResults.Ok(new LoginResponse(location, companyId));
+        }
+        else
+        {
+            return TypedResults.BadRequest();
+        }
+    }
+
 }

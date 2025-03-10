@@ -1,5 +1,5 @@
 import "./style.css";
-import {NavLink, Route} from "react-router";
+import { NavLink, Route } from "react-router";
 import LoginPage from "./Login.jsx";
 
 function Navigation() {
@@ -41,7 +41,27 @@ function Navigation() {
             Log-in
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/company/2" activeclassname="active">
+            Green future corp.
+          </NavLink>
+        </li>
       </ul>
+      <div
+        style={{
+          marginTop: "30px",
+          paddingTop: "20px",
+          borderTop: "1px solid #e0e0e0",
+          textAlign: "center",
+          fontSize: "12px",
+          color: "#7f8c8d",
+        }}
+      >
+        Powered by{" "}
+        <span style={{ fontWeight: "bold" }}>
+          Alcorel<sup>&reg;</sup>
+        </span>
+      </div>
     </nav>
   );
 }

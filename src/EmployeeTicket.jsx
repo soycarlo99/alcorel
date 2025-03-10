@@ -113,7 +113,7 @@ export default function EmployeeTicket() {
   const filteredResults = tickets.filter(
     (ticket) =>
       ticket.status.toLowerCase().includes(statusQuery.toLowerCase()) &&
-      ticket.categoryName.toLowerCase().includes(categoryQuery.toLowerCase())
+      ticket.categoryName.toLowerCase().includes(categoryQuery.toLowerCase()),
   );
 
   return (
@@ -140,7 +140,6 @@ export default function EmployeeTicket() {
             <option value="waiting">waiting</option>
             <option value="close">close</option>
             <option value="solved">solved</option>
-
           </select>
           <button type="button" onClick={toggleTicketsDate}>
             Date ↕️

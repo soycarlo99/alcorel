@@ -49,22 +49,26 @@ export default function EditCategories() {
   return (
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
-        <label>Add Category: </label>
+        <h1>Add Category</h1>
 
-        <input name="category_name" type="text" required />
-        <input name="company_id" type="text" required />
-        <input type="submit" value="Submit" />
+        <input
+          name="category_name"
+          placeholder="Please enter new category name..."
+          type="text"
+          required
+        />
+        <input type="submit" value="ADD" />
       </form>
       <p>Existing categories:</p>
 
       {categories.map((item, index) => (
-        <div>
+        <div className="removeCat">
           <h3 key={index}>{item.category_name}</h3>
           <form
             onSubmit={handleRemove}
             action={`/api/DeleteCategory/${item.id}`}
           >
-            <input type="submit" value={`Remove Category ${item.id}`} />
+            <input className="RemoveButton" type="submit" value="-" />
           </form>
         </div>
       ))}
