@@ -81,14 +81,16 @@ export default function CustomerView() {
     }
   }
 
-  async function SendFeedback() {
+  async function SendFeedback(event) {
+    console.log("hej");
+    event.preventDefault();
     try {
       const response = await fetch(
         `/api/sendRating/${rating}/${ticket.ticketId}`,
         {
           headers: { "Content-Type": "application/json" },
           method: "PUT",
-          body: statusdata,
+          body: "",
         },
       );
       if (response.ok) {
@@ -115,16 +117,20 @@ export default function CustomerView() {
       </div>
       {ticket.status == "solved" ? (
         <div>
-          <p>
-            <select value="Rate the experience please">
+          <form>
+            <select
+              value={rating || ""}
+              onChange={(e) => setRating(e.target.value)}
+            >
               <option value="">Rate the experience please</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
-          </p>
+            <button onClick={SendFeedback}>Submit Rating</button>
+          </form>
         </div>
       ) : (
         <p></p>
