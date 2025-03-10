@@ -4,10 +4,10 @@ using Server;
 var builder = WebApplication.CreateBuilder(args);
 
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
-var port = builder.Configuration["PG_PORT"] ?? "5432";
+var port = builder.Configuration["PG_PORT"] ?? "5433";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
-var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
-var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
+var password = builder.Configuration["PG_PASSWORD"] ?? "postgres";
+var database = builder.Configuration["PG_DATABASE"] ?? "alcorel";
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 dataSourceBuilder.EnableUnmappedTypes();
