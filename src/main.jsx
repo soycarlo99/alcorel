@@ -14,7 +14,7 @@ import CustomerView from "./CustomerView";
 import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
-import AdminDashboard from "./AdminDashboard";
+import EmployeeDashboard from "./EmployeeDashboard";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -32,7 +32,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:token" element={<CustomerView />} />
             <Route path="/Login" element={<LoginPage />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard/>} />
+            <Route path="/employee/dashboard" element={<EmployeeDashboard/>} />
           </Routes>
         </div>
       </div>
