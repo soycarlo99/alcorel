@@ -68,7 +68,8 @@ public static class EmployeeRoutes
     public static async Task<List<GetEmployeeDTO>> GetEmployee(NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 1 || role == 2)
         {
             return new List<GetEmployeeDTO>();
         }
@@ -98,15 +99,16 @@ public static class EmployeeRoutes
         PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db, PasswordHasher<string> hasher, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 1 || role == 2)
         {
-            return TypedResults.BadRequest("You don't have a company ID");
+            return TypedResults.BadRequest("You don't have a company ID nor a role");
         }
         using var command = db.CreateCommand(@"
         INSERT INTO testuser 
             (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
         VALUES 
-            (@name, @email, @password, @pending_confirmed, @role::user_role, @company_id) 
+            (@name, @email, @password, @pending_confirmed, @role::user_role, @company_id)  
         RETURNING 
             id, name, email, password, pending_confirmed, admin_customer_employee, company_id");
 
@@ -144,7 +146,7 @@ public static class EmployeeRoutes
 
 
     public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveEmployee(int testuserId, NpgsqlDataSource db)
+    RemoveEmployee(int testuserId, NpgsqlDataSource db, HttpContext ctx)
     {
         using var command = db.CreateCommand(@"DELETE FROM testuser WHERE id = @selected_employee");
 

@@ -58,8 +58,10 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
 app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
 app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
-app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) => {
+app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
+{
     ctx.Session.SetInt32("companyId", companyId);
+    ctx.Session.SetInt32("role", 1);
     return TypedResults.Ok(new { success = true });
 });
 
