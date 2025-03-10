@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 
 export default function AdminDashboard()
 {
+    
     return (
-        <h1>Admin Dashboard</h1>
+        <main>
+            <h1>Admin Dashboard</h1>
+        </main>
     )
 }
