@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 export default function EmployeeDashboard() {
     const [companyId, setCompanyId] = useState("");
     const [companyName, setCompanyName] = useState("");
-    const [loading, setLoading] = useState(true);
+    //const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -15,35 +15,35 @@ export default function EmployeeDashboard() {
             console.log(data)
             setCompanyId(data.companyId)
         }
-    
-    
-        fetchCompanyId();
-    });    
-
-    //test
-
-    useEffect(() => {
+        
         async function fetchCompanyName() {
             try {
                 const response = await fetch("/api/employee/dashboard");
                 if (!response.ok) {
                     throw new Error(`status: ${response.status}`);
                 }
-                const body = await response.json();
-                setCompanyName(body);
+                const data = await response.json();
+
+                console.log("API Response:", data);
+                setCompanyName(data.companyName);
+                
             } catch (error) {
-                console.error("Fetching tickets failed:", error);
+                console.error("Fetching company name failed:", error);
             }
         }
+        
         fetchCompanyName();
-        //test slut
-    }, []);
+        fetchCompanyId();
+    }, [companyId, companyName]);
+
+    //test
 
     return (
         <main>
+            
             <h1>Employee Dashboard</h1>
-            <p>Company: {companyId}</p>
-
+            <h2>CompanyId: {companyId || "Loading..."}</h2>
+            <h3>CompanyName: {companyName || "Loading..."}</h3>
         </main>
-        )
-    }
+    )
+}
