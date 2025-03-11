@@ -7,7 +7,6 @@ import AddQuestions from "./AddQuestions";
 import TicketCreation from "./customer/TicketCreation";
 import EmployeeTicket from "./EmployeeTicket";
 import Navigation from "./Navigation";
-import "./style.css";
 import ManageEmployees from "./manageEmployee";
 import TicketDetails from "./TicketDetails";
 import CustomerView from "./CustomerView";

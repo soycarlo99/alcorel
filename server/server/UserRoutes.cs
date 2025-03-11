@@ -345,26 +345,35 @@ public static class UserRoutes
         }
     }
 
-    SignUpAdminDTO(
+
+    public record SignUpAdminDTO(
         string CompanyName,
         string Email,
         string AdminName,
         string orgNumber,
-        string Passwordm
-        )
+        string Password
+    );
 
-    SignUpAdmin(PostUserDTO userDto, NpgsqlDataSource db)
+    public static async Task<IResult> SignUpAdmin(SignUpAdminDTO adminDto, NpgsqlDataSource db, PasswordHasher<string> hasher)
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING id, name");
-        command.Parameters.AddWithValue("name", userDto.Name);
-        command.Parameters.AddWithValue("email", userDto.Email);
-        command.Parameters.AddWithValue("password", userDto.Password);
-        command.Parameters.AddWithValue("role", userDto.admin_customer_employee);
-        command.Parameters.AddWithValue("company_id", userDto.company_id);
-
+        using var companyCmd = db.CreateCommand("INSERT INTO company (name, org_number, email, password) VALUES (@name, @orgNumber, @email, @password) RETURNING id");
+        string hashedPassword = hasher.HashPassword("", adminDto.Password);
+        companyCmd.Parameters.AddWithValue("name", adminDto.CompanyName);
+        companyCmd.Parameters.AddWithValue("orgNumber", adminDto.orgNumber); 
+        companyCmd.Parameters.AddWithValue("email", adminDto.Email);
+        companyCmd.Parameters.AddWithValue("password", hashedPassword);
+        
         try
         {
-            using var reader = await command.ExecuteReaderAsync();
+            var companyId = (int)await companyCmd.ExecuteScalarAsync();
+            
+            using var userCmd = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, 'admin'::user_role, @company_id) RETURNING id, name");
+            userCmd.Parameters.AddWithValue("name", adminDto.AdminName);
+            userCmd.Parameters.AddWithValue("email", adminDto.Email);
+            userCmd.Parameters.AddWithValue("password", adminDto.Password);
+            userCmd.Parameters.AddWithValue("company_id", companyId);
+            
+            using var reader = await userCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
                 var user = new User(reader.GetInt32(0), reader.GetString(1));
@@ -376,5 +385,4 @@ public static class UserRoutes
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
-    }
-}
+    }}
