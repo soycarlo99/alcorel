@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function EmployeeDashboard() {
-    const [companyId, setCompanyId] = useState("");
-    const [companyName, setCompanyName] = useState("");
+    const [companyId, setCompanyId] = useState();
+    const [companyName, setCompanyName] = useState();
     //const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -25,18 +25,21 @@ export default function EmployeeDashboard() {
                 const data = await response.json();
 
                 console.log("API Response:", data);
-                setCompanyName(data.companyName);
+
+                const companyName = data
+                console.log(companyName[0].name);
+                
+                setCompanyName(companyName[0].name);
                 
             } catch (error) {
                 console.error("Fetching company name failed:", error);
             }
         }
-        
-        fetchCompanyName();
         fetchCompanyId();
-    }, [companyId, companyName]);
+        fetchCompanyName();
+        
+    }, []);
 
-    //test
 
     return (
         <main>
