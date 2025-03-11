@@ -14,33 +14,29 @@ export default function EmployeeDashboard() {
             const data = await response.json();
             console.log(data)
             setCompanyId(data.companyId)
-        };
-
+        }
+    
+    
         fetchCompanyId();
+    });    
 
-//test
+    //test
 
-        useEffect(() => {
-            async function fetchCompanyName() {
-                try {
-                    const response = await fetch("/api/employee/dashboard");
-                    if (!response.ok) {
-                        throw new Error(`status: ${response.status}`);
-                    }
-                    const body = await response.json();
-                    setCompanyName(body);
-                } catch (error) {
-                    console.error("Fetching tickets failed:", error);
+    useEffect(() => {
+        async function fetchCompanyName() {
+            try {
+                const response = await fetch("/api/employee/dashboard");
+                if (!response.ok) {
+                    throw new Error(`status: ${response.status}`);
                 }
+                const body = await response.json();
+                setCompanyName(body);
+            } catch (error) {
+                console.error("Fetching tickets failed:", error);
             }
-            fetchCompanyName();
-        
-        
+        }
+        fetchCompanyName();
         //test slut
-            
-            
-            
-        
     }, []);
 
     return (
@@ -49,5 +45,5 @@ export default function EmployeeDashboard() {
             <p>Company: {companyId}</p>
 
         </main>
-    )
+        )
     }
