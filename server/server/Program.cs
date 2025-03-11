@@ -6,10 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<PasswordHasher<string>>();
 
 var host = builder.Configuration["PG_HOST"] ?? "localhost";
-var port = builder.Configuration["PG_PORT"] ?? "5433";
+var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
-var password = builder.Configuration["PG_PASSWORD"] ?? "postgres";
-var database = builder.Configuration["PG_DATABASE"] ?? "alcorel";
+var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
+var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder($"Host={host};Port={port};Username={username};Password={password};Database={database}");
 dataSourceBuilder.EnableUnmappedTypes();
@@ -98,5 +98,6 @@ app.MapGet("/api/session/companyId", (HttpContext ctx) =>
     var companyId = ctx.Session.GetInt32("companyId");
     return TypedResults.Ok(new { companyId = companyId });
 });
+app.MapGet("/api/employee/dashboard", CompanyRoutes.GetCompanyName);
 
 app.Run();

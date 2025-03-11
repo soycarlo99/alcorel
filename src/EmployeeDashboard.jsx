@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 export default function EmployeeDashboard() {
     const [companyId, setCompanyId] = useState("");
+    const [companyName, setCompanyName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -16,6 +17,30 @@ export default function EmployeeDashboard() {
         };
 
         fetchCompanyId();
+
+//test
+
+        useEffect(() => {
+            async function fetchCompanyName() {
+                try {
+                    const response = await fetch("/api/employee/dashboard");
+                    if (!response.ok) {
+                        throw new Error(`status: ${response.status}`);
+                    }
+                    const body = await response.json();
+                    setCompanyName(body);
+                } catch (error) {
+                    console.error("Fetching tickets failed:", error);
+                }
+            }
+            fetchCompanyName();
+        
+        
+        //test slut
+            
+            
+            
+        
     }, []);
 
     return (
@@ -25,4 +50,4 @@ export default function EmployeeDashboard() {
 
         </main>
     )
-}
+    }
