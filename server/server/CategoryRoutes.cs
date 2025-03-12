@@ -24,17 +24,19 @@ public static class CategoryRoutes
     public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 2)
         {
             return new List<GetCategoriesDTO>();
         }
-        
+
+
         List<GetCategoriesDTO> result = new();
         using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE company_id = @companyId");
         query.Parameters.AddWithValue("companyId", companyId);
         using var reader = await query.ExecuteReaderAsync();
-        
-        while(await reader.ReadAsync())
+
+        while (await reader.ReadAsync())
         {
             result.Add(new(
                 reader.GetInt32(0),
@@ -49,12 +51,12 @@ public static class CategoryRoutes
     public static async Task<List<GetCategoriesDTO>> GetCategoriesById(int categoryId, NpgsqlDataSource db)
     {
         List<GetCategoriesDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1"); 
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1");
 
         query.Parameters.AddWithValue(categoryId);
         using var reader = await query.ExecuteReaderAsync();
-        
-        while(await reader.ReadAsync())
+
+        while (await reader.ReadAsync())
         {
             result.Add(new(
                 reader.GetInt32(0),
@@ -65,20 +67,21 @@ public static class CategoryRoutes
         return result;
     }
 
-    public static async Task<Results<Created<Category>, BadRequest<string>>> 
+    public static async Task<Results<Created<Category>, BadRequest<string>>>
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null || companyId != categoryDto.company_id)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 1 || role == 2)
         {
             return TypedResults.BadRequest("Unauthorized or invalid company ID");
         }
-        
+
         using var command = db.CreateCommand(@"
             INSERT INTO categories (category_name, company_id) 
             VALUES (@category_name, @company_id) 
             RETURNING id, category_name, company_id");
-        
+
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
         command.Parameters.AddWithValue("company_id", categoryDto.company_id);
         try
@@ -105,7 +108,7 @@ public static class CategoryRoutes
     RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
-        
+
         command.Parameters.AddWithValue("selected_category", categoryId);
 
         try

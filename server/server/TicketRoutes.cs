@@ -2,6 +2,7 @@ using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
 namespace Server;
 
+
 public static class TicketRoutes
 {
 
@@ -94,7 +95,7 @@ public static class TicketRoutes
     }
 
     public static async Task<Results<Created<Ticket>, BadRequest<string>>>
-    PostTicket(PostTicketDTO ticketDto, NpgsqlDataSource db)
+    PostTicket(PostTicketDTO ticketDto, NpgsqlDataSource db, HttpContext ctx)
     {
         string token = GenerateToken();
 
@@ -108,6 +109,13 @@ public static class TicketRoutes
         command.Parameters.AddWithValue("user_id", ticketDto.user_id);
         command.Parameters.AddWithValue("category_id", ticketDto.category_id);
         command.Parameters.AddWithValue("token", token);
+        int? companyId = ctx.Session.GetInt32("companyId");
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 2)
+        {
+            Console.WriteLine("NOOO");
+            return TypedResults.BadRequest("Unauthorized, You are a employee and cant create a ticket");
+        }
 
         try
         {
@@ -140,11 +148,11 @@ public static class TicketRoutes
             JOIN categories c ON t.category_id = c.id
             JOIN testuser u ON t.user_id = u.id
             WHERE t.access_token = @token";
-        
+
         using var ticketCmd = db.CreateCommand(ticketQuery);
         ticketCmd.Parameters.AddWithValue("token", token);
         using var ticketReader = await ticketCmd.ExecuteReaderAsync();
-        
+
         if (!await ticketReader.ReadAsync())
             return TypedResults.NotFound();
 
@@ -152,7 +160,7 @@ public static class TicketRoutes
         ctx.Session.SetString("customerEmail", email);
 
         var ticketId = ticketReader.GetInt32(0);
-        var ticket = new 
+        var ticket = new
         {
             Id = ticketId,
             TicketTime = ticketReader.GetDateTime(1),
@@ -190,10 +198,10 @@ public static class TicketRoutes
         while (await qaReader.ReadAsync())
         {
             questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetInt32(0),  
-                qaReader.GetString(1), 
-                qaReader.IsDBNull(2) ? null : qaReader.GetString(2), 
-                qaReader.GetInt32(3) 
+                qaReader.GetInt32(0),
+                qaReader.GetString(1),
+                qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
+                qaReader.GetInt32(3)
             ));
         }
 
@@ -243,8 +251,9 @@ public static class TicketRoutes
     public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null){
-          return new List<DetailedTicket>();
+        if (companyId == null)
+        {
+            return new List<DetailedTicket>();
         }
 
         List<DetailedTicket> result = new();
@@ -272,15 +281,15 @@ public static class TicketRoutes
         while (await reader.ReadAsync())
         {
             result.Add(new DetailedTicket(
-                reader.GetInt32(0), 
+                reader.GetInt32(0),
                 reader.GetFieldValue<DateTime>(1),
                 reader.GetString(2),
                 reader.GetString(3),
                 reader.GetString(4),
-                "", 
+                "",
                 null,
-                "", 
-                "" 
+                "",
+                ""
             ));
         }
         return result;
@@ -295,15 +304,15 @@ public static class TicketRoutes
             JOIN categories c ON t.category_id = c.id
             JOIN testuser u ON t.user_id = u.id
             WHERE t.id = @id";
-        
+
         using var ticketCmd = db.CreateCommand(ticketQuery);
         ticketCmd.Parameters.AddWithValue("id", id);
         using var ticketReader = await ticketCmd.ExecuteReaderAsync();
-        
+
         if (!await ticketReader.ReadAsync())
             return TypedResults.NotFound();
 
-        var ticket = new 
+        var ticket = new
         {
             Id = ticketReader.GetInt32(0),
             TicketTime = ticketReader.GetDateTime(1),
@@ -341,10 +350,10 @@ public static class TicketRoutes
         while (await qaReader.ReadAsync())
         {
             questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetInt32(0),  
-                qaReader.GetString(1), 
-                qaReader.IsDBNull(2) ? null : qaReader.GetString(2), 
-                qaReader.GetInt32(3) 
+                qaReader.GetInt32(0),
+                qaReader.GetString(1),
+                qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
+                qaReader.GetInt32(3)
             ));
         }
 
@@ -360,6 +369,6 @@ public static class TicketRoutes
         );
 
         return TypedResults.Ok(fullDetails);
-  }
+    }
 
 }
