@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, Outlet, Link, NavLink } from "react-router";
 
 export default function CustomerView() {
   const { token } = useParams();

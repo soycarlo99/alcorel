@@ -1,13 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, useParams } from "react-router";
+import { BrowserRouter, Routes, Route, useParams, Outlet } from "react-router";
 
 import EditCategories from "./EditCategories";
 import AddQuestions from "./AddQuestions";
 import TicketCreation from "./customer/TicketCreation";
 import EmployeeTicket from "./EmployeeTicket";
 import Navigation from "./Navigation";
-import "./style.css";
 import ManageEmployees from "./manageEmployee";
 import TicketDetails from "./TicketDetails";
 import CustomerView from "./CustomerView";
@@ -15,6 +14,7 @@ import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
 import AdminDashboard from "./AdminDashboard";
+import AiChat from "./chat";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -24,15 +24,24 @@ createRoot(document.getElementById("root")).render(
         <div className="main-content">
           <Routes>
             <Route index element={<TicketCreation />} />
-            <Route path="/EditCategories" element={<EditCategories />} />
-            <Route path="/EmployeeTicket" element={<EmployeeTicket />} />
-            <Route path="/AddQuestions" element={<AddQuestions />} />
-            <Route path="/ManageEmployee" element={<ManageEmployees />} />
+            <Route path="/editCategories" element={<EditCategories />} />
+            <Route path="/employeeTicket" element={<EmployeeTicket />} />
+            <Route path="/addQuestions" element={<AddQuestions />} />
+            <Route path="/manageEmployee" element={<ManageEmployees />} />
             <Route path="/company/:companyId" element={<CompanyLanding />} />
-            <Route path="/Ticket/:id" element={<TicketDetails />} />
-            <Route path="/CustomerView/:token" element={<CustomerView />} />
+            <Route path="/ticket/:id" element={<TicketDetails />} />
+            <Route
+              path="CustomerView/:token"
+              element={
+                <>
+                  <CustomerView />
+                  <AiChat />
+                </>
+              }
+            />
+            <Route path="/chat" element={<AiChat />} />
             <Route path="/Login" element={<LoginPage />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard/>} />
+            <Route path="/AdminDashboard" element={<AdminDashboard />} />
           </Routes>
         </div>
       </div>

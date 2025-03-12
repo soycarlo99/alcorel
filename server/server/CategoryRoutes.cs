@@ -69,7 +69,7 @@ public static class CategoryRoutes
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null || companyId != categoryDto.company_id)
+        if (companyId == null)
         {
             return TypedResults.BadRequest("Unauthorized or invalid company ID");
         }
@@ -80,7 +80,7 @@ public static class CategoryRoutes
             RETURNING id, category_name, company_id");
         
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
-        command.Parameters.AddWithValue("company_id", categoryDto.company_id);
+        command.Parameters.AddWithValue("company_id", companyId);
         try
         {
             using var reader = await command.ExecuteReaderAsync();

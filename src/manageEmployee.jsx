@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-
 export default function ManageEmployees() {
   const [employee, SetEmployee] = useState([]);
-
   useEffect(() => {
     GetEmployee();
   }, []);
-
   async function GetEmployee() {
     try {
       const response = await fetch("/api/GetEmployee");
@@ -17,7 +14,6 @@ export default function ManageEmployees() {
       console.error(error);
     }
   }
-
   function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
@@ -41,7 +37,6 @@ export default function ManageEmployees() {
       }
     });
   }
-
   function handleRemove(event) {
     event.preventDefault();
     fetch(event.target.action, {
@@ -52,22 +47,20 @@ export default function ManageEmployees() {
       }
     });
   }
-
   function handleResetPassword(event) {
     event.preventDefault();
     let data = JSON.stringify(EventTarget.data);
-    console.log(EventTarget.data)
+    console.log(EventTarget.data);
     fetch(event.target.action, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: data,
     }).then((response) => {
       if (response.ok) {
-        console.log(response)
+        console.log(response);
         GetEmployee();
       }
     });
-
   }
   return (
     <div>
@@ -85,16 +78,39 @@ export default function ManageEmployees() {
       </form>
       <h3>Existing employees:</h3>
       {employee.map((item, index) => (
-        <div className="ExistingEmployeeCard">
-          <h3 id="employees" key={index}>{item.name}</h3>
+        <div className="ExistingEmployeeCard" key={index}>
+          <div className="removeCat">
+            <form
+              onSubmit={handleRemove}
+              action={`/api/DeleteEmployee/${item.id}`}
+            >
+              <input
+                className="RemoveButton"
+                type="submit"
+                value="-"
+                style={{
+                  boxShadow: "none",
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  appearance: "none",
+                  border: "none",
+                  outline: "none",
+                }}
+                title={`Eliminate ${item.name}`}
+              />
+            </form>
+            <h3 id="employees">{item.name}</h3>
+          </div>
           <form
-            onSubmit={handleRemove}
-            action={`/api/DeleteEmployee/${item.id}`}
+            name="resetpassword"
+            onSubmit={handleResetPassword}
+            action={`/api/ResetPassword/${item.id}`}
           >
-            <input id="ElimButton" type="submit" value={`Eliminate ${item.name}`} />
-          </form>
-          <form name="resetpassword" onSubmit={handleResetPassword} action={`/api/ResetPassword/${item.id}`}>
-            <input id="ResetPassButton" type="submit" value={'ResetPassword'} />
+            <input
+              id="ResetPassButton"
+              type="submit"
+              value={"Reset Password"}
+            />
           </form>
         </div>
       ))}
