@@ -6,7 +6,6 @@ import LoginPage from "./Login.jsx";
 
 function Navigation() {
   const [waitingTicketsCount, setWaitingTicketsCount] = useState(0);
-
   const [isEmployee, setIsEmployee] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
 
@@ -26,31 +25,33 @@ function Navigation() {
         console.error("Fetching tickets failed:", error);
       }
     }
-    fetchTickets();
-  }, []);
 
-  useEffect(() => {
-    fetch("/api/login/employee").then((response) => {
-      if (response.ok) {
-        setIsEmployee(true);
-      } else {
+    async function checkUserRoles() {
+      try {
+        const employeeResponse = await fetch("/api/login/employee");
+        setIsEmployee(employeeResponse.ok);
+      } catch (error) {
+        console.error("Employee check failed:", error);
         setIsEmployee(false);
       }
-    });
 
-    fetch("/api/login/admin").then((response) => {
-      if (response.ok) {
-        console.log(response);
-        setIsAdmin(true);
-      } else {
+      try {
+        const adminResponse = await fetch("/api/login/admin");
+        if (adminResponse.ok) {
+          console.log(adminResponse);
+        }
+        setIsAdmin(adminResponse.ok);
+      } catch (error) {
+        console.error("Admin check failed:", error);
         setIsAdmin(false);
       }
-    });
+    }
+
+    fetchTickets();
+    checkUserRoles();
   }, []);
-  if (isEmployee == null) {
-    return null;
-  }
-  if (isAdmin == null) {
+
+  if (isEmployee === null || isAdmin === null) {
     return null;
   }
 
@@ -101,11 +102,6 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
-            <NavLink exact to="/" activeclassname="active">
-              Create Ticket
-            </NavLink>
-          </li>
-          <li>
             <NavLink to="/add-questions" activeclassname="active">
               Add Questions
             </NavLink>
@@ -123,6 +119,16 @@ function Navigation() {
           <li>
             <NavLink to="/login" activeclassname="active">
               Log-in
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/usage-of-iframe" activeclassname="active">
+              iFrame
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/alcorel" activeclassname="active">
+              Alcorel LandingPage
             </NavLink>
           </li>
           <li>
@@ -165,6 +171,11 @@ function Navigation() {
           <li>
             <NavLink to="/company/2" activeclassname="active">
               Green future corp.
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/login" activeclassname="active">
+              Log-in
             </NavLink>
           </li>
         </ul>

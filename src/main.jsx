@@ -88,20 +88,24 @@ function AdminRoute({ element }) {
 }
 
 const LayoutWithNav = () => (
-  <div className="app-container">
-    <Navigation />
-    <div className="main-content">
-      <Outlet />
+  <RoleProvider>
+    <div className="app-container">
+      <Navigation />
+      <div className="main-content">
+        <Outlet />
+      </div>
     </div>
-  </div>
+  </RoleProvider>
 );
 
 const LayoutWithoutNav = () => (
-  <div className="app-container">
-    <div className="main-content full-width">
-      <Outlet />
+  <RoleProvider>
+    <div className="app-container">
+      <div className="main-content full-width">
+        <Outlet />
+      </div>
     </div>
-  </div>
+  </RoleProvider>
 );
 
 createRoot(document.getElementById("root")).render(
@@ -111,15 +115,17 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route element={<LayoutWithoutNav />}>
             <Route index element={<TicketCreation />} />
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/company/:companyId" element={<CompanyLanding />} />
             <Route path="/customer-view/:token" element={<CustomerView />} />
+            <Route path="/login" element={<LoginPage />} />
           </Route>
           <Route element={<LayoutWithNav />}>
             <Route
               path="/edit-categories"
               element={<AdminRoute element={<EditCategories />} />}
             />
+            <Route path="/login" element={<LoginPage />} />
+
             <Route path="/employee-ticket" element={<EmployeeTicket />} />
             <Route
               path="/add-questions"
@@ -134,7 +140,7 @@ createRoot(document.getElementById("root")).render(
               path="/employee/dashboard"
               element={<EmployeeRoute element={<EmployeeDashboard />} />}
             />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/alcorel" element={<Alcorel />} />
             <Route path="/usage-of-iframe" element={<HowToUseIframe />} />
           </Route>
