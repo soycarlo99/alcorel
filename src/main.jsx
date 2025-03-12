@@ -66,7 +66,7 @@ function EmployeeRoute({ element }) {
 
 function AdminRoute({ element }) {
   const { isAdmin } = useAuth();
-  return isAdmin? element: <h1>Unauthorized</h1>
+  return isAdmin? element: <h1>Unauthorized, only admins are allowed here</h1>
 } 
 
 createRoot(document.getElementById("root")).render(
