@@ -113,4 +113,8 @@ app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) 
     return Results.Ok(result);
 });
 
+//Feedback APIs
+app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
+//app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
+
 app.Run();
