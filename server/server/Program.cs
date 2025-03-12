@@ -58,7 +58,8 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
 app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
 app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
-app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) => {
+app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
+{
     ctx.Session.SetInt32("companyId", companyId);
     return TypedResults.Ok(new { success = true });
 });
@@ -92,6 +93,25 @@ app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
+app.MapGet("/api/session/companyId", (HttpContext ctx) =>
+{
+    var companyId = ctx.Session.GetInt32("companyId");
+    return TypedResults.Ok(new { companyId = companyId });
+});
+app.MapGet("/api/employee/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
+{
+    var companyId = ctx.Session.GetInt32("companyId");
+
+    var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+    return Results.Ok(result);
+});
+app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
+{
+    var companyId = ctx.Session.GetInt32("companyId");
+
+    var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+    return Results.Ok(result);
+});
 
 //Feedback APIs
 app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
