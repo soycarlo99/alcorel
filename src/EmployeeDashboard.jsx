@@ -7,7 +7,8 @@ export default function EmployeeDashboard() {
     //const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
-
+    const Logotype2 = "https://reactjs.org/logo-og.png";
+    
     useEffect(() => {
         const fetchCompanyId = async () => {
             const response = await fetch('/api/session/companyId');
@@ -50,6 +51,13 @@ export default function EmployeeDashboard() {
             <h1>Employee Dashboard</h1>
             <h2>CompanyId: {companyId || "Loading..."}</h2>
             <h3>CompanyName: {companyName || "Loading..."}</h3>
+
+            {/*  1: direct url, 2: local pic using var, at the moment there is no local pic, 3: url using var   */}
+            <img src="https://reactjs.org/logo-og.png" alt="Test" style={{ width: '200px', }}/>
+            {/*    <img src={Logotype} alt="Test2" style={{ width: '210px', }}/> */}
+            <img src={Logotype2} alt="Test3" style={{ width: '220px', }}/>
+            
+            
         </main>
     )
 }
