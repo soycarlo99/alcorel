@@ -15,35 +15,38 @@ export default function EmployeeDashboard() {
             console.log(data)
             setCompanyId(data.companyId)
         }
-        
-        async function fetchCompanyName() {
-            try {
-                const response = await fetch("/api/employee/dashboard");
+
+        fetchCompanyId();
+    }, []);
+
+    useEffect(() => {
+        if (companyId) {
+            fetchCompanyName();
+        }
+    }, [companyId]);
+
+    async function fetchCompanyName() {
+        try {
+            // Only proceed if companyId is available
+            if (companyId) {
+                const response = await fetch(`/api/employee/dashboard?companyId=${companyId}`);
                 if (!response.ok) {
                     throw new Error(`status: ${response.status}`);
                 }
                 const data = await response.json();
-
                 console.log("API Response:", data);
-
-                const companyName = data
+                const companyName = data;
                 console.log(companyName[0].name);
-                
                 setCompanyName(companyName[0].name);
-                
-            } catch (error) {
-                console.error("Fetching company name failed:", error);
             }
+        } catch (error) {
+            console.error("Fetching company name failed:", error);
+            setError("Failed to load company name");
         }
-        fetchCompanyId();
-        fetchCompanyName();
-        
-    }, []);
-
+    }
 
     return (
         <main>
-            
             <h1>Employee Dashboard</h1>
             <h2>CompanyId: {companyId || "Loading..."}</h2>
             <h3>CompanyName: {companyName || "Loading..."}</h3>

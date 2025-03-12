@@ -19,15 +19,14 @@ public static class CompanyRoutes
     {
         List<Name> result = new();
         using var query = db.CreateCommand("SELECT name FROM company WHERE id = @companyId");
-       query.Parameters.AddWithValue("@companyId");
-
-       
-       using var reader = await query.ExecuteReaderAsync();
-       if (await reader.ReadAsync())
-       {
-           result.Add(new Name(reader.GetString(0)));
-       }
-       
+        query.Parameters.AddWithValue("@companyId", companyId);
+        using var reader = await query.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            result.Add(new(
+                reader.GetString(0)
+            ));
+        }
         return result;
     }
 
