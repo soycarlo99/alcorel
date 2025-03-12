@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+
+
+
 export default function EmployeeDashboard() {
     const [companyId, setCompanyId] = useState();
     const [companyName, setCompanyName] = useState();
@@ -49,13 +52,14 @@ export default function EmployeeDashboard() {
     return (
         <main>
             <h1>Employee Dashboard</h1>
-            <h2>CompanyId: {companyId || "Loading..."}</h2>
+            {/*  <h2>CompanyId: {companyId || "Loading..."}</h2>*/}
             <h3>CompanyName: {companyName || "Loading..."}</h3>
 
-            {/*  1: direct url, 2: local pic using var, at the moment there is no local pic, 3: url using var   */}
-            <img src="https://reactjs.org/logo-og.png" alt="Test" style={{ width: '200px', }}/>
-            {/*    <img src={Logotype} alt="Test2" style={{ width: '210px', }}/> */}
-            <img src={Logotype2} alt="Test3" style={{ width: '220px', }}/>
+          
+           
+            {/*      <img src={Logotype2} alt="Test2" style={{ width: '210px', }}/> */}
+            <img src="/src/Logotypes/GreenFutureCorp.webp" alt="Test4" style={{ width: '250px', }}/>
+         
             
             
         </main>
