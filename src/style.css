@@ -43,11 +43,30 @@ body {
   font-weight: bold;
 }
 
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+}
+
 .main-content {
   margin-left: 230px;
   padding: 20px;
   background-color: #fff;
   min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.full-width {
+  margin-left: 0;
+  width: 100%;
 }
 
 .CreateTicket {
@@ -61,6 +80,12 @@ body {
   flex-direction: column;
   padding: 20px;
   border-radius: 10px;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .form label {
@@ -454,4 +479,42 @@ input[type="radio"] {
 .rating > label:hover,
 .rating > label:hover ~ label {
   color: orange !important;
+}
+
+.moto {
+  background-color: rgba(100, 27, 100, 0.4);
+  padding: 25px;
+  border-radius: 20px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+.notification-badge {
+  background-color: orange;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 5px;
+  font-size: 12px;
+  margin-left: 8px;
+  display: inline-block;
+  min-width: 16px;
+  text-align: center;
+  font-weight: bold;
+  animation: bounce 5s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
 }

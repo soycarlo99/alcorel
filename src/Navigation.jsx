@@ -1,51 +1,72 @@
 import "./style.css";
 import { NavLink, Route, Navigate } from "react-router";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
+
 import LoginPage from "./Login.jsx";
 
 function Navigation() {
-
+  const [waitingTicketsCount, setWaitingTicketsCount] = useState(0);
   const [isEmployee, setIsEmployee] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
 
   useEffect(() => {
-    fetch("/api/login/employee")
-      .then(response => {
-        if (response.ok) {
-          setIsEmployee(true)
-        } else {
-          setIsEmployee(false)
+    async function fetchTickets() {
+      try {
+        const response = await fetch("/api/DetailedTicket");
+        if (!response.ok) {
+          throw new Error(`status: ${response.status}`);
         }
-        
-      })
-    
-    fetch("/api/login/admin")
-      .then(response => {
-        if (response.ok) {
-          console.log(response)
-          setIsAdmin(true)
-        } else {
-          setIsAdmin(false)
+        const body = await response.json();
+        const waitingCount = body.filter(
+          (ticket) => ticket.status.toLowerCase() === "waiting",
+        ).length;
+        setWaitingTicketsCount(waitingCount);
+      } catch (error) {
+        console.error("Fetching tickets failed:", error);
+      }
+    }
+
+    async function checkUserRoles() {
+      try {
+        const employeeResponse = await fetch("/api/login/employee");
+        setIsEmployee(employeeResponse.ok);
+      } catch (error) {
+        console.error("Employee check failed:", error);
+        setIsEmployee(false);
+      }
+
+      try {
+        const adminResponse = await fetch("/api/login/admin");
+        if (adminResponse.ok) {
+          console.log(adminResponse);
         }
-        
-      })
+        setIsAdmin(adminResponse.ok);
+      } catch (error) {
+        console.error("Admin check failed:", error);
+        setIsAdmin(false);
+      }
+    }
+
+    fetchTickets();
+    checkUserRoles();
   }, []);
-  if (isEmployee == null) {
-    return null
-  }
-  if (isAdmin == null) {
-    return null
-  }
 
-
+  if (isEmployee === null || isAdmin === null) {
+    return null;
+  }
 
   if (isEmployee) {
     return (
       <nav className="sidebar">
         <ul>
           <li>
-            <NavLink to="/EmployeeTicket" activeclassname="active">
+            <NavLink to="/employee-ticket" activeclassname="active">
               Employee Tickets
+              {waitingTicketsCount > 0 && (
+                <span className="notification-badge">
+                  {waitingTicketsCount}
+                </span>
+              )}
             </NavLink>
           </li>
         </ul>
@@ -71,38 +92,43 @@ function Navigation() {
       <nav className="sidebar">
         <ul>
           <li>
-            <NavLink to="/EditCategories" activeclassname="active">
+            <NavLink to="/edit-categories" activeclassname="active">
               Edit Categories
             </NavLink>
           </li>
           <li>
-            <NavLink to="/EmployeeTicket" activeclassname="active">
+            <NavLink to="/employee-ticket" activeclassname="active">
               Employee Tickets
             </NavLink>
           </li>
           <li>
-            <NavLink exact to="/" activeclassname="active">
-              Create Ticket
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/AddQuestions" activeclassname="active">
+            <NavLink to="/add-questions" activeclassname="active">
               Add Questions
             </NavLink>
           </li>
           <li>
-            <NavLink to="/ManageEmployee" activeclassname="active">
+            <NavLink to="/manage-employee" activeclassname="active">
               Manage Employee
             </NavLink>
           </li>
           <li>
-            <NavLink to="/CustomerView" activeclassname="active">
+            <NavLink to="/customer-view" activeclassname="active">
               Customer View (reply)
             </NavLink>
           </li>
           <li>
-            <NavLink to="/Login" activeclassname="active">
+            <NavLink to="/login" activeclassname="active">
               Log-in
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/usage-of-iframe" activeclassname="active">
+              iFrame
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/alcorel" activeclassname="active">
+              Alcorel LandingPage
             </NavLink>
           </li>
           <li>
@@ -138,13 +164,18 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/CustomerView" activeclassname="active">
+            <NavLink to="/customer-view" activeclassname="active">
               Customer View (reply)
             </NavLink>
           </li>
           <li>
             <NavLink to="/company/2" activeclassname="active">
               Green future corp.
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/login" activeclassname="active">
+              Log-in
             </NavLink>
           </li>
         </ul>

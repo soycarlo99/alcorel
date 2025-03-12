@@ -64,6 +64,18 @@ app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
     ctx.Session.SetInt32("role", 1);
     return TypedResults.Ok(new { success = true });
 });
+app.MapGet("/api/company/current", (HttpContext ctx) => {
+    var companyId = ctx.Session.GetInt32("companyId");
+    
+    if (companyId.HasValue)
+    {
+        return Results.Ok(new { companyId = companyId.Value });
+    }
+    else
+    {
+        return Results.NotFound(new { error = "No company session found" });
+    }
+});
 
 
 // app.MapGet("/api/login/employee", (HttpContext ctx) =>
@@ -159,5 +171,11 @@ app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) 
 //Feedback APIs
 app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
 //app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
+
+//Sign-up APIs
+app.MapPost("api/signup", UserRoutes.SignUpAdmin);
+
+
+
 
 app.Run();
