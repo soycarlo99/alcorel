@@ -26,6 +26,7 @@ export default function LoginPage() {
       if (response.ok) {
         response.text().then(resp => {
           const json = JSON.parse(resp)  //fix
+          location.reload();
           navigate(json.redirectPath)
         })
         // response.text().then((location) => {
