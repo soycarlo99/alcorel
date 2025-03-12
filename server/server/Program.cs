@@ -62,6 +62,18 @@ app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) => 
     ctx.Session.SetInt32("companyId", companyId);
     return TypedResults.Ok(new { success = true });
 });
+app.MapGet("/api/company/current", (HttpContext ctx) => {
+    var companyId = ctx.Session.GetInt32("companyId");
+    
+    if (companyId.HasValue)
+    {
+        return Results.Ok(new { companyId = companyId.Value });
+    }
+    else
+    {
+        return Results.NotFound(new { error = "No company session found" });
+    }
+});
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);

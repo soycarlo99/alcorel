@@ -1,19 +1,44 @@
 import "./style.css";
 import { NavLink, Route } from "react-router";
+import { useState, useEffect } from "react";
 import LoginPage from "./Login.jsx";
 
 function Navigation() {
+  const [waitingTicketsCount, setWaitingTicketsCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchTickets() {
+      try {
+        const response = await fetch("/api/DetailedTicket");
+        if (!response.ok) {
+          throw new Error(`status: ${response.status}`);
+        }
+        const body = await response.json();
+        const waitingCount = body.filter(
+          (ticket) => ticket.status.toLowerCase() === "waiting",
+        ).length;
+        setWaitingTicketsCount(waitingCount);
+      } catch (error) {
+        console.error("Fetching tickets failed:", error);
+      }
+    }
+    fetchTickets();
+  }, []);
+
   return (
     <nav className="sidebar">
       <ul>
         <li>
-          <NavLink to="/EditCategories" activeclassname="active">
+          <NavLink to="/edit-categories" activeclassname="active">
             Edit Categories
           </NavLink>
         </li>
         <li>
-          <NavLink to="/EmployeeTicket" activeclassname="active">
+          <NavLink to="/employee-ticket" activeclassname="active">
             Employee Tickets
+            {waitingTicketsCount > 0 && (
+              <span className="notification-badge">{waitingTicketsCount}</span>
+            )}
           </NavLink>
         </li>
         <li>
@@ -22,28 +47,33 @@ function Navigation() {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/AddQuestions" activeclassname="active">
+          <NavLink to="/add-questions" activeclassname="active">
             Add Questions
           </NavLink>
         </li>
         <li>
-          <NavLink to="/ManageEmployee" activeclassname="active">
+          <NavLink to="/manage-employee" activeclassname="active">
             Manage Employee
           </NavLink>
         </li>
         <li>
-          <NavLink to="/CustomerView" activeclassname="active">
+          <NavLink to="/customer-view" activeclassname="active">
             Customer View (reply)
           </NavLink>
         </li>
         <li>
-          <NavLink to="/Alcorel" activeclassname="active">
+          <NavLink to="/alcorel" activeclassname="active">
             AlcoRel Landing page
           </NavLink>
         </li>
         <li>
-          <NavLink to="/Login" activeclassname="active">
+          <NavLink to="/login" activeclassname="active">
             Log-in
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/usage-of-iframe" activeclassname="active">
+            Usage of iFrame
           </NavLink>
         </li>
         <li>
