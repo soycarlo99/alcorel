@@ -83,7 +83,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="/AddQuestions" element={<AdminRoute element={<AddQuestions />} />} />
               <Route path="/ManageEmployee" element={<AdminRoute element={<ManageEmployees />} />}/> 
               <Route path="/company/:companyId" element={<CompanyLanding />} />
-              <Route path="/Ticket/:id" element={<AdminRoute element={<TicketDetails />} />} />
+              <Route path="/Ticket/:id" element={<TicketDetails />} />
               <Route path="/CustomerView/:token" element={<CustomerView />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/admindashboard" element={<AdminDashboard />} />
