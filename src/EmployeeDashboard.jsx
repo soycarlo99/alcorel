@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 export default function EmployeeDashboard() {
     const [companyId, setCompanyId] = useState();
     const [companyName, setCompanyName] = useState();
+    const [companyLogo, setCompanyLogo] = useState();
     //const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -39,15 +40,18 @@ export default function EmployeeDashboard() {
                 }
                 const data = await response.json();
                 console.log("API Response:", data);
-                const companyName = data;
-                console.log(companyName[0].name);
-                setCompanyName(companyName[0].name);
+                const companyInfo = data;
+                console.log(companyInfo[0].company);
+                setCompanyName(companyInfo[0].company);
+                setCompanyLogo(companyInfo[0].logotype);
             }
         } catch (error) {
             console.error("Fetching company name failed:", error);
             setError("Failed to load company name");
         }
     }
+
+   
 
     return (
         <main>
@@ -57,8 +61,9 @@ export default function EmployeeDashboard() {
 
           
            
-            {/*      <img src={Logotype2} alt="Test2" style={{ width: '210px', }}/> */}
-            <img src="/src/Logotypes/GreenFutureCorp.webp" alt="Test4" style={{ width: '250px', }}/>
+            <img src={companyLogo} alt="Test2" style={{ width: '210px', }}/> 
+            
+
          
             
             

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 export default function AdminDashboard() {
     const [companyId, setCompanyId] = useState();
     const [companyName, setCompanyName] = useState();
+    const [companyLogo, setCompanyLogo] = useState();
     //const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -35,9 +36,10 @@ export default function AdminDashboard() {
                 }
                 const data = await response.json();
                 console.log("API Response:", data);
-                const companyName = data;
-                console.log(companyName[0].name);
-                setCompanyName(companyName[0].name);
+                const companyInfo = data;
+                console.log(companyInfo[0].company);
+                setCompanyName(companyInfo[0].company);
+                setCompanyLogo(companyInfo[0].logotype);
             }
         } catch (error) {
             console.error("Fetching company name failed:", error);
@@ -45,11 +47,16 @@ export default function AdminDashboard() {
         }
     }
 
+
+
     return (
         <main>
             <h1>Admin Dashboard</h1>
             <h2>CompanyId: {companyId || "Loading..."}</h2>
             <h3>CompanyName: {companyName || "Loading..."}</h3>
+            <img src={companyLogo} alt="Test2" style={{ width: '210px', }} /> 
+
+
         </main>
     )
 }

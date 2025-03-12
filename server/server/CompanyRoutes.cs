@@ -9,15 +9,16 @@ public static class CompanyRoutes
 {
 
 
-    public record Name(
-        string name
+    public record Company(
+        string company,
+        string logotype
     );
 
 
 
-    public static async Task<List<Name>> GetCompanyName(NpgsqlDataSource db, int companyId)
+    public static async Task<List<Company>> GetCompanyName(NpgsqlDataSource db, int companyId)
     {
-        List<Name> result = new();
+        List<Company> result = new();
         using var query = db.CreateCommand("SELECT name, logotype FROM company WHERE id = @companyId");
         query.Parameters.AddWithValue("@companyId", companyId);
         
@@ -25,7 +26,8 @@ public static class CompanyRoutes
         if (await reader.ReadAsync())
         {
             result.Add(new(
-                reader.GetString(0)
+                reader.GetString(0),
+                reader.GetString(1)
             ));
         }
         return result;
