@@ -15,18 +15,19 @@ public static class CompanyRoutes
 
 
 
-    public static async Task<List<Name>> GetCompanyName(NpgsqlDataSource db)
+    public static async Task<List<Name>> GetCompanyName(NpgsqlDataSource db, int companyId)
     {
         List<Name> result = new();
-        using var query = db.CreateCommand("SELECT name FROM company WHERE id = 1");
-        using var reader = await query.ExecuteReaderAsync();
+        using var query = db.CreateCommand("SELECT name FROM company WHERE id = @companyId");
+       query.Parameters.AddWithValue("@companyId");
 
-        if (await reader.ReadAsync())
-        {
-            result.Add(new(
-                reader.GetString(0)
-            ));
-        }
+       
+       using var reader = await query.ExecuteReaderAsync();
+       if (await reader.ReadAsync())
+       {
+           result.Add(new Name(reader.GetString(0)));
+       }
+       
         return result;
     }
 
