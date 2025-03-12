@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,6 +26,7 @@ export default function LoginPage() {
       if (response.ok) {
         response.text().then(resp => {
           const json = JSON.parse(resp)  //fix
+          location.reload();
           navigate(json.redirectPath)
         })
         // response.text().then((location) => {

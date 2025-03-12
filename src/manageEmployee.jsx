@@ -18,7 +18,7 @@ export default function ManageEmployees() {
     }
   }
 
-  function handleAddSubmit(event) {
+  async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
     data = Object.fromEntries(data);
@@ -29,17 +29,22 @@ export default function ManageEmployees() {
     console.log(data);
     data = JSON.stringify(data);
     console.log(data);
-    fetch("/api/PostEmployee", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: data,
-    }).then((response) => {
-      if (response.ok) {
-        GetEmployee();
-        console.log("Employee Added Succesfully");
-        document.getElementById("forum").reset();
+    try {
+      const response = await fetch("/api/PostEmployee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+      });
+        if (response.ok) {
+          GetEmployee();
+          console.log("Employee Added Succesfully");
+          document.getElementById("forum").reset();
+      } else if (response.badrequest) {
+        console.log(badrequest)
       }
-    });
+      } catch (error) {
+        console.log(error)
+      }
   }
 
   function handleRemove(event) {
