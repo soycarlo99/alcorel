@@ -101,7 +101,14 @@ app.MapGet("/api/session/companyId", (HttpContext ctx) =>
 app.MapGet("/api/employee/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
 {
     var companyId = ctx.Session.GetInt32("companyId");
-    
+
+    var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+    return Results.Ok(result);
+});
+app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
+{
+    var companyId = ctx.Session.GetInt32("companyId");
+
     var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
     return Results.Ok(result);
 });

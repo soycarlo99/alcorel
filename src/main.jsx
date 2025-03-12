@@ -15,6 +15,7 @@ import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
 import EmployeeDashboard from "./EmployeeDashboard";
+import AdminDashboard from "./AdminDashboard";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -32,7 +33,9 @@ createRoot(document.getElementById("root")).render(
             <Route path="/Ticket/:id" element={<TicketDetails />} />
             <Route path="/CustomerView/:token" element={<CustomerView />} />
             <Route path="/Login" element={<LoginPage />} />
-            <Route path="/employee/dashboard" element={<EmployeeDashboard/>} />
+            <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
           </Routes>
         </div>
       </div>
