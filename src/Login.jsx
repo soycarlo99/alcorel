@@ -25,12 +25,13 @@ export default function LoginPage() {
     }).then((response) => {
       if (response.ok) {
         response.text().then(resp => {
-        const json = JSON.parse(resp)  //fix
-        navigate(json.redirectPath)
+          const json = JSON.parse(resp)  //fix
+          location.reload();
+          navigate(json.redirectPath)
         })
-        //response.text().then((location) => {
-        //navigate(location.slice(1, -1));
-        //});
+        // response.text().then((location) => {
+        //   navigate(location.slice(1, -1));
+        // });
       } else {
         console.error("response not ok");
       }

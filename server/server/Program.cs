@@ -61,8 +61,51 @@ app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
 app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
 {
     ctx.Session.SetInt32("companyId", companyId);
+    ctx.Session.SetInt32("role", 1);
     return TypedResults.Ok(new { success = true });
 });
+
+
+// app.MapGet("/api/login/employee", (HttpContext ctx) =>
+// {
+//     int? role = ctx.Session.GetInt32("role");
+//     if (role == 2)
+//     {
+//         return Results.Json(new { role });
+//     }
+//     return TypedResults.Ok(new { success = false });
+// });
+
+// app.MapGet("/api/login/admin", (HttpContext ctx) =>
+// {
+//     int? role = ctx.Session.GetInt32("role");
+//     if (role == 0)
+//     {
+//         return Results.Json(new { role });
+//     }
+//     return TypedResults.Ok(new { success = false });
+// });
+
+app.MapGet("/api/login/employee", (HttpContext ctx) =>
+{
+    int? role = ctx.Session.GetInt32("role");
+    if (role == 2)
+    {
+        return Results.Ok();
+    }
+    return TypedResults.BadRequest(new { success = false });
+});
+
+app.MapGet("/api/login/admin", (HttpContext ctx) =>
+{
+    int? role = ctx.Session.GetInt32("role");
+    if (role == 0)
+    {
+        return Results.Ok();
+    }
+    return TypedResults.BadRequest(new { success = false });
+});
+
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
