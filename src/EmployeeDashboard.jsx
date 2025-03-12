@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-export default function AdminDashboard() {
+export default function EmployeeDashboard() {
     const [companyId, setCompanyId] = useState();
     const [companyName, setCompanyName] = useState();
     //const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
         try {
             // Only proceed if companyId is available
             if (companyId) {
-                const response = await fetch(`/api/admin/dashboard?companyId=${companyId}`);
+                const response = await fetch(`/api/employee/dashboard?companyId=${companyId}`);
                 if (!response.ok) {
                     throw new Error(`status: ${response.status}`);
                 }
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
 
     return (
         <main>
-            <h1>Admin Dashboard</h1>
+            <h1>Employee Dashboard</h1>
             <h2>CompanyId: {companyId || "Loading..."}</h2>
             <h3>CompanyName: {companyName || "Loading..."}</h3>
         </main>

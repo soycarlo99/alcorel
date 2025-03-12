@@ -15,6 +15,7 @@ import CustomerView from "./CustomerView";
 import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
+import EmployeeDashboard from "./EmployeeDashboard";
 import AdminDashboard from "./AdminDashboard";
 import { Navigate } from "react-router";
 const userContext = createContext({
@@ -86,6 +87,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="/Ticket/:id" element={<TicketDetails />} />
               <Route path="/CustomerView/:token" element={<CustomerView />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/employee/dashboard" element={<EmployeeRoute element={<EmployeeDashboard />} />} />
               <Route path="/admindashboard" element={<AdminDashboard />} />
             </Routes>
           </div>
