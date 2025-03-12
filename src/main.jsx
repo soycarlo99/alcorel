@@ -1,7 +1,7 @@
-import { StrictMode } from "react";
+import { StrictMode, useState, useEffect, useContext, createContext } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, useParams, Outlet } from "react-router";
-import { useState } from "react";
+
 
 import EditCategories from "./EditCategories";
 import AddQuestions from "./AddQuestions";
@@ -16,67 +16,81 @@ import LoginPage from "./Login";
 import CompanyLanding from "./CompanyLanding";
 import "./style.css";
 import AdminDashboard from "./AdminDashboard";
+import { Navigate } from "react-router";
+const userContext = createContext({
+  isEmployee: null,
+  isAdmin: null,
+});
 
+export const useAuth = () => useContext(userContext);
 
+function RoleProvider({ children }) {
+  const [isEmployee, setIsEmployee] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(null);
 
-  createRoot(document.getElementById("root")).render(
+  useEffect(() => {
+    fetch("/api/login/employee").then((response) => {
+      if (response.ok) {
+        setIsEmployee(true);
+      } else {
+        setIsEmployee(false);
+      }
+    });
 
-    <StrictMode>
-      <BrowserRouter>
+    fetch("/api/login/admin").then((response) => {
+      if (response.ok) {
+        console.log(response);
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    });
+  }, []);
+  if (isEmployee == null) {
+    return null;
+  }
+  if (isAdmin == null) {
+    return null;
+  }
+  return (
+    <userContext.Provider value={{ isEmployee, isAdmin }}>
+      {children}
+    </userContext.Provider>
+  );
+}
+
+function EmployeeRoute({ element }) {
+  const { isEmployee } = useAuth();
+  return isEmployee? element: <h1>Unauthorized</h1>
+} 
+
+function AdminRoute({ element }) {
+  const { isAdmin } = useAuth();
+  return isAdmin? element: <h1>Unauthorized</h1>
+} 
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <RoleProvider>
         <div className="app-container">
           <Navigation />
           <div className="main-content">
-        <RoleProvider />
             <Routes>
               <Route index element={<TicketCreation />} />
-              <Route path="/EditCategories" element={<EditCategories />} />
+              <Route path="/EditCategories" element={<AdminRoute element={<EditCategories />} />} />
               <Route path="/EmployeeTicket" element={<EmployeeTicket />} />
-              <Route path="/AddQuestions" element={<AddQuestions />} />
-              <Route isEmployee? {(<TicketCreation />)} : {()} path="/ManageEmployee" element={<ManageEmployees />} />
+              <Route path="/AddQuestions" element={<AdminRoute element={<AddQuestions />} />} />
+              <Route path="/ManageEmployee" element={<AdminRoute element={<ManageEmployees />} />}/> 
               <Route path="/company/:companyId" element={<CompanyLanding />} />
-              <Route path="/Ticket/:id" element={<TicketDetails />} />
+              <Route path="/Ticket/:id" element={<AdminRoute element={<TicketDetails />} />} />
               <Route path="/CustomerView/:token" element={<CustomerView />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/admindashboard" element={<AdminDashboard />} />
             </Routes>
           </div>
         </div>
-      </BrowserRouter>
-    </StrictMode>,
-  );
-
-  function RoleProvider() {
-  const [isEmployee, setIsEmployee] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(null);
-
-  useEffect(() => {
-    fetch("/api/login/employee")
-      .then(response => {
-        if (response.ok) {
-          setIsEmployee(true)
-        } else {
-          setIsEmployee(false)
-        }
-        
-      })
-    
-    fetch("/api/login/admin")
-      .then(response => {
-        if (response.ok) {
-          console.log(response)
-          setIsAdmin(true)
-        } else {
-          setIsAdmin(false)
-        }
-        
-      })
-  }, []);
-  if (isEmployee == null) {
-    return null
-  }
-  if (isAdmin == null) {
-    return null
-  }
-}
-  
-  
+      </RoleProvider>
+    </BrowserRouter>
+  </StrictMode>
+);
