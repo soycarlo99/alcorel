@@ -71,62 +71,64 @@ export default function TicketCreation() {
     }
   }
   return (
+    <>
+      <a href="/login" className="login-link"></a>
       <main className="CreateTicket">
         {feedback && (
-            <div
-                className={
-                  feedback.includes("success") ? "success-message" : "error-message"
-                }
-            >
-              {feedback}
-            </div>
+          <div
+            className={
+              feedback.includes("success") ? "success-message" : "error-message"
+            }
+          >
+            {feedback}
+          </div>
         )}
         <form className="form" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="name-input">Enter your name:</label>
             <input
-                id="name-input"
-                type="text"
-                value={name}
-                onChange={handleNameChange}
-                required
+              id="name-input"
+              type="text"
+              value={name}
+              onChange={handleNameChange}
+              required
             />
           </div>
 
           <div>
             <label htmlFor="email-input">Enter your email:</label>
             <input
-                id="email-input"
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                required
+              id="email-input"
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              required
             />
           </div>
 
           <div>
             <label htmlFor="message-input">Enter your Message:</label>
             <textarea
-                id="message-input"
-                value={message}
-                onChange={handleMessageChange}
-                required
+              id="message-input"
+              value={message}
+              onChange={handleMessageChange}
+              required
             ></textarea>
           </div>
 
           <div>
             <label htmlFor="category-select">Choose a category:</label>
             <select
-                id="category-select"
-                value={category_id}
-                onChange={handleCategoryChange}
-                required
+              id="category-select"
+              value={category_id}
+              onChange={handleCategoryChange}
+              required
             >
               <option value="">Please Choose an Option</option>
               {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.category_name}
-                  </option>
+                <option key={category.id} value={category.id}>
+                  {category.category_name}
+                </option>
               ))}
             </select>
           </div>
@@ -136,5 +138,6 @@ export default function TicketCreation() {
           </button>
         </form>
       </main>
+    </>
   );
 }
