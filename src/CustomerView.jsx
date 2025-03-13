@@ -5,6 +5,7 @@ export default function CustomerView() {
   const { token } = useParams();
   const [ticket, setTicket] = useState(null);
   const [answered, setAnswered] = useState({});
+  const [rating, setRating] = useState(null);
 
   useEffect(() => {
     function fetchTicket() {
@@ -80,6 +81,27 @@ export default function CustomerView() {
     }
   }
 
+  async function handleRatingSubmit(event) {
+    event.preventDefault();
+    try {
+      const response = await fetch(
+        `/api/sendRating/${rating}/${ticket.ticketId}`,
+        {
+          headers: { "Content-Type": "application/json" },
+          method: "PUT",
+          body: "",
+        },
+      );
+      if (response.ok) {
+        console.log(
+          `Rating ${rating} submitted for ticket #${ticket.ticketId} successfully`,
+        );
+      }
+    } catch (error) {
+      console.error("Rating submission failed:", error);
+    }
+  }
+
   if (!ticket) return <p>Loading ticket...</p>;
 
   return (
@@ -94,7 +116,63 @@ export default function CustomerView() {
         <p>Category: {ticket.categoryName}</p>
         <p>Created: {new Date(ticket.ticketTime).toLocaleString()}</p>
       </div>
-
+      {ticket.status === "solved" && (
+        <div>
+          <h3>Please rate your experience</h3>
+          <form onSubmit={handleRatingSubmit}>
+            <div className="rating">
+              <input
+                value="5"
+                id="star-1"
+                type="radio"
+                name="rating"
+                checked={rating === "5"}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label htmlFor="star-1">★</label>
+              <input
+                value="4"
+                id="star-2"
+                type="radio"
+                name="rating"
+                checked={rating === "4"}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label htmlFor="star-2">★</label>
+              <input
+                value="3"
+                id="star-3"
+                type="radio"
+                name="rating"
+                checked={rating === "3"}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label htmlFor="star-3">★</label>
+              <input
+                value="2"
+                id="star-4"
+                type="radio"
+                name="rating"
+                checked={rating === "2"}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label htmlFor="star-4">★</label>
+              <input
+                value="1"
+                id="star-5"
+                type="radio"
+                name="rating"
+                checked={rating === "1"}
+                onChange={(e) => setRating(e.target.value)}
+              />
+              <label htmlFor="star-5">★</label>
+            </div>
+            <button className="SendRating" type="submit">
+              Submit Rating
+            </button>
+          </form>
+        </div>
+      )}
       <h2>Questions & Answers</h2>
       {ticket.questionAnswers?.length > 0 ? (
         ticket.questionAnswers.map((qa, idx) => (
@@ -125,7 +203,6 @@ export default function CustomerView() {
       ) : (
         <p>No Q&A found</p>
       )}
-
       <h2>Messages</h2>
       {ticket.messages?.length > 0 ? (
         ticket.messages.map((msg, idx) => (
@@ -139,7 +216,6 @@ export default function CustomerView() {
       ) : (
         <p>No messages</p>
       )}
-
       <form className="form" onSubmit={handleAddSubmit}>
         <textarea name="message" required placeholder="Reply..." />
         <button type="submit">Send Reply</button>

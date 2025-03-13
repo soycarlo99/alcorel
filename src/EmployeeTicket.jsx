@@ -9,8 +9,6 @@ export default function EmployeeTicket() {
   const [statusQuery, setStatusQuery] = useState("");
   const [categoryQuery, setCategoryQuery] = useState("");
 
-  console.log(tickets);
-
   //FOR SOTRTING ON CATEGORY
   /*
   function toggleTicketsCategory() {
@@ -156,7 +154,7 @@ export default function EmployeeTicket() {
             <p>{ticket.userName}</p>
             <p>{ticket.categoryName}</p>
             <p className={`status ${ticket.status}`}>{ticket.status}</p>
-            <p>{ticket.ticketTime}</p>
+            <p>{new Date(ticket.ticketTime).toLocaleString()}</p>
           </Link>
         ))}
       </div>

@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 export default function ManageEmployees() {
   const [employee, SetEmployee] = useState([]);
+
   useEffect(() => {
     GetEmployee();
   }, []);
+
   async function GetEmployee() {
     try {
       const response = await fetch("/api/GetEmployee");
       const body = await response.json();
       SetEmployee(body);
-      console.log(body);
     } catch (error) {
       console.error(error);
     }
   }
-  function handleAddSubmit(event) {
+
+  async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
     data = Object.fromEntries(data);
@@ -25,18 +27,24 @@ export default function ManageEmployees() {
     console.log(data);
     data = JSON.stringify(data);
     console.log(data);
-    fetch("/api/PostEmployee", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: data,
-    }).then((response) => {
+    try {
+      const response = await fetch("/api/PostEmployee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+      });
       if (response.ok) {
         GetEmployee();
         console.log("Employee Added Succesfully");
         document.getElementById("forum").reset();
+      } else if (response.badrequest) {
+        console.log(badrequest);
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   }
+
   function handleRemove(event) {
     event.preventDefault();
     fetch(event.target.action, {
@@ -47,6 +55,7 @@ export default function ManageEmployees() {
       }
     });
   }
+
   function handleResetPassword(event) {
     event.preventDefault();
     let data = JSON.stringify(EventTarget.data);
@@ -65,11 +74,19 @@ export default function ManageEmployees() {
   return (
     <div>
       <form id="forum" className="form" onSubmit={handleAddSubmit}>
-        <label>Add Employee: </label>
-        <p>Name: </p>
-        <input name="name" type="text" required />
-        <p>Email: </p>
-        <input name="email" type="email" required />
+        <label>Add Employee</label>
+        <input
+          name="name"
+          placeholder="enter new employee's name"
+          type="text"
+          required
+        />
+        <input
+          name="email"
+          placeholder="enter new employee's email"
+          type="email"
+          required
+        />
         <p>password: </p>
         <input name="password" type="password" required />
         <input name="pending_confirmed" type="hidden" />

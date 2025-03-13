@@ -9,7 +9,6 @@ export default function EditCategories() {
       const response = await fetch("/api/GetCategory");
       const body = await response.json();
       setCategories(body);
-      console.log(body);
     } catch (error) {
       console.error(error);
     }
