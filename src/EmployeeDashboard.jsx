@@ -63,9 +63,12 @@ export default function EmployeeDashboard() {
            
             <img src={companyLogo} alt="Test2" style={{ width: '210px', }}/> 
             
+<input></input>
 
-         
-            
+
+            <button type="submit" className="login-button">
+                Add Logotype
+            </button>
             
         </main>
     )
