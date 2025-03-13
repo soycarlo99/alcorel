@@ -1,0 +1,144 @@
+.alcorel-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.alcorel-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.alcorel-header h1 {
+  font-size: 2.5rem;
+  color: #4a6fdc;
+  margin-bottom: 0.5rem;
+}
+
+.alcorel-header .motto {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.alcorel-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 3.5rem;
+}
+
+.alcorel-image {
+  flex: 1;
+  min-width: 300px;
+}
+
+.alcorel-illustration {
+  width: 100%;
+  max-width: 500px;
+  display: block;
+  border-radius: 8px;
+}
+
+.alcorel-form-container {
+  flex: 1;
+  min-width: 300px;
+}
+
+.alcorel-form-container h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #4a6fdc;
+}
+
+.alcorel-error-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border-radius: 8px;
+  border-left: 4px solid #dc3545;
+}
+
+.alcorel-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.alcorel-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.alcorel-form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e1e5f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.alcorel-form-group input:focus {
+  outline: none;
+  border-color: #4a6fdc;
+}
+
+.alcorel-signup-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4a6fdc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.alcorel-signup-button:hover {
+  background-color: #3a5ec7;
+}
+
+.alcorel-login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.alcorel-login-link a {
+  color: #4a6fdc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.alcorel-login-link a:hover {
+  text-decoration: underline;
+}
+
+.alcorel-footer {
+  text-align: center;
+  margin-top: 3rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .alcorel-content {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .alcorel-image {
+    order: -1;
+  }
+}

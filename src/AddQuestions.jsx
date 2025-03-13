@@ -30,7 +30,6 @@ export default function AddQuestions() {
 
   async function fetchQuestions() {
     if (!category_id) return;
-
     try {
       const response = await fetch(`api/questions/${category_id}`, {
         method: "GET",
@@ -90,10 +89,9 @@ export default function AddQuestions() {
   return (
     <>
       <h1>Add/See questions</h1>
-      <div>
-        <label>Select Category to View:</label>
+      <div className="form">
         <select value={category_id} onChange={handleCategoryChange}>
-          <option value="">Choose a Category</option>
+          <option value="">Select Category to View</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.category_name}
@@ -123,12 +121,24 @@ export default function AddQuestions() {
       {questionsList.map((question) => (
         <div key={question.id}>
           <h3>Question: {question.questions}</h3>
-          <p>Category ID: {question.category_id}</p>
           <form
             onSubmit={handleRemove}
             action={`/api/questions/${question.id}`}
           >
-            <input type="submit" value={`Remove Question ${question.id}`} />
+            <button
+              type="submit"
+              className="RemoveButton"
+              style={{
+                border: "none",
+                outline: "none",
+                boxShadow: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
+              }}
+            >
+              -
+            </button>
           </form>
         </div>
       ))}

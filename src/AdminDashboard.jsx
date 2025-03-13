@@ -9,22 +9,21 @@ export default function AdminDashboard() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchCompanyId = async () => {
-            const response = await fetch('/api/session/companyId');
-            const data = await response.json();
-            console.log(data)
-            setCompanyId(data.companyId)
-        }
+  useEffect(() => {
+    const fetchCompanyId = async () => {
+      const response = await fetch("/api/session/companyId");
+      const data = await response.json();
+      setCompanyId(data.companyId);
+    };
 
-        fetchCompanyId();
-    }, []);
+    fetchCompanyId();
+  }, []);
 
-    useEffect(() => {
-        if (companyId) {
-            fetchCompanyName();
-        }
-    }, [companyId]);
+  useEffect(() => {
+    if (companyId) {
+      fetchCompanyName();
+    }
+  }, [companyId]);
 
     async function fetchCompanyName() {
         try {

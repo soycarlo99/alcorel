@@ -24,11 +24,13 @@ public static class CategoryRoutes
     public static async Task<List<GetCategoriesDTO>> GetCategories(NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 2)
         {
             return new List<GetCategoriesDTO>();
         }
-        
+
+
         List<GetCategoriesDTO> result = new();
         using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE company_id = @companyId");
         query.Parameters.AddWithValue("companyId", companyId);
@@ -49,7 +51,7 @@ public static class CategoryRoutes
     public static async Task<List<GetCategoriesDTO>> GetCategoriesById(int categoryId, NpgsqlDataSource db)
     {
         List<GetCategoriesDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1"); 
+        using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE id = $1");
 
         query.Parameters.AddWithValue(categoryId);
         using var reader = await query.ExecuteReaderAsync();
@@ -69,7 +71,8 @@ public static class CategoryRoutes
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
-        if (companyId == null || companyId != categoryDto.company_id)
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 1 || role == 2)
         {
             return TypedResults.BadRequest("Unauthorized or invalid company ID");
         }
@@ -80,7 +83,7 @@ public static class CategoryRoutes
             RETURNING id, category_name, company_id");
         
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
-        command.Parameters.AddWithValue("company_id", categoryDto.company_id);
+        command.Parameters.AddWithValue("company_id", companyId);
         try
         {
             using var reader = await command.ExecuteReaderAsync();

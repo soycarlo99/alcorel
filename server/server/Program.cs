@@ -61,8 +61,64 @@ app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
 app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
 {
     ctx.Session.SetInt32("companyId", companyId);
+    ctx.Session.SetInt32("role", 1);
     return TypedResults.Ok(new { success = true });
 });
+
+app.MapGet("/api/company/current", (HttpContext ctx) => {
+    var companyId = ctx.Session.GetInt32("companyId");
+    
+    if (companyId.HasValue)
+    {
+        return Results.Ok(new { companyId = companyId.Value });
+    }
+    else
+    {
+        return Results.NotFound(new { error = "No company session found" });
+    }
+});
+
+
+// app.MapGet("/api/login/employee", (HttpContext ctx) =>
+// {
+//     int? role = ctx.Session.GetInt32("role");
+//     if (role == 2)
+//     {
+//         return Results.Json(new { role });
+//     }
+//     return TypedResults.Ok(new { success = false });
+// });
+
+// app.MapGet("/api/login/admin", (HttpContext ctx) =>
+// {
+//     int? role = ctx.Session.GetInt32("role");
+//     if (role == 0)
+//     {
+//         return Results.Json(new { role });
+//     }
+//     return TypedResults.Ok(new { success = false });
+// });
+
+app.MapGet("/api/login/employee", (HttpContext ctx) =>
+{
+    int? role = ctx.Session.GetInt32("role");
+    if (role == 2)
+    {
+        return Results.Ok();
+    }
+    return TypedResults.BadRequest(new { success = false });
+});
+
+app.MapGet("/api/login/admin", (HttpContext ctx) =>
+{
+    int? role = ctx.Session.GetInt32("role");
+    if (role == 0)
+    {
+        return Results.Ok();
+    }
+    return TypedResults.BadRequest(new { success = false });
+});
+
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
@@ -116,5 +172,24 @@ app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) 
 //Feedback APIs
 //app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
 //app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
+
+//Sign-up APIs
+app.MapPost("api/signup", UserRoutes.SignUpAdmin);
+
+//Sign-out APIs
+app.MapPost("/api/logout", (HttpContext ctx) =>
+{
+    ctx.Response.Cookies.Delete(".AspNetCore.Session", new CookieOptions
+    {
+        Path = "/",
+        Secure = ctx.Request.IsHttps,
+        HttpOnly = true,
+        SameSite = SameSiteMode.Lax
+    });
+    return Results.Ok(new { success = true });
+});
+
+
+
 
 app.Run();
