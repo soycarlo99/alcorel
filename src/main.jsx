@@ -15,21 +15,22 @@ import {
   Navigate,
 } from "react-router";
 
-import EditCategories from "./EditCategories";
-import AddQuestions from "./AddQuestions";
-import TicketCreation from "./customer/TicketCreation";
-import EmployeeTicket from "./EmployeeTicket";
-import Navigation from "./Navigation";
-import ManageEmployees from "./manageEmployee";
-import TicketDetails from "./TicketDetails";
-import CustomerView from "./CustomerView";
-import LoginPage from "./Login";
-import CompanyLanding from "./CompanyLanding";
 import "./style.css";
-import EmployeeDashboard from "./EmployeeDashboard";
-import AdminDashboard from "./AdminDashboard";
+import AiChat from "./chat";
 import Alcorel from "./Alcorel";
+import LoginPage from "./Login";
+import Navigation from "./Navigation";
+import AddQuestions from "./AddQuestions";
+import CustomerView from "./CustomerView";
+import TicketDetails from "./TicketDetails";
 import HowToUseIframe from "./usageOfiFrame";
+import AdminDashboard from "./AdminDashboard";
+import CompanyLanding from "./CompanyLanding";
+import EditCategories from "./EditCategories";
+import EmployeeTicket from "./EmployeeTicket";
+import ManageEmployees from "./manageEmployee";
+import EmployeeDashboard from "./EmployeeDashboard";
+import TicketCreation from "./customer/TicketCreation";
 
 const userContext = createContext({
   isEmployee: null,
@@ -42,32 +43,28 @@ function RoleProvider({ children }) {
   const [isEmployee, setIsEmployee] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
 
-  useEffect(() => {
+  const refreshAuthState = () => {
     fetch("/api/login/employee").then((response) => {
-      if (response.ok) {
-        setIsEmployee(true);
-      } else {
-        setIsEmployee(false);
-      }
+      setIsEmployee(response.ok);
     });
 
     fetch("/api/login/admin").then((response) => {
       if (response.ok) {
-        console.log(response);
-        setIsAdmin(true);
-      } else {
-        setIsAdmin(false);
       }
+      setIsAdmin(response.ok);
     });
+  };
+
+  useEffect(() => {
+    refreshAuthState();
   }, []);
-  if (isEmployee == null) {
+
+  if (isEmployee === null || isAdmin === null) {
     return null;
   }
-  if (isAdmin == null) {
-    return null;
-  }
+
   return (
-    <userContext.Provider value={{ isEmployee, isAdmin }}>
+    <userContext.Provider value={{ isEmployee, isAdmin, refreshAuthState }}>
       {children}
     </userContext.Provider>
   );
@@ -76,6 +73,15 @@ function RoleProvider({ children }) {
 function EmployeeRoute({ element }) {
   const { isEmployee } = useAuth();
   return isEmployee ? element : <h1>Unauthorized</h1>;
+}
+
+function BothRoles({ element }) {
+  const { isAdmin, isEmployee } = useAuth();
+  return isAdmin || isEmployee ? (
+    element
+  ) : (
+    <h1>Unauthorized, only admins are allowed here</h1>
+  );
 }
 
 function AdminRoute({ element }) {
@@ -116,7 +122,15 @@ createRoot(document.getElementById("root")).render(
           <Route element={<LayoutWithoutNav />}>
             <Route index element={<TicketCreation />} />
             <Route path="/company/:companyId" element={<CompanyLanding />} />
-            <Route path="/customer-view/:token" element={<CustomerView />} />
+            <Route
+              path="customer-view/:token"
+              element={
+                <>
+                  <CustomerView />
+                  <AiChat />
+                </>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
           </Route>
           <Route element={<LayoutWithNav />}>
@@ -125,8 +139,10 @@ createRoot(document.getElementById("root")).render(
               element={<AdminRoute element={<EditCategories />} />}
             />
             <Route path="/login" element={<LoginPage />} />
-
-            <Route path="/employee-ticket" element={<EmployeeTicket />} />
+            <Route
+              path="/employee-ticket"
+              element={<BothRoles element={<EmployeeTicket />} />}
+            />
             <Route
               path="/add-questions"
               element={<AdminRoute element={<AddQuestions />} />}
@@ -142,7 +158,10 @@ createRoot(document.getElementById("root")).render(
             />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/alcorel" element={<Alcorel />} />
-            <Route path="/usage-of-iframe" element={<HowToUseIframe />} />
+            <Route
+              path="/usage-of-iframe"
+              element={<AdminRoute element={<HowToUseIframe />} />}
+            />
           </Route>
         </Routes>
       </RoleProvider>

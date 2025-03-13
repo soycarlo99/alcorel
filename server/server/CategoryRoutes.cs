@@ -35,8 +35,8 @@ public static class CategoryRoutes
         using var query = db.CreateCommand("SELECT id, category_name, company_id FROM categories WHERE company_id = @companyId");
         query.Parameters.AddWithValue("companyId", companyId);
         using var reader = await query.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
+        
+        while(await reader.ReadAsync())
         {
             result.Add(new(
                 reader.GetInt32(0),
@@ -55,8 +55,8 @@ public static class CategoryRoutes
 
         query.Parameters.AddWithValue(categoryId);
         using var reader = await query.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
+        
+        while(await reader.ReadAsync())
         {
             result.Add(new(
                 reader.GetInt32(0),
@@ -67,7 +67,7 @@ public static class CategoryRoutes
         return result;
     }
 
-    public static async Task<Results<Created<Category>, BadRequest<string>>>
+    public static async Task<Results<Created<Category>, BadRequest<string>>> 
         PostCategory(PostCategoryDTO categoryDto, NpgsqlDataSource db, HttpContext ctx)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
@@ -76,14 +76,14 @@ public static class CategoryRoutes
         {
             return TypedResults.BadRequest("Unauthorized or invalid company ID");
         }
-
+        
         using var command = db.CreateCommand(@"
             INSERT INTO categories (category_name, company_id) 
             VALUES (@category_name, @company_id) 
             RETURNING id, category_name, company_id");
-
+        
         command.Parameters.AddWithValue("category_name", categoryDto.category_name);
-        command.Parameters.AddWithValue("company_id", categoryDto.company_id);
+        command.Parameters.AddWithValue("company_id", companyId);
         try
         {
             using var reader = await command.ExecuteReaderAsync();
@@ -108,7 +108,7 @@ public static class CategoryRoutes
     RemoveCategory(int categoryId, NpgsqlDataSource db)
     {
         using var command = db.CreateCommand(@"DELETE FROM categories WHERE id = @selected_category");
-
+        
         command.Parameters.AddWithValue("selected_category", categoryId);
 
         try

@@ -12,7 +12,11 @@ const HowToUseIframe = () => {
     const fetchCompanyId = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/company/current");
+        const response = await fetch("/api/company/current", {
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+          },
+        });
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -48,7 +52,17 @@ const HowToUseIframe = () => {
   height="500px" 
   frameborder="0"
   title="Support Portal"
-  allow="clipboard-write; encrypted-media;"
+  style="border: none; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+></iframe>`;
+  };
+
+  const ShowcaseIframe = () => {
+    return `<iframe 
+  src="${baseUrl}/" 
+  width="100%" 
+  height="500px" 
+  frameborder="0"
+  title="Support Portal"
   style="border: none; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
 ></iframe>`;
   };
@@ -135,7 +149,7 @@ const HowToUseIframe = () => {
           {loading ? (
             <p>Loading preview...</p>
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: generateIframeCode() }} />
+            <div dangerouslySetInnerHTML={{ __html: ShowcaseIframe() }} />
           )}
         </div>
       </div>

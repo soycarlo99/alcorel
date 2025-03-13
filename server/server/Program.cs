@@ -64,6 +64,7 @@ app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
     ctx.Session.SetInt32("role", 1);
     return TypedResults.Ok(new { success = true });
 });
+
 app.MapGet("/api/company/current", (HttpContext ctx) => {
     var companyId = ctx.Session.GetInt32("companyId");
     
@@ -174,6 +175,19 @@ app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
 
 //Sign-up APIs
 app.MapPost("api/signup", UserRoutes.SignUpAdmin);
+
+//Sign-out APIs
+app.MapPost("/api/logout", (HttpContext ctx) =>
+{
+    ctx.Response.Cookies.Delete(".AspNetCore.Session", new CookieOptions
+    {
+        Path = "/",
+        Secure = ctx.Request.IsHttps,
+        HttpOnly = true,
+        SameSite = SameSiteMode.Lax
+    });
+    return Results.Ok(new { success = true });
+});
 
 
 

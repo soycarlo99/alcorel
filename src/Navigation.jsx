@@ -1,5 +1,5 @@
 import "./style.css";
-import { NavLink, Route, Navigate } from "react-router";
+import { NavLink, Route, Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import LoginPage from "./Login.jsx";
@@ -8,6 +8,7 @@ function Navigation() {
   const [waitingTicketsCount, setWaitingTicketsCount] = useState(0);
   const [isEmployee, setIsEmployee] = useState(null);
   const [isAdmin, setIsAdmin] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchTickets() {
@@ -38,7 +39,6 @@ function Navigation() {
       try {
         const adminResponse = await fetch("/api/login/admin");
         if (adminResponse.ok) {
-          console.log(adminResponse);
         }
         setIsAdmin(adminResponse.ok);
       } catch (error) {
@@ -51,6 +51,23 @@ function Navigation() {
     checkUserRoles();
   }, []);
 
+  async function handleLogout() {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        console.error("Logout failed on server");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      window.location.href = "/login";
+    }
+  }
+
   if (isEmployee === null || isAdmin === null) {
     return null;
   }
@@ -60,14 +77,22 @@ function Navigation() {
       <nav className="sidebar">
         <ul>
           <li>
+            <NavLink to="/employee/dashboard" activeclassname="active">
+              Dashboard
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/employee-ticket" activeclassname="active">
-              Employee Tickets
+              Tickets
               {waitingTicketsCount > 0 && (
                 <span className="notification-badge">
                   {waitingTicketsCount}
                 </span>
               )}
             </NavLink>
+          </li>
+          <li>
+            <a href="#" onClick={handleLogout} className="logout-link"></a>
           </li>
         </ul>
         <div
@@ -92,13 +117,23 @@ function Navigation() {
       <nav className="sidebar">
         <ul>
           <li>
+            <NavLink to="/admin/dashboard" activeclassname="active">
+              Dashboard
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/edit-categories" activeclassname="active">
               Edit Categories
             </NavLink>
           </li>
           <li>
             <NavLink to="/employee-ticket" activeclassname="active">
-              Employee Tickets
+              Tickets
+              {waitingTicketsCount > 0 && (
+                <span className="notification-badge">
+                  {waitingTicketsCount}
+                </span>
+              )}
             </NavLink>
           </li>
           <li>
@@ -112,16 +147,6 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/customer-view" activeclassname="active">
-              Customer View (reply)
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/login" activeclassname="active">
-              Log-in
-            </NavLink>
-          </li>
-          <li>
             <NavLink to="/usage-of-iframe" activeclassname="active">
               iFrame
             </NavLink>
@@ -132,8 +157,28 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
+            <a href="#" onClick={handleLogout} className="logout-link"></a>
+          </li>
+          <div
+            style={{
+              marginTop: "30px",
+              paddingTop: "20px",
+              borderTop: "1px solid #e0e0e0",
+              textAlign: "center",
+              fontSize: "12px",
+              color: "#7f8c8d",
+            }}
+          >
+            <span>for demo purposes only</span>
+          </div>
+          <li>
             <NavLink to="/company/2" activeclassname="active">
               Green future corp.
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/customer-view" activeclassname="active">
+              Customer View (reply)
             </NavLink>
           </li>
         </ul>

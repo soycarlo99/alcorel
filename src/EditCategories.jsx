@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
-
 export default function EditCategories() {
   const [categories, setCategories] = useState([]);
-
   useEffect(() => {
     GetCategory();
   }, []);
-
   async function GetCategory() {
     try {
       const response = await fetch("/api/GetCategory");
       const body = await response.json();
       setCategories(body);
-      console.log(body);
     } catch (error) {
       console.error(error);
     }
   }
-
   function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
@@ -34,7 +29,6 @@ export default function EditCategories() {
       }
     });
   }
-
   function handleRemove(event) {
     event.preventDefault();
     fetch(event.target.action, {
@@ -45,12 +39,10 @@ export default function EditCategories() {
       }
     });
   }
-
   return (
     <div>
       <form className="form" onSubmit={handleAddSubmit}>
         <h1>Add Category</h1>
-
         <input
           name="category_name"
           placeholder="Please enter new category name..."
@@ -60,16 +52,28 @@ export default function EditCategories() {
         <input type="submit" value="ADD" />
       </form>
       <p>Existing categories:</p>
-
       {categories.map((item, index) => (
-        <div className="removeCat">
-          <h3 key={index}>{item.category_name}</h3>
+        <div className="removeCat" key={index}>
           <form
             onSubmit={handleRemove}
             action={`/api/DeleteCategory/${item.id}`}
           >
-            <input className="RemoveButton" type="submit" value="-" />
+            <button
+              type="submit"
+              className="RemoveButton"
+              style={{
+                border: "none",
+                outline: "none",
+                boxShadow: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
+              }}
+            >
+              -
+            </button>
           </form>
+          <h3>{item.category_name}</h3>
         </div>
       ))}
     </div>
