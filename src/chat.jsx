@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import ReactMarkdown from "react-markdown";
 import "./style.css";
 
@@ -48,6 +48,10 @@ export default function AiChat() {
       setPrompt("");
     }
   };
+
+  useEffect(() => {
+    openForm();
+  }, []);
 
   const handlePrompt = (event) => {
     setPrompt(event.target.value);

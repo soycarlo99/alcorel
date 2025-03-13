@@ -148,7 +148,7 @@ app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
-app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.ResetPassword);
+//app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.PasswordResetRequest);
 app.MapGet("/api/session/companyId", (HttpContext ctx) =>
 {
     var companyId = ctx.Session.GetInt32("companyId");
@@ -188,6 +188,11 @@ app.MapPost("/api/logout", (HttpContext ctx) =>
     });
     return Results.Ok(new { success = true });
 });
+
+
+//Password Reset APIs
+app.MapPost("/api/password/reset/{userId}", EmployeeRoutes.ResetPasswordWithLink);
+app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
 
 
 

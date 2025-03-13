@@ -23,6 +23,7 @@ import Navigation from "./Navigation";
 import AddQuestions from "./AddQuestions";
 import CustomerView from "./CustomerView";
 import TicketDetails from "./TicketDetails";
+import ResetPassword from "./ResetPassword";
 import HowToUseIframe from "./usageOfiFrame";
 import AdminDashboard from "./AdminDashboard";
 import CompanyLanding from "./CompanyLanding";
@@ -122,6 +123,7 @@ createRoot(document.getElementById("root")).render(
           <Route element={<LayoutWithoutNav />}>
             <Route index element={<TicketCreation />} />
             <Route path="/company/:companyId" element={<CompanyLanding />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="customer-view/:token"
               element={

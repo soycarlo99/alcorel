@@ -96,7 +96,7 @@ public static class EmployeeRoutes
     }
 
     public static async Task<Results<Created<Employee>, BadRequest<string>>>
-        PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db, PasswordHasher<string> hasher, HttpContext ctx)
+        PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db, PasswordHasher<string> hasher, HttpContext ctx, IEmailService emailService)
     {
         int? companyId = ctx.Session.GetInt32("companyId");
         int? role = ctx.Session.GetInt32("role");
@@ -134,6 +134,36 @@ public static class EmployeeRoutes
                     reader.GetString(5),
                     reader.GetInt32(6)
                 );
+
+
+                await emailService.SendEmailAsync(
+    to: employeeDto.email,
+    subject: "Welcome onboard!",
+    body: $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+            <div style='text-align: center; margin-bottom: 20px;'>
+                <h1 style='color: #2c3e50;'>Hi {employeeDto.name}, you need to reset your password to be able to log-in</h1>
+                <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+use the link below to reset your password
+            </p>
+            </div>
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='http://localhost:5173/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                   www.alcorel.com/resetpassword/
+                </a>
+
+            </div>
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+Don't hesitate to contact us if you need guidance
+            </p>
+            <a href='mailto:support@alcorel.com'>support@alcorel.com</a>
+
+            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
+                Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
+            </div>
+        </div>
+    "
+);
                 return TypedResults.Created($"/api/Employee/{employee.id}", employee);
             }
             return TypedResults.BadRequest("Failed to create employee");
@@ -171,29 +201,101 @@ public static class EmployeeRoutes
         }
     }
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-   ResetPassword(int testuserId, NpgsqlDataSource db)
+    public record PasswordResetDTO(string NewPassword);
+    
+    public static async Task<IResult> SendResetLink(int testuserId, NpgsqlDataSource db, PasswordHasher<string> hasher, IEmailService emailService)
     {
-        using var command = db.CreateCommand(@"UPDATE testuser SET password = 'hej' WHERE id = @selected_employee");
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = @hashedwelcome WHERE id = @selected_employee RETURNING email");
 
+        string hashedPassword = hasher.HashPassword("", "welcome");
         command.Parameters.AddWithValue("selected_employee", testuserId);
+        command.Parameters.AddWithValue("hashedwelcome", hashedPassword);
 
         try
         {
-            var rowsAffected = await command.ExecuteNonQueryAsync();
-
-            if (rowsAffected > 0)
+            using var reader = await command.ExecuteReaderAsync();
+         
+            if(await reader.ReadAsync())
             {
-                return TypedResults.Ok($"Updated {rowsAffected} employee successfully");
+                string email = reader.GetString(0);
+                
+                string token = Guid.NewGuid().ToString();
+                
+                string resetUrl = $"http://localhost:5173/reset-password?token={token}&id={testuserId}";
+                
+                await emailService.SendEmailAsync(
+                    to: email,
+                    subject: "Password Reset Link",
+                    body: $@"
+                        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+                            <div style='text-align: center; margin-bottom: 20px;'>
+                                <h1 style='color: #2c3e50;'>Password Reset</h1>
+                            </div>
+                            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                                Your password has been temporarily set to <strong>welcome</strong>. Please click the link below to set a new password:
+                            </p>
+                            <div style='text-align: center; margin: 30px 0;'>
+                                <a href='{resetUrl}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                                    Set New Password
+                                </a>
+                            </div>
+                            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                                If the button doesn't work, you can copy and paste this link into your browser:
+                            </p>
+                            <p style='font-size: 14px; background-color: #f5f5f5; padding: 10px; border-radius: 4px; word-break: break-all;'>
+                                {resetUrl}
+                            </p>
+                            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                                Don't hesitate to contact us if you need guidance:
+                            </p>
+                            <a href='mailto:support@alcorel.com'>support@alcorel.com</a>
+
+                            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
+                                Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
+                            </div>
+                        </div>
+                    "
+                );
+                
+                return TypedResults.Ok($"Reset link sent to employee's email");
             }
             else
             {
-                return TypedResults.Ok("No employees password updated");
+                return TypedResults.BadRequest("No employee found with the given ID");
             }
         }
         catch (PostgresException ex)
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
+    
+    public static async Task<IResult> ResetPasswordWithLink(int userId, PasswordResetDTO passwordResetDTO, NpgsqlDataSource db, PasswordHasher<string> hasher)
+    {
+        if (string.IsNullOrEmpty(passwordResetDTO.NewPassword))
+        {
+            return Results.BadRequest(new { error = "New password is required" });
+        }
+        
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = @password WHERE id = @userId RETURNING email");
+        string hashedPassword = hasher.HashPassword("", passwordResetDTO.NewPassword);
+        command.Parameters.AddWithValue("userId", userId);
+        command.Parameters.AddWithValue("password", hashedPassword);
+        
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            
+            if (await reader.ReadAsync())
+            {
+                return Results.Ok(new { message = "Password has been successfully reset" });
+            }
+            
+            return Results.NotFound(new { error = "User not found" });
+        }
+        catch (PostgresException ex)
+        {
+            return Results.BadRequest(new { error = $"Database error: {ex.Message}" });
         }
     }
 }
