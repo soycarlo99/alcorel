@@ -377,7 +377,7 @@ public static class UserRoutes
             using var userCmd = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, 'admin'::user_role, @company_id) RETURNING id, name");
             userCmd.Parameters.AddWithValue("name", adminDto.AdminName);
             userCmd.Parameters.AddWithValue("email", adminDto.Email);
-            userCmd.Parameters.AddWithValue("password", adminDto.Password);
+            userCmd.Parameters.AddWithValue("password", hashedPassword);
             userCmd.Parameters.AddWithValue("company_id", companyId);
 
             //send welcome email

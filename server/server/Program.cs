@@ -145,7 +145,7 @@ app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) 
 app.MapPut("/api/update/logo/{companyId}", CompanyRoutes.UpdateCompanyLogo);
 
 //Feedback APIs
-//app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
+app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
 //app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
 
 //Sign-up APIs
@@ -165,7 +165,7 @@ app.MapPost("/api/logout", (HttpContext ctx) =>
 });
 
 //Password Reset APIs
-app.MapPost("/api/password/reset/{userId}", EmployeeRoutes.ResetPasswordWithLink);
+app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
 
 app.Run();

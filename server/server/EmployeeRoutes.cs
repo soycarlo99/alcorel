@@ -205,11 +205,14 @@ Don't hesitate to contact us if you need guidance
     
     public static async Task<IResult> SendResetLink(int testuserId, NpgsqlDataSource db, PasswordHasher<string> hasher, IEmailService emailService)
     {
-        using var command = db.CreateCommand(@"UPDATE testuser SET password = @hashedwelcome WHERE id = @selected_employee RETURNING email");
+                      string token = Guid.NewGuid().ToString();
+
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = @hashedwelcome, reset_token = @resetToken WHERE id = @userid  RETURNING email");
 
         string hashedPassword = hasher.HashPassword("", "welcome");
-        command.Parameters.AddWithValue("selected_employee", testuserId);
+        command.Parameters.AddWithValue("resetToken", token);
         command.Parameters.AddWithValue("hashedwelcome", hashedPassword);
+        command.Parameters.AddWithValue("userid", testuserId);
 
         try
         {
@@ -219,7 +222,6 @@ Don't hesitate to contact us if you need guidance
             {
                 string email = reader.GetString(0);
                 
-                string token = Guid.NewGuid().ToString();
                 
                 string resetUrl = $"http://localhost:5173/reset-password?token={token}&id={testuserId}";
                 
@@ -270,16 +272,16 @@ Don't hesitate to contact us if you need guidance
         }
     }
     
-    public static async Task<IResult> ResetPasswordWithLink(int userId, PasswordResetDTO passwordResetDTO, NpgsqlDataSource db, PasswordHasher<string> hasher)
+    public static async Task<IResult> ResetPasswordWithLink(string resetToken, PasswordResetDTO passwordResetDTO, NpgsqlDataSource db, PasswordHasher<string> hasher)
     {
         if (string.IsNullOrEmpty(passwordResetDTO.NewPassword))
         {
             return Results.BadRequest(new { error = "New password is required" });
         }
         
-        using var command = db.CreateCommand(@"UPDATE testuser SET password = @password WHERE id = @userId RETURNING email");
+        using var command = db.CreateCommand(@"UPDATE testuser SET password = @password WHERE reset_token = @resetToken RETURNING email");
         string hashedPassword = hasher.HashPassword("", passwordResetDTO.NewPassword);
-        command.Parameters.AddWithValue("userId", userId);
+        command.Parameters.AddWithValue("resetToken", resetToken);
         command.Parameters.AddWithValue("password", hashedPassword);
         
         try
