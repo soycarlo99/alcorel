@@ -7,14 +7,10 @@ using Microsoft.AspNetCore.Http;
 
 public static class CompanyRoutes
 {
-
-
     public record Company(
         string company,
         string logotype
     );
-
-
 
     public static async Task<List<Company>> GetCompanyName(NpgsqlDataSource db, int companyId)
     {
@@ -34,6 +30,36 @@ public static class CompanyRoutes
     }
 
 
+
+public record UpdateLogotypeDTO(string logotype);
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
+    UpdateCompanyLogo(int companyId, UpdateLogotypeDTO LogoDto, NpgsqlDataSource db)
+    {
+        string newLogo = LogoDto.logotype;
+
+        using var command = db.CreateCommand(@"
+            UPDATE company
+            SET logotype = @logotype
+            WHERE id = @companyId
+            RETURNING id");
+
+        command.Parameters.AddWithValue("logotype", LogoDto.logotype);
+        command.Parameters.AddWithValue("companyId", companyId);
+
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return TypedResults.Ok($"logotype updated for ticket {reader.GetInt32(0)}");
+            }
+            return TypedResults.BadRequest("Failed to update ticket logotype");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 
 
 }

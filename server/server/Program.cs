@@ -168,6 +168,7 @@ app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) 
     var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
     return Results.Ok(result);
 });
+app.MapPut("/api/update/logo/{companyId}", CompanyRoutes.UpdateCompanyLogo);
 
 //Feedback APIs
 //app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
