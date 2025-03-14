@@ -5,38 +5,28 @@ export default function EmployeeTicket() {
   const [tickets, setTickets] = useState([]);
   const [ticketsId, setTicketsId] = useState(true);
   const [ticketsDate, setTicketsDate] = useState(true);
-
   const [statusQuery, setStatusQuery] = useState("");
   const [categoryQuery, setCategoryQuery] = useState("");
+  const [category_id, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
 
-  //FOR SOTRTING ON CATEGORY
-  /*
-  function toggleTicketsCategory() {
-    if (ticketsCategory === true) {
-      console.log(ticketsCategory);
-      setTicketsCategory(false);
-      handleSortCategory();
-    } else if (ticketsCategory === false) {
-      console.log(ticketsCategory);
-      setTicketsCategory(true);
-      handleSortCategory1();
+  async function fetchCategories() {
+    try {
+      const response = await fetch("/api/GetCategory");
+      if (!response.ok) {
+        throw new Error(`status: ${response.status}`);
+      }
+      const body = await response.json();
+      setCategories(body);
+      console.log(body);
+    } catch (error) {
+      console.error("Fetching categories failed:", error);
     }
   }
 
-  const handleSortCategory = () => {
-    const sorted = [...tickets].sort((a, b) => {
-      return a.categoryName.localeCompare(b.categoryName);
-    });
-    setTickets(sorted);
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
   };
-
-  const handleSortCategory1 = () => {
-    const sorted1 = [...tickets].sort((a, b) => {
-      return b.categoryName.localeCompare(a.categoryName);
-    });
-    setTickets(sorted1);
-  };
-*/
 
   //FOR SORTING BY DATE
   function toggleTicketsDate() {
@@ -105,6 +95,8 @@ export default function EmployeeTicket() {
         console.error("Fetching tickets failed:", error);
       }
     }
+    fetchCategories();
+
     fetchTickets();
   }, []);
 
@@ -123,17 +115,22 @@ export default function EmployeeTicket() {
             ID ↕️
           </button>
           <button>Customer</button>
-          <input
-            type="text"
-            placeholder="Category"
+          <select
             value={categoryQuery}
             onChange={(e) => setCategoryQuery(e.target.value)}
-          />
+          >
+            <option value="">Show all categories</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.category_name}>
+                {category.category_name}
+              </option>
+            ))}
+          </select>
           <select
             value={statusQuery}
             onChange={(e) => setStatusQuery(e.target.value)}
           >
-            <option value="">Status</option>
+            <option value="">Show all statuses</option>
             <option value="active">active</option>
             <option value="waiting">waiting</option>
             <option value="close">close</option>
