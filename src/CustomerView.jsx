@@ -1,31 +1,41 @@
 import { useEffect, useState } from "react";
-import { useParams, Outlet, Link, NavLink } from "react-router";
+import { useParams } from "react-router";
+import { useTicket } from "./TicketContext";
+import alcorelLogo from "./logotype/AlcoRel.png";
 
 export default function CustomerView() {
   const { token } = useParams();
   const [ticket, setTicket] = useState(null);
   const [answered, setAnswered] = useState({});
   const [rating, setRating] = useState(null);
+  const { setTicketData, refreshTrigger } = useTicket();
+
+  const fetchTicket = () => {
+    fetch(`/api/ticket/token/${token}`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Ticket not found");
+        return response.json();
+      })
+      .then((data) => {
+        setTicket(data);
+        setTicketData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching ticket:", error);
+      });
+  };
 
   useEffect(() => {
-    function fetchTicket() {
-      fetch(`/api/ticket/token/${token}`)
-        .then((response) => {
-          if (!response.ok) throw new Error("Ticket not found");
-          return response.json();
-        })
-        .then((data) => {
-          setTicket(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching ticket:", error);
-        });
-    }
-
     if (token) {
       fetchTicket();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (token && refreshTrigger > 0) {
+      fetchTicket();
+    }
+  }, [refreshTrigger, token]);
 
   async function handleAddSubmit(event) {
     event.preventDefault();
@@ -42,7 +52,7 @@ export default function CustomerView() {
       await fetch(`/api/tickets/${ticket.ticketId}/status`, {
         headers: { "Content-Type": "application/json" },
         method: "PUT",
-        body: JSON.stringify({ status: "active" }),
+        body: JSON.stringify({ status: "waiting" }),
       });
 
       fetch(`/api/ticket/token/${token}`)
@@ -74,7 +84,10 @@ export default function CustomerView() {
 
         fetch(`/api/ticket/token/${token}`)
           .then((response) => response.json())
-          .then((data) => setTicket(data));
+          .then((data) => {
+            setTicket(data);
+            setTicketData(data);
+          });
       }
     } catch (error) {
       console.error("Answer submission failed:", error);
@@ -106,6 +119,11 @@ export default function CustomerView() {
 
   return (
     <div className="ticket-details">
+      <img
+        src={alcorelLogo}
+        alt="Alcorel"
+        style={{ margin: "-30px 0px -40px 0", maxWidth: "100px" }}
+      />
       <h1>Ticket #{ticket.ticketId}</h1>
       <div className="TicketHeader">
         <p>
@@ -174,45 +192,56 @@ export default function CustomerView() {
         </div>
       )}
       <h2>Questions & Answers</h2>
-      {ticket.questionAnswers?.length > 0 ? (
-        ticket.questionAnswers.map((qa, idx) => (
-          <div key={idx} className="qa">
-            <p className="QuestionStyle">
-              <strong>Q:</strong> {qa.question}
-            </p>
-            <form
-              className="form"
-              onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
-            >
-              <input
-                name="answer"
-                type="text"
-                defaultValue={qa.answer}
-                required
-              />
-              <button
-                className="sendAnswer"
-                type="submit"
-                disabled={answered[qa.qid]}
+      <div className="qas">
+        {ticket.questionAnswers?.length > 0 ? (
+          ticket.questionAnswers.map((qa, idx) => (
+            <div key={idx} className="qa">
+              <p className="QuestionStyle">
+                <strong>Q:</strong> {qa.question}
+              </p>
+              <form
+                className="form"
+                onSubmit={(e) => handleAnswerSubmit(e, qa.qid)}
               >
-                Send answer
-              </button>
-            </form>
-          </div>
-        ))
-      ) : (
-        <p>No Q&A found</p>
-      )}
+                <input
+                  name="answer"
+                  type="text"
+                  defaultValue={qa.answer}
+                  required
+                />
+                <button
+                  className="sendAnswer"
+                  type="submit"
+                  disabled={answered[qa.qid]}
+                >
+                  Send <span>&#10146;</span>
+                </button>
+              </form>
+            </div>
+          ))
+        ) : (
+          <p>No Q&A found</p>
+        )}
+      </div>
       <h2>Messages</h2>
       {ticket.messages?.length > 0 ? (
-        ticket.messages.map((msg, idx) => (
-          <div key={idx} className="message">
-            <small className="messageTime">
-              {new Date(msg.timestamp).toLocaleString()}
-            </small>
-            <pre className="messageTextarea">{msg.message}</pre>
-          </div>
-        ))
+        ticket.messages.map((msg, idx) => {
+          const isAlgoRelMessage =
+            msg.message.trim().endsWith("- AlgoRel") ||
+            msg.message.trim().endsWith("-AlgoRel");
+          return (
+            <div key={idx} className="message">
+              <small className="messageTime">
+                {new Date(msg.timestamp).toLocaleString()}
+              </small>
+              <pre
+                className={`messageTextarea ${isAlgoRelMessage ? "algorel-message" : ""}`}
+              >
+                {msg.message}
+              </pre>
+            </div>
+          );
+        })
       ) : (
         <p>No messages</p>
       )}
@@ -220,6 +249,9 @@ export default function CustomerView() {
         <textarea name="message" required placeholder="Reply..." />
         <button type="submit">Send Reply</button>
       </form>
+      <footer className="alcorel-footer">
+        <p>© {new Date().getFullYear()} Alcorel CRM. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

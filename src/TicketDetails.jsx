@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router";
 
 export default function TicketDetails() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [message, setMessage] = useState(null);
+  const [username, setUsername] = useState("");
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     function fetchTicket() {
@@ -21,14 +23,34 @@ export default function TicketDetails() {
         });
     }
 
+    function fetchUsername() {
+      fetch("/api/session/username")
+        .then((response) => {
+          if (!response.ok) throw new Error("Username not found");
+          return response.json();
+        })
+        .then((data) => {
+          setUsername(data.username);
+        })
+        .catch((error) => {
+          console.error("Error fetching username:", error);
+        });
+    }
+
     fetchTicket();
+    fetchUsername();
   }, [handleAddSubmit]);
 
   async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
-    data = Object.fromEntries(data);
-    data = JSON.stringify(data);
+    let formData = Object.fromEntries(data);
+
+    if (username) {
+      formData.message = `${formData.message}\n\nBest regards,\n${username}`;
+    }
+
+    data = JSON.stringify(formData);
     try {
       const response = await fetch(`/api/${id}/message`, {
         headers: { "Content-Type": "application/json" },
@@ -118,16 +140,25 @@ export default function TicketDetails() {
 
           <h2>Messages</h2>
           {ticket.messages.length > 0 ? (
-            ticket.messages.map((msg, idx) => (
-              <div key={idx} className="message">
-                <small className="messageTime">
-                  {new Date(msg.timestamp).toLocaleString()}
-                </small>
-                <pre readOnly className="messageTextarea">
-                  {msg.message}
-                </pre>
-              </div>
-            ))
+            ticket.messages.map((msg, idx) => {
+              const isAlgoRelMessage =
+                msg.message.trim().endsWith("- AlgoRel") ||
+                msg.message.trim().endsWith("-AlgoRel");
+
+              return (
+                <div key={idx} className="message">
+                  <small className="messageTime">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </small>
+                  <pre
+                    readOnly
+                    className={`messageTextarea ${isAlgoRelMessage ? "algorel-message" : ""}`}
+                  >
+                    {msg.message}
+                  </pre>
+                </div>
+              );
+            })
           ) : (
             <p>No messages</p>
           )}
@@ -140,7 +171,8 @@ export default function TicketDetails() {
                 name="message"
                 type="text"
                 required
-                placeholder="Reply ... "
+                placeholder="Reply ... (signature will be added automatically)"
+                ref={textareaRef}
               />
               <button type="submit">Send Reply</button>
             </form>

@@ -119,8 +119,7 @@ export default function AddQuestions() {
         <input type="submit" value="Add Question" />
       </form>
       {questionsList.map((question) => (
-        <div key={question.id}>
-          <h3>Question: {question.questions}</h3>
+        <div key={question.id} className="removeCat">
           <form
             onSubmit={handleRemove}
             action={`/api/questions/${question.id}`}
@@ -140,6 +139,7 @@ export default function AddQuestions() {
               -
             </button>
           </form>
+          <h3>{question.questions}</h3>
         </div>
       ))}
     </>

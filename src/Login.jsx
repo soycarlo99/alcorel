@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import alcorelLogo from "./logotype/AlcoRel.png";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,9 +29,6 @@ export default function LoginPage() {
           const json = JSON.parse(resp);
           navigate(json.redirectPath);
         });
-        // response.text().then((location) => {
-        //   navigate(location.slice(1, -1));
-        // });
       } else {
         console.error("response not ok");
       }
@@ -39,6 +37,14 @@ export default function LoginPage() {
 
   return (
     <div className="login-container">
+      <img
+        src={alcorelLogo}
+        style={{
+          clipPath: "inset(75px 0 75px 0)",
+          maxWidth: "190px",
+          marginLeft: "100px",
+        }}
+      />
       <h2>Login</h2>
 
       {error && <div className="error-message">{error}</div>}

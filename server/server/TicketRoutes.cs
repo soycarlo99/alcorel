@@ -129,7 +129,7 @@ public static class TicketRoutes
                     reader.GetInt32(3),
                     reader.GetInt32(4)
                 );
-                return TypedResults.Created($"/customerView/{token}", ticket);
+                return TypedResults.Created($"/customer-view/{token}", ticket);
             }
             return TypedResults.BadRequest("Failed to create ticket");
         }

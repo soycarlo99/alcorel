@@ -1,7 +1,7 @@
 import "./style.css";
 import { NavLink, Route, Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import alcorelLogo from "./logotype/AlcoRel.png";
 import LoginPage from "./Login.jsx";
 
 function Navigation() {
@@ -75,6 +75,11 @@ function Navigation() {
   if (isEmployee) {
     return (
       <nav className="sidebar">
+        <img
+          src={alcorelLogo}
+          style={{ clipPath: "inset(75px 0 75px 0)", maxWidth: "190px" }}
+        />
+
         <ul>
           <li>
             <NavLink to="/employee/dashboard" activeclassname="active">
@@ -115,6 +120,11 @@ function Navigation() {
   } else if (isAdmin) {
     return (
       <nav className="sidebar">
+        <img
+          src={alcorelLogo}
+          style={{ clipPath: "inset(75px 0 75px 0)", maxWidth: "190px" }}
+        />
+
         <ul>
           <li>
             <NavLink to="/admin/dashboard" activeclassname="active">
