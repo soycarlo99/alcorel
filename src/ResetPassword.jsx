@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -11,8 +11,12 @@ const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const token = new URLSearchParams(location.search).get("token");
-  const userId = new URLSearchParams(location.search).get("id");
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const userId = searchParams.get("id");
+
+  //const token = new URLSearchParams(location.search).get("token");
+  //const userId = new URLSearchParams(location.search).get("id");
 
   const handleSubmit = async (e) => {
     e.preventDefault();

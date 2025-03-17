@@ -45,7 +45,7 @@ export default function Alcorel() {
       if (response.ok) {
         try {
           const resp = await response.json();
-          navigate(resp.redirectPath || "/dashboard/admin");
+          navigate(resp.redirectPath || "/login");
         } catch (err) {
           console.error("Failed to parse JSON response:", err);
           setError("Registration successful, but redirection failed.");

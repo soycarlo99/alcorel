@@ -111,7 +111,11 @@ export default function EmployeeTicket() {
       <div className="Tickets">
         <h1>Tickets</h1>
         <div className="Titles">
-          <button type="button" onClick={toggleTicketsId}>
+          <button
+            type="button"
+            onClick={toggleTicketsId}
+            className={!ticketsId ? "active" : ""}
+          >
             ID ↕️
           </button>
           <button>Customer</button>
@@ -136,7 +140,11 @@ export default function EmployeeTicket() {
             <option value="close">close</option>
             <option value="solved">solved</option>
           </select>
-          <button type="button" onClick={toggleTicketsDate}>
+          <button
+            type="button"
+            onClick={toggleTicketsDate}
+            className={!ticketsDate ? "active" : ""}
+          >
             Date ↕️
           </button>
         </div>

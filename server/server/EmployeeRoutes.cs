@@ -104,6 +104,7 @@ public static class EmployeeRoutes
         {
             return TypedResults.BadRequest("You don't have a company ID nor a role");
         }
+
         using var command = db.CreateCommand(@"
         INSERT INTO testuser 
             (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
@@ -112,7 +113,7 @@ public static class EmployeeRoutes
         RETURNING 
             id, name, email, password, pending_confirmed, admin_customer_employee, company_id");
 
-        string hashedPassword = hasher.HashPassword("", employeeDto.password);
+        string hashedPassword = hasher.HashPassword("", "welcome");
         command.Parameters.AddWithValue("name", employeeDto.name);
         command.Parameters.AddWithValue("email", employeeDto.email);
         command.Parameters.AddWithValue("password", hashedPassword);
@@ -140,29 +141,35 @@ public static class EmployeeRoutes
     to: employeeDto.email,
     subject: "Welcome onboard!",
     body: $@"
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
-            <div style='text-align: center; margin-bottom: 20px;'>
-                <h1 style='color: #2c3e50;'>Hi {employeeDto.name}, you need to reset your password to be able to log-in</h1>
-                <p style='font-size: 16px; line-height: 1.5; color: #333;'>
-use the link below to reset your password
-            </p>
-            </div>
-            <div style='text-align: center; margin: 30px 0;'>
-                <a href='http://localhost:5173/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
-                   www.alcorel.com/resetpassword/
-                </a>
-
-            </div>
+    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+        <div style='text-align: center; margin-bottom: 20px;'>
+            <h1 style='color: #2c3e50;'>Welcome Onboard!</h1>
             <p style='font-size: 16px; line-height: 1.5; color: #333;'>
-Don't hesitate to contact us if you need guidance
+                Hi {employeeDto.name},
             </p>
-            <a href='mailto:support@alcorel.com'>support@alcorel.com</a>
-
-            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
-                Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
-            </div>
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                The admin has now created an account for you in our system. You can log in using your email and the default password: <strong>welcome</strong>
+            </p>
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                Please log in as soon as possible. You'll be prompted to change it to a stronger password for your security.
+            </p>
+            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+                We're excited to have you join us! If you need any assistance getting started, don't hesitate to reach out to our support team.
+            </p>
         </div>
-    "
+        <div style='text-align: center; margin: 30px 0;'>
+            <a href='http://localhost:5173/login' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+               Log In Now
+            </a>
+        </div>
+        <p style='font-size: 16px; line-height: 1.5; color: #333; text-align: center;'>
+            Best of luck in your new role!
+        </p>
+        <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
+            Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
+        </div>
+    </div>
+"
 );
                 return TypedResults.Created($"/api/Employee/{employee.id}", employee);
             }
@@ -205,7 +212,7 @@ Don't hesitate to contact us if you need guidance
     
     public static async Task<IResult> SendResetLink(int testuserId, NpgsqlDataSource db, PasswordHasher<string> hasher, IEmailService emailService)
     {
-                      string token = Guid.NewGuid().ToString();
+        string token = Guid.NewGuid().ToString();
 
         using var command = db.CreateCommand(@"UPDATE testuser SET password = @hashedwelcome, reset_token = @resetToken WHERE id = @userid  RETURNING email");
 
@@ -300,5 +307,36 @@ Don't hesitate to contact us if you need guidance
             return Results.BadRequest(new { error = $"Database error: {ex.Message}" });
         }
     }
+
+    public static async Task<IResult> CheckDefaultPassword(int userId, NpgsqlDataSource db, PasswordHasher<string> hasher)
+{
+    using var command = db.CreateCommand("SELECT password FROM testuser WHERE id = @userId");
+    command.Parameters.AddWithValue("userId", userId);
+    
+    try
+    {
+        var storedHash = await command.ExecuteScalarAsync() as string;
+        
+        if (storedHash == null)
+        {
+            return TypedResults.NotFound("User not found");
+        }
+        
+        var verificationResult = hasher.VerifyHashedPassword("", storedHash, "welcome");
+        
+        if (verificationResult == PasswordVerificationResult.Success)
+        {
+            return TypedResults.BadRequest("You are using the default password, please change your password");
+        }
+        
+        return TypedResults.Ok("Password is not the default");
+    }
+    catch (PostgresException ex)
+    {
+        return TypedResults.BadRequest($"Database error: {ex.Message}");
+    }
+}
+
+
 }
 

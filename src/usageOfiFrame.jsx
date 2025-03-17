@@ -202,7 +202,7 @@ const HowToUseIframe = () => {
         }
 
         h2 {
-          color: #3498db;
+          color: #2980b9;
           margin-bottom: 15px;
         }
 

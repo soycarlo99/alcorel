@@ -106,13 +106,13 @@ public static class UserRoutes
             </p>
             
             <div style='text-align: center; margin: 30px 0;'>
-                <a href='http://localhost:5173/Customerview/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                <a href='http://localhost:5173/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                     Complete Additional Questions
                 </a>
 <p style='font-size: 16px; line-height: 1.5; color: #333;'>
                 if the button doesn't work click on the link below:
             </p>
-                <a href='http://localhost:5173/Customerview/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                <a href='http://localhost:5173/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                    www.alcorel.com/customerservice 
                 </a>
 
@@ -261,7 +261,7 @@ public static class UserRoutes
     public static async Task<IResult>
     Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx, PasswordHasher<string> hasher)
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id, password from testuser where email = $1");
+        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id, password, id from testuser where email = $1");
         cmd.Parameters.AddWithValue(credentials.Email);
 
         using var reader = await cmd.ExecuteReaderAsync();
@@ -271,6 +271,7 @@ public static class UserRoutes
             var role = reader.GetFieldValue<UserRole>(1);
             var companyId = reader.GetInt32(2);
             string hashedPassword = reader.GetString(3);
+            int id = reader.GetInt32(4);
             var verifyResult = hasher.VerifyHashedPassword("", hashedPassword, credentials.Password);
             Console.WriteLine(verifyResult);
 
@@ -286,6 +287,8 @@ public static class UserRoutes
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
             ctx.Session.SetString("email", credentials.Email);
+            ctx.Session.SetInt32("id", id);
+
 
             string location = "";
             switch (role)

@@ -87,11 +87,14 @@ export default function ManageEmployees() {
           type="email"
           required
         />
-        <p>password: </p>
-        <input name="password" type="password" required />
+        <p className="note">
+          New employees get the password <strong>welcome</strong> by default.
+          when they log-in they will get prompt to reset their password
+        </p>
+        <input name="password" type="hidden" />
         <input name="pending_confirmed" type="hidden" />
         <input name="admin_customer_employee" type="hidden" value="employee" />
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Add employee" />
       </form>
       <h3>Existing employees:</h3>
       {employee.map((item, index) => (

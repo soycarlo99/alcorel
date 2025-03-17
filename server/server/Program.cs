@@ -63,6 +63,18 @@ app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
     return TypedResults.Ok(new { success = true });
 });
 
+app.MapGet("/api/session/userId", (HttpContext ctx) =>
+{
+    var userId = ctx.Session.GetInt32("id");
+    return TypedResults.Ok(new { userId = userId });
+});
+
+app.MapGet("/api/session/username", (HttpContext ctx) =>
+{
+    var username = ctx.Session.GetString("name");
+    return TypedResults.Ok(new { username = username });
+});
+
 app.MapGet("/api/company/current", (HttpContext ctx) => {
     var companyId = ctx.Session.GetInt32("companyId");
     
@@ -167,5 +179,6 @@ app.MapPost("/api/logout", (HttpContext ctx) =>
 //Password Reset APIs
 app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
+app.MapGet("/api/employee/{userId}/check-password", EmployeeRoutes.CheckDefaultPassword);
 
 app.Run();

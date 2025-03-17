@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import alcorelLogo from "../logotype/AlcoRel.png";
+
 export default function TicketCreation() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -74,6 +76,11 @@ export default function TicketCreation() {
     <>
       <a href="/login" className="login-link"></a>
       <main className="CreateTicket">
+        <img
+          src={alcorelLogo}
+          alt="Alcorel"
+          style={{ margin: "-30px 0px -40px 0", maxWidth: "100px" }}
+        />
         {feedback && (
           <div
             className={
@@ -138,6 +145,9 @@ export default function TicketCreation() {
           </button>
         </form>
       </main>
+      <footer className="alcorel-footer">
+        <p>© {new Date().getFullYear()} Alcorel CRM. All rights reserved.</p>
+      </footer>
     </>
   );
 }
