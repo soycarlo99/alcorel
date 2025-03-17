@@ -42,6 +42,14 @@ export default function CustomerView() {
       const initialAnsweredState = {};
       ticket.questionAnswers.forEach((qa) => {
         initialAnsweredState[qa.qid] = !!qa.answer;
+
+        /*double negation - explain it in class if people are intressted - falsy values in JS are
+        false
+        0 (zero)
+        "" (empty string)
+        null
+        undefined
+        NaN */
       });
       setAnsweredQuestions(initialAnsweredState);
     }
