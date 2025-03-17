@@ -224,7 +224,38 @@ export default function CustomerView() {
         )}
       </div>
       <h2>Messages</h2>
-      {ticket.messages?.length > 0 ? (
+      {ticket.messages?.length === 0 && <p>No messages</p>}
+
+      {ticket.messages?.length === 1 && (
+        <>
+          {ticket.messages.map((msg, idx) => {
+            const isAlgoRelMessage =
+              msg.message.trim().endsWith("- AlgoRel") ||
+              msg.message.trim().endsWith("-AlgoRel");
+            return (
+              <div key={idx} className="message">
+                <small className="messageTime">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </small>
+                <pre
+                  className={`messageTextarea ${isAlgoRelMessage ? "algorel-message" : ""}`}
+                >
+                  {msg.message}
+                </pre>
+              </div>
+            );
+          })}
+
+          {/* typing animation */}
+          <div className="typing-animation">
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+          </div>
+        </>
+      )}
+
+      {ticket.messages?.length > 1 &&
         ticket.messages.map((msg, idx) => {
           const isAlgoRelMessage =
             msg.message.trim().endsWith("- AlgoRel") ||
@@ -241,10 +272,7 @@ export default function CustomerView() {
               </pre>
             </div>
           );
-        })
-      ) : (
-        <p>No messages</p>
-      )}
+        })}
       <form className="form" onSubmit={handleAddSubmit}>
         <textarea name="message" required placeholder="Reply..." />
         <button type="submit">Send Reply</button>

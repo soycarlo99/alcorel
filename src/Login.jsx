@@ -30,6 +30,9 @@ export default function LoginPage() {
           navigate(json.redirectPath);
         });
       } else {
+        if (response.status === 400) {
+          setError("Wrong Credentials, please check your credentials");
+        }
         console.error("response not ok");
       }
     });

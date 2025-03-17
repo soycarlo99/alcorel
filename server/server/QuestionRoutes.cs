@@ -133,4 +133,32 @@ public static class QuestionRoutes
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
     }
+
+    public record UpdateQuestionDTO(string question);
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
+    UpdateQuestion(int questionId, UpdateQuestionDTO questionDto, NpgsqlDataSource db)
+    {
+        string newQuestion = questionDto.question;
+        using var command = db.CreateCommand(@"
+            UPDATE questions
+            SET questions = @newQuestion
+            WHERE id = @id
+            RETURNING id, questions");
+        command.Parameters.AddWithValue("newQuestion", questionDto.question);
+        command.Parameters.AddWithValue("id", questionId);
+        
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return TypedResults.Ok($"Question updated for #{reader.GetInt32(0)}");
+            }
+            return TypedResults.BadRequest("Failed to update question");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 }

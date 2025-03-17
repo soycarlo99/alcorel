@@ -119,12 +119,14 @@ app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
 app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
 app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
 app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
+app.MapPut("/api/update/question/{questionId}", QuestionRoutes.UpdateQuestion);
 
 //Category APIs
 app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
 app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
 app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
 app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
+app.MapPut("/api/update/category/{catId}", CategoryRoutes.UpdateCategories);
 
 //Message APIs
 app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
@@ -180,5 +182,7 @@ app.MapPost("/api/logout", (HttpContext ctx) =>
 app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
 app.MapGet("/api/employee/{userId}/check-password", EmployeeRoutes.CheckDefaultPassword);
+app.MapGet("/api/password/validate-token/{resetToken}", EmployeeRoutes.ValidateResetToken);
+
 
 app.Run();
