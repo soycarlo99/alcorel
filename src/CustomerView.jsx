@@ -6,7 +6,7 @@ import alcorelLogo from "./logotype/AlcoRel.png";
 export default function CustomerView() {
   const { token } = useParams();
   const [ticket, setTicket] = useState(null);
-  const [answered, setAnswered] = useState({});
+  const [answeredQuestions, setAnsweredQuestions] = useState({});
   const [rating, setRating] = useState(null);
   const { setTicketData, refreshTrigger } = useTicket();
 
@@ -37,6 +37,16 @@ export default function CustomerView() {
     }
   }, [refreshTrigger, token]);
 
+  useEffect(() => {
+    if (ticket && ticket.questionAnswers) {
+      const initialAnsweredState = {};
+      ticket.questionAnswers.forEach((qa) => {
+        initialAnsweredState[qa.qid] = !!qa.answer;
+      });
+      setAnsweredQuestions(initialAnsweredState);
+    }
+  }, [ticket]);
+
   async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
@@ -65,9 +75,25 @@ export default function CustomerView() {
     }
   }
 
+  async function updateTicketStatus(ticketId, status = "waiting") {
+    try {
+      const response = await fetch(`/api/tickets/${ticketId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      return response;
+    } catch (error) {
+      console.error("Failed to update ticket status:", error);
+      throw error;
+    }
+  }
+
   async function handleAnswerSubmit(event, questionId) {
     event.preventDefault();
     const answer = event.target.answer.value;
+
+    setAnsweredQuestions((prev) => ({ ...prev, [questionId]: true }));
 
     try {
       const response = await fetch(
@@ -80,16 +106,18 @@ export default function CustomerView() {
       );
 
       if (response.ok) {
-        setAnswered((prev) => ({ ...prev, [questionId]: true }));
+        await updateTicketStatus(ticket.ticketId, "waiting");
 
-        fetch(`/api/ticket/token/${token}`)
-          .then((response) => response.json())
-          .then((data) => {
-            setTicket(data);
-            setTicketData(data);
-          });
+        const tokenResponse = await fetch(`/api/ticket/token/${token}`);
+        const data = await tokenResponse.json();
+        setTicket(data);
+        setTicketData(data);
+      } else {
+        setAnsweredQuestions((prev) => ({ ...prev, [questionId]: false }));
+        console.error("Failed to submit answer");
       }
     } catch (error) {
+      setAnsweredQuestions((prev) => ({ ...prev, [questionId]: false }));
       console.error("Answer submission failed:", error);
     }
   }
@@ -212,9 +240,15 @@ export default function CustomerView() {
                 <button
                   className="sendAnswer"
                   type="submit"
-                  disabled={answered[qa.qid]}
+                  disabled={answeredQuestions[qa.qid]}
                 >
-                  Send <span>&#10146;</span>
+                  {answeredQuestions[qa.qid] ? (
+                    "Sent ✓"
+                  ) : (
+                    <>
+                      Send <span>&#10146;</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
