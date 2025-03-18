@@ -278,7 +278,7 @@ public static class UserRoutes
             if (verifyResult == PasswordVerificationResult.Failed)
             {
                 Console.WriteLine("NOT cracked");
-                return TypedResults.BadRequest();
+                return TypedResults.BadRequest("Wrong credentials");
 
             }
 

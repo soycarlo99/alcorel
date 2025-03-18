@@ -108,14 +108,6 @@ export default function ManageEmployees() {
                 className="RemoveButton"
                 type="submit"
                 value="-"
-                style={{
-                  boxShadow: "none",
-                  WebkitAppearance: "none",
-                  MozAppearance: "none",
-                  appearance: "none",
-                  border: "none",
-                  outline: "none",
-                }}
                 title={`Eliminate ${item.name}`}
               />
             </form>

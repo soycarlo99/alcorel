@@ -6,6 +6,8 @@ export default function AddQuestions() {
   const [categories, setCategories] = useState([]);
   const [category_id, setCategory] = useState("");
   const [questions, setQuestions] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [newQuestionText, setNewQuestionText] = useState("");
 
   const handleCategoryChange = (event) => {
     setCategory(event.target.value);
@@ -86,6 +88,34 @@ export default function AddQuestions() {
     });
   }
 
+  function showEdit(id, currentQuestion) {
+    setEditingId(id);
+    setNewQuestionText(currentQuestion);
+  }
+
+  async function handleQuestionEditSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    let data = new FormData(form);
+    data = Object.fromEntries(data);
+
+    try {
+      const response = await fetch(`/api/update/question/${data.id}`, {
+        headers: { "Content-Type": "application/json" },
+        method: "PUT",
+        body: JSON.stringify({ question: newQuestionText }),
+      });
+
+      if (response.ok) {
+        console.log(`Question updated`);
+        fetchQuestions();
+        setEditingId(null);
+      }
+    } catch (error) {
+      console.error("Question update failed:", error);
+    }
+  }
+
   return (
     <>
       <h1>Add/See questions</h1>
@@ -124,22 +154,40 @@ export default function AddQuestions() {
             onSubmit={handleRemove}
             action={`/api/questions/${question.id}`}
           >
-            <button
-              type="submit"
-              className="RemoveButton"
-              style={{
-                border: "none",
-                outline: "none",
-                boxShadow: "none",
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                appearance: "none",
-              }}
-            >
+            <button type="submit" className="RemoveButton">
               -
             </button>
           </form>
           <h3>{question.questions}</h3>
+          <button
+            className="editButton"
+            onClick={() => showEdit(question.id, question.questions)}
+          >
+            ✎
+          </button>
+          {editingId === question.id && (
+            <div className="editForm">
+              <form onSubmit={handleQuestionEditSubmit}>
+                <input
+                  className="editCategoryForm"
+                  name="question"
+                  value={newQuestionText}
+                  onChange={(e) => setNewQuestionText(e.target.value)}
+                />
+                <input name="id" type="hidden" value={question.id} />
+                <button className="SaveButton" type="submit">
+                  &#10003;
+                </button>
+                <button
+                  type="button"
+                  className="RemoveButton"
+                  onClick={() => setEditingId(null)}
+                >
+                  x
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       ))}
     </>

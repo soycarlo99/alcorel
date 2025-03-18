@@ -129,4 +129,36 @@ public static class CategoryRoutes
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
     }
+
+    
+public record UpdateCatDTO(string Cat);
+
+    public static async Task<Results<Ok<string>, BadRequest<string>>>
+    UpdateCategories(int catId, UpdateCatDTO CatDto, NpgsqlDataSource db)
+    {
+        string newCat = CatDto.Cat;
+
+        using var command = db.CreateCommand(@"
+            UPDATE categories
+            SET category_name = @newCat
+            WHERE id = @id
+            RETURNING id, category_name");
+
+        command.Parameters.AddWithValue("newCat", CatDto.Cat);
+        command.Parameters.AddWithValue("id", catId);
+
+        try
+        {
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return TypedResults.Ok($"category updated for  #{reader.GetInt32(0)}");
+            }
+            return TypedResults.BadRequest("Failed to update category");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 }

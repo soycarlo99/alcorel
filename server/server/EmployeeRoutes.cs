@@ -309,34 +309,60 @@ public static class EmployeeRoutes
     }
 
     public static async Task<IResult> CheckDefaultPassword(int userId, NpgsqlDataSource db, PasswordHasher<string> hasher)
-{
-    using var command = db.CreateCommand("SELECT password FROM testuser WHERE id = @userId");
-    command.Parameters.AddWithValue("userId", userId);
-    
-    try
     {
-        var storedHash = await command.ExecuteScalarAsync() as string;
+        using var command = db.CreateCommand("SELECT password FROM testuser WHERE id = @userId");
+        command.Parameters.AddWithValue("userId", userId);
         
-        if (storedHash == null)
+        try
         {
-            return TypedResults.NotFound("User not found");
+            var storedHash = await command.ExecuteScalarAsync() as string;
+            
+            if (storedHash == null)
+            {
+                return TypedResults.NotFound("User not found");
+            }
+            
+            var verificationResult = hasher.VerifyHashedPassword("", storedHash, "welcome");
+            
+            if (verificationResult == PasswordVerificationResult.Success)
+            {
+                return TypedResults.BadRequest("You are using the default password, please change your password");
+            }
+            
+            return TypedResults.Ok("Password is not the default");
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
+
+    public static async Task<IResult> ValidateResetToken(string resetToken, NpgsqlDataSource db)
+    {
+        if (string.IsNullOrEmpty(resetToken))
+        {
+            return Results.BadRequest(new { valid = false, error = "Reset token is required" });
         }
         
-        var verificationResult = hasher.VerifyHashedPassword("", storedHash, "welcome");
+        using var command = db.CreateCommand(@"SELECT id FROM testuser WHERE reset_token = @resetToken");
+        command.Parameters.AddWithValue("resetToken", resetToken);
         
-        if (verificationResult == PasswordVerificationResult.Success)
+        try
         {
-            return TypedResults.BadRequest("You are using the default password, please change your password");
+            using var reader = await command.ExecuteReaderAsync();
+            
+            if (await reader.ReadAsync())
+            {
+                int userId = reader.GetInt32(0);
+                return Results.Ok(new { valid = true, userId, message = "Token is valid" });
+            }
+            
+            return Results.NotFound(new { valid = false, error = "Invalid or expired reset token" });
         }
-        
-        return TypedResults.Ok("Password is not the default");
+        catch (PostgresException ex)
+        {
+            return Results.BadRequest(new { valid = false, error = $"Database error: {ex.Message}" });
+        }
     }
-    catch (PostgresException ex)
-    {
-        return TypedResults.BadRequest($"Database error: {ex.Message}");
-    }
-}
-
-
 }
 

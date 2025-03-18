@@ -6,7 +6,7 @@ import alcorelLogo from "./logotype/AlcoRel.png";
 export default function CustomerView() {
   const { token } = useParams();
   const [ticket, setTicket] = useState(null);
-  const [answered, setAnswered] = useState({});
+  const [answeredQuestions, setAnsweredQuestions] = useState({});
   const [rating, setRating] = useState(null);
   const { setTicketData, refreshTrigger } = useTicket();
 
@@ -37,6 +37,24 @@ export default function CustomerView() {
     }
   }, [refreshTrigger, token]);
 
+  useEffect(() => {
+    if (ticket && ticket.questionAnswers) {
+      const initialAnsweredState = {};
+      ticket.questionAnswers.forEach((qa) => {
+        initialAnsweredState[qa.qid] = !!qa.answer;
+
+        /*double negation - explain it in class if people are intressted - falsy values in JS are
+        false
+        0 (zero)
+        "" (empty string)
+        null
+        undefined
+        NaN */
+      });
+      setAnsweredQuestions(initialAnsweredState);
+    }
+  }, [ticket]);
+
   async function handleAddSubmit(event) {
     event.preventDefault();
     let data = new FormData(event.target);
@@ -65,9 +83,25 @@ export default function CustomerView() {
     }
   }
 
+  async function updateTicketStatus(ticketId, status = "waiting") {
+    try {
+      const response = await fetch(`/api/tickets/${ticketId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      return response;
+    } catch (error) {
+      console.error("Failed to update ticket status:", error);
+      throw error;
+    }
+  }
+
   async function handleAnswerSubmit(event, questionId) {
     event.preventDefault();
     const answer = event.target.answer.value;
+
+    setAnsweredQuestions((prev) => ({ ...prev, [questionId]: true }));
 
     try {
       const response = await fetch(
@@ -80,16 +114,18 @@ export default function CustomerView() {
       );
 
       if (response.ok) {
-        setAnswered((prev) => ({ ...prev, [questionId]: true }));
+        await updateTicketStatus(ticket.ticketId, "waiting");
 
-        fetch(`/api/ticket/token/${token}`)
-          .then((response) => response.json())
-          .then((data) => {
-            setTicket(data);
-            setTicketData(data);
-          });
+        const tokenResponse = await fetch(`/api/ticket/token/${token}`);
+        const data = await tokenResponse.json();
+        setTicket(data);
+        setTicketData(data);
+      } else {
+        setAnsweredQuestions((prev) => ({ ...prev, [questionId]: false }));
+        console.error("Failed to submit answer");
       }
     } catch (error) {
+      setAnsweredQuestions((prev) => ({ ...prev, [questionId]: false }));
       console.error("Answer submission failed:", error);
     }
   }
@@ -212,9 +248,15 @@ export default function CustomerView() {
                 <button
                   className="sendAnswer"
                   type="submit"
-                  disabled={answered[qa.qid]}
+                  disabled={answeredQuestions[qa.qid]}
                 >
-                  Send <span>&#10146;</span>
+                  {answeredQuestions[qa.qid] ? (
+                    "Sent ✓"
+                  ) : (
+                    <>
+                      Send <span>&#10146;</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
@@ -224,7 +266,38 @@ export default function CustomerView() {
         )}
       </div>
       <h2>Messages</h2>
-      {ticket.messages?.length > 0 ? (
+      {ticket.messages?.length === 0 && <p>No messages</p>}
+
+      {ticket.messages?.length === 1 && (
+        <>
+          {ticket.messages.map((msg, idx) => {
+            const isAlgoRelMessage =
+              msg.message.trim().endsWith("- AlgoRel") ||
+              msg.message.trim().endsWith("-AlgoRel");
+            return (
+              <div key={idx} className="message">
+                <small className="messageTime">
+                  {new Date(msg.timestamp).toLocaleString()}
+                </small>
+                <pre
+                  className={`messageTextarea ${isAlgoRelMessage ? "algorel-message" : ""}`}
+                >
+                  {msg.message}
+                </pre>
+              </div>
+            );
+          })}
+
+          {/* typing animation */}
+          <div className="typing-animation">
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+          </div>
+        </>
+      )}
+
+      {ticket.messages?.length > 1 &&
         ticket.messages.map((msg, idx) => {
           const isAlgoRelMessage =
             msg.message.trim().endsWith("- AlgoRel") ||
@@ -241,10 +314,7 @@ export default function CustomerView() {
               </pre>
             </div>
           );
-        })
-      ) : (
-        <p>No messages</p>
-      )}
+        })}
       <form className="form" onSubmit={handleAddSubmit}>
         <textarea name="message" required placeholder="Reply..." />
         <button type="submit">Send Reply</button>
