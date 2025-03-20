@@ -6,17 +6,38 @@
 
 Technologies used:
 
-- .NET8 Minimal API:s
+- .NET8 Minimal API:s (RESTful)
 - Npgsql
 - PostgreSQL
 - React
 - React-Dom
+- Ollama
 - React-Router
 - Mailsolution: MailKit
 
-# API Documentation
+### Build From Source
 
-[Introduction](#introduction) [Authentication](#authentication) [Base URL](#base-url) [Request & Response](#request-response) [Reference](#reference) [Code Examples](#code-examples)
+Clone the repository and build the server manually:
+
+```bash
+git clone https://github.com/soycarlo99/alcorel.git
+
+cd alcorel
+cd server/Server
+
+dotnet run
+```
+
+### Frontend installation guide
+
+To install react you need to do the steps bellow:
+
+```bash
+# in the main root path run this command to install react and its dependencies
+npm install
+```
+
+# API Documentation
 
 ## Introduction
 
@@ -39,7 +60,7 @@ All subsequent requests require a valid session cookie.
 
 The base URL for all API endpoints is:
 
-http://localhost:5000/api/
+http://localhost:5001/api/
 
 ## Request & Response Formats
 
@@ -58,8 +79,11 @@ Successful responses return a 200 OK status with JSON data.
 
 Error responses return appropriate status codes with error details:
 
+- 200 Ok
+- 201 Created
 - 400 Bad Request
 - 401 Unauthorized
+- 403 Forbid
 - 404 Not Found
 - 500 Internal Server Error
 
@@ -73,7 +97,6 @@ Error responses return appropriate status codes with error details:
 | POST /tickets                             | Create new support ticket               | ticket_time, status, user_id, category_id                  | New ticket object                 |
 | PUT /tickets/{ticketId}/status            | Update ticket status                    | ticketId, new status                                       | Updated ticket status             |
 | POST /questions                           | Create new question                     | questions, category_id                                     | New question object               |
-| POST /categories                          | Create new category                     | category_name, company_id                                  | New category object               |
 | DELETE /categories/{categoryId}           | Delete existing category                | categoryId                                                 | Deletion confirmation             |
 | POST /messages                            | Add message to ticket                   | ticket_id, message                                         | New message object                |
 | PUT /sendRating/{rating}/{ticketId}       | Send rating for ticket                  | rating, ticketId                                           | Rating confirmation               |
@@ -92,84 +115,185 @@ Error responses return appropriate status codes with error details:
 | POST /PostCategory                        | Create new category                     | category_name, company_id                                  | New category object               |
 | DELETE /DeleteCategory/{categoryId}       | Delete category                         | categoryId                                                 | Deletion confirmation             |
 | PUT /update/category/{catId}              | Update category                         | catId, new category name                                   | Update confirmation               |
-| PUT /update/logo/{companyId}              | Update company logo                     | companyId, new logo                                        | Update confirmation               |
-| GET /employee/dashboard                   | Get employee dashboard information      | None                                                       | Company name and logo             |
-| GET /admin/dashboard                      | Get admin dashboard information         | None                                                       | Company name and logo             |
+| PUT /update/logo/{companyId}              | Update company logo                     | companyId, logotype                                        | Update confirmation               |
+| GET /employee/dashboard                   | Get current company ID from session     | None                                                       | Company name                      |
+| GET /admin/dashboard                      | Get admin dashboard information         | None                                                       | Company name                      |
 | POST /password/reset/{resetToken}         | Reset password with token               | resetToken, newPassword                                    | Confirmation message              |
 | PUT /ResetPassword/{testuserId}           | Send password reset link                | testuserId                                                 | Confirmation message              |
 | GET /employee/{userId}/check-password     | Check if user is using default password | userId                                                     | Password status                   |
 | GET /password/validate-token/{resetToken} | Validate password reset token           | resetToken                                                 | Token validation status           |
 
-## Code Examples
+## Detailed PUT /sendRating API
 
-### React (with async/await)
+**Verb**: PUT
+
+**Path**: http://localhost:5001/api/sendRating/{rating}/{ticketId}
+
+**Parameter Binding Count**: 2
+
+### Description
+
+This endpoint allows users to send a rating for a specific ticket.
+
+### Parameters
+
+- `rating` (integer): The rating value to be assigned to the ticket
+- `ticketId` (integer): The ID of the ticket to be rated
+
+### Request Body
 
 ```js
-// Login example
-                const login = async () => {
-                    try {
-                        const response = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                email: 'user@example.com',
-                                password: 'password'
-                            })
-                        });
+{
+  // No request body required
+}
+```
 
-                        if (!response.ok) {
-                            throw new Error('Login failed');
-                        }
+### Responses
 
-                        const data = await response.json();
-                        console.log('Login successful:', data);
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                };
+#### Successful Response
 
-                // Create ticket example
-                const createTicket = async () => {
-                    try {
-                        const response = await fetch('/api/tickets', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                ticket\_time: new Date().toISOString(),
-                                status: 'open',
-                                user\_id: 123,
-                                category\_id: 45
-                            })
-                        });
+**Status Code**: 200 OK
 
-                        if (!response.ok) {
-                            throw new Error('Ticket creation failed');
-                        }
+**Content Type**: text/plain
 
-                        const data = await response.json();
-                        console.log('Ticket created:', data);
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                };
+**Example Response**:
 
-                // Get ticket by token example
-                const getTicketByToken = async (token) => {
-                    try {
-                        const response = await fetch(\`/api/ticket/token/${token}\`);
+```
+Rating updated to 4 in ticket #123
+```
 
-                        if (!response.ok) {
-                            throw new Error('Failed to get ticket');
-                        }
+#### Error Responses
 
-                        const data = await response.json();
-                        console.log('Ticket details:', data);
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                };
+**Status Code**: 400 Bad Request
+
+**Content Type**: text/plain
+
+**Example Responses**:
+
+```
+Failed to rate
+```
+
+```
+Database error: [Specific error message]
+```
+
+## Detailed POST /tickets API
+
+**Verb**: POST
+
+**Path**: http://localhost:5001/api/tickets
+
+**Parameter Binding Count**: 0
+
+### Description
+
+This endpoint allows users to create a new support ticket.
+
+### Request Body
+
+```js
+{
+    "ticket_time": "2025-03-20T12:00:00Z",
+    "status": "open",
+    "user_id": 123,
+    "category_id": 45
+}
+```
+
+### Responses
+
+#### Successful Response
+
+**Status Code**: 201 Created
+
+**Content Type**: application/json
+
+**Example Response**:
+
+```json
+{
+  "id": 456,
+  "ticket_time": "2025-03-20T12:00:00Z",
+  "status": "open",
+  "user_id": 123,
+  "category_id": 45
+}
+```
+
+#### Error Responses
+
+**Status Code**: 400 Bad Request
+
+**Content Type**: text/plain
+
+**Example Responses**:
+
+```
+Unauthorized, You are an employee and can't create a ticket
+```
+
+```
+Failed to create ticket
+```
+
+```
+Database error: [Specific error message]
+```
+
+## Code Examples
+
+1. Create Ticket Example (using async/await):
+
+```javascript
+const createTicket = async () => {
+  try {
+    const response = await fetch("/api/tickets", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ticket_time: new Date().toISOString(),
+        status: "open",
+        user_id: 123,
+        category_id: 45,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Ticket creation failed");
+    }
+
+    const data = await response.json();
+    console.log("Ticket created:", data);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+```
+
+2. Send Rating Example (using chained promises):
+
+```javascript
+const sendRating = (rating, ticketId) => {
+  fetch(`/api/sendRating/${rating}/${ticketId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to send rating");
+      }
+      return response.text();
+    })
+    .then((data) => {
+      console.log("Rating sent successfully:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
 ```

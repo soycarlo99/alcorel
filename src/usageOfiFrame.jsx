@@ -5,6 +5,7 @@ const HowToUseIframe = () => {
   const [companyId, setCompanyId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAutoFetched, setIsAutoFetched] = useState(false);
   const codeRef = useRef(null);
   const baseUrl = "http://localhost:5173";
 
@@ -24,12 +25,14 @@ const HowToUseIframe = () => {
             setError(
               "No company session found. Please enter your company ID manually.",
             );
+            setIsAutoFetched(false);
           } else {
             throw new Error("Failed to fetch company ID");
           }
         } else {
           const data = await response.json();
           setCompanyId(data.companyId.toString());
+          setIsAutoFetched(true);
         }
       } catch (err) {
         console.error("Error fetching company ID:", err);
@@ -37,6 +40,7 @@ const HowToUseIframe = () => {
         setError(
           "Could not retrieve your company ID. Please enter it manually.",
         );
+        setIsAutoFetched(false);
       } finally {
         setLoading(false);
       }
@@ -107,12 +111,14 @@ const HowToUseIframe = () => {
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
                 placeholder="Enter your company ID"
+                disabled={isAutoFetched}
+                className={isAutoFetched ? "auto-fetched" : ""}
               />
             </div>
             {error && <p className="error-message">{error}</p>}
             <p className="note">
               {error
-                ? "You can find your Company ID in your account settings or in the welcome email." //We need to integerate welcome mail to the admin account creation
+                ? "You can find your Company ID in your account settings or in the welcome email."
                 : "Your company ID has been automatically loaded from your active session."}
             </p>
           </>
@@ -223,6 +229,12 @@ const HowToUseIframe = () => {
           border-radius: 4px;
           flex-grow: 1;
           max-width: 300px;
+        }
+
+        .company-id-input input.auto-fetched {
+          background-color: #f9f9f9;
+          border-color: #ccc;
+          color: #555;
         }
 
         .code-container {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
-const ResetPassword = () => {
+function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -155,6 +155,6 @@ const ResetPassword = () => {
       </form>
     </div>
   );
-};
+}
 
 export default ResetPassword;
