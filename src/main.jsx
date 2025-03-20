@@ -95,82 +95,83 @@ function AdminRoute({ element }) {
   );
 }
 
-const LayoutWithNav = () => (
-  <RoleProvider>
-    <div className="app-container">
-      <Navigation />
-      <div className="main-content">
-        <Outlet />
+function LayoutWithNav() {
+  return (
+    <RoleProvider>
+      <div className="app-container">
+        <Navigation />
+        <div className="main-content">
+          <Outlet />
+        </div>
       </div>
-    </div>
-  </RoleProvider>
-);
+    </RoleProvider>
+  );
+}
 
-const LayoutWithoutNav = () => (
-  <RoleProvider>
-    <div className="app-container">
-      <div className="main-content full-width">
-        <Outlet />
+function LayoutWithoutNav() {
+  return (
+    <RoleProvider>
+      <div className="app-container">
+        <div className="main-content full-width">
+          <Outlet />
+        </div>
       </div>
-    </div>
-  </RoleProvider>
-);
+    </RoleProvider>
+  );
+}
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <RoleProvider>
-      <Routes>
-        <Route element={<LayoutWithoutNav />}>
-          <Route index element={<TicketCreation />} />
-          <Route path="/company/:companyId" element={<CompanyLanding />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route
-            path="customer-view/:token"
-            element={
-              <TicketProvider>
-                <>
-                  <CustomerView />
-                  <AiChat />
-                </>
-              </TicketProvider>
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-        <Route element={<LayoutWithNav />}>
-          <Route
-            path="/edit-categories"
-            element={<AdminRoute element={<EditCategories />} />}
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/employee-ticket"
-            element={<BothRoles element={<EmployeeTicket />} />}
-          />
-          <Route
-            path="/add-questions"
-            element={<AdminRoute element={<AddQuestions />} />}
-          />
-          <Route
-            path="/manage-employee"
-            element={<AdminRoute element={<ManageEmployees />} />}
-          />
-          <Route path="/ticket/:id" element={<TicketDetails />} />
-          <Route
-            path="/employee/dashboard"
-            element={<EmployeeRoute element={<EmployeeDashboard />} />}
-          />
-          <Route
-            path="/admin/dashboard"
-            element={<AdminRoute element={<AdminDashboard />} />}
-          />
-          <Route path="/alcorel" element={<Alcorel />} />
-          <Route
-            path="/usage-of-iframe"
-            element={<AdminRoute element={<HowToUseIframe />} />}
-          />
-        </Route>
-      </Routes>
-    </RoleProvider>
+    <Routes>
+      <Route element={<LayoutWithoutNav />}>
+        <Route index element={<TicketCreation />} />
+        <Route path="/company/:companyId" element={<CompanyLanding />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route
+          path="customer-view/:token"
+          element={
+            <TicketProvider>
+              <>
+                <CustomerView />
+                <AiChat />
+              </>
+            </TicketProvider>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+      <Route element={<LayoutWithNav />}>
+        <Route
+          path="/edit-categories"
+          element={<AdminRoute element={<EditCategories />} />}
+        />
+        <Route
+          path="/employee-ticket"
+          element={<BothRoles element={<EmployeeTicket />} />}
+        />
+        <Route
+          path="/add-questions"
+          element={<AdminRoute element={<AddQuestions />} />}
+        />
+        <Route
+          path="/manage-employee"
+          element={<AdminRoute element={<ManageEmployees />} />}
+        />
+        <Route path="/ticket/:id" element={<TicketDetails />} />
+        <Route
+          path="/employee/dashboard"
+          element={<EmployeeRoute element={<EmployeeDashboard />} />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<AdminRoute element={<AdminDashboard />} />}
+        />
+        <Route path="/alcorel" element={<Alcorel />} />
+        <Route
+          path="/usage-of-iframe"
+          element={<AdminRoute element={<HowToUseIframe />} />}
+        />
+      </Route>
+    </Routes>
   </BrowserRouter>,
 );
