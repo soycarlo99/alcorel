@@ -1,8 +1,4 @@
-</head>
-<body>
-<img src="https://github.com/soycarlo99/alcorel/blob/main/src/logotype/AlcoRel.png?raw=true" alt="Program Logo">
-</body>
-</html>
+![Alcorel demo](https://github.com/soycarlo99/alcorel/blob/main/src/logotype/trimmed.gif)
 
 Technologies used:
 
