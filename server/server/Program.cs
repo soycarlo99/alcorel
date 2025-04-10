@@ -11,14 +11,19 @@ var username = builder.Configuration["PG_USER"] ?? "postgres";
 var password = builder.Configuration["PG_PASSWORD"] ?? "ostmacka666";
 var database = builder.Configuration["PG_DATABASE"] ?? "alcorel1";
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder($"Host={host};Port={port};Username={username};Password={password};Database={database}");
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+    $"Host={host};Port={port};Username={username};Password={password};Database={database}"
+);
 
 dataSourceBuilder.EnableUnmappedTypes();
 var databaseBuilder = dataSourceBuilder.Build();
 builder.Services.AddSingleton<NpgsqlDataSource>(databaseBuilder);
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options => { options.Cookie.IsEssential = true; });
+builder.Services.AddSession(options =>
+{
+    options.Cookie.IsEssential = true;
+});
 
 var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
 if (emailSettings != null)
@@ -44,7 +49,14 @@ static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
 
     await email.SendEmailAsync(request.To, request.Subject, request.Body);
 
-    Console.WriteLine("Email sent to: " + request.To + " with subject: " + request.Subject + " and body: " + request.Body);
+    Console.WriteLine(
+        "Email sent to: "
+            + request.To
+            + " with subject: "
+            + request.Subject
+            + " and body: "
+            + request.Body
+    );
     return Results.Ok(new { message = "Email sent." });
 }
 
@@ -54,59 +66,79 @@ app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
 app.MapPost("/api/login", UserRoutes.Post);
 app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
 app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
+
 //app.MapPost("/api/users", UserRoutes.PostUser);
 //app.MapPost("/api/login", UserRoutes.CheckCredentials);
-app.MapGet("/api/company/{companyId}/init", (int companyId, HttpContext ctx) =>
-{
-    ctx.Session.SetInt32("companyId", companyId);
-    ctx.Session.SetInt32("role", 1);
-    return TypedResults.Ok(new { success = true });
-});
-
-app.MapGet("/api/session/userId", (HttpContext ctx) =>
-{
-    var userId = ctx.Session.GetInt32("id");
-    return TypedResults.Ok(new { userId = userId });
-});
-
-app.MapGet("/api/session/username", (HttpContext ctx) =>
-{
-    var username = ctx.Session.GetString("name");
-    return TypedResults.Ok(new { username = username });
-});
-
-app.MapGet("/api/company/current", (HttpContext ctx) => {
-    var companyId = ctx.Session.GetInt32("companyId");
-    
-    if (companyId.HasValue)
+app.MapGet(
+    "/api/company/{companyId}/init",
+    (int companyId, HttpContext ctx) =>
     {
-        return Results.Ok(new { companyId = companyId.Value });
+        ctx.Session.SetInt32("companyId", companyId);
+        ctx.Session.SetInt32("role", 1);
+        return TypedResults.Ok(new { success = true });
     }
-    else
-    {
-        return Results.NotFound(new { error = "No company session found" });
-    }
-});
+);
 
-app.MapGet("/api/login/employee", (HttpContext ctx) =>
-{
-    int? role = ctx.Session.GetInt32("role");
-    if (role == 2)
+app.MapGet(
+    "/api/session/userId",
+    (HttpContext ctx) =>
     {
-        return Results.Ok();
+        var userId = ctx.Session.GetInt32("id");
+        return TypedResults.Ok(new { userId = userId });
     }
-    return TypedResults.BadRequest(new { success = false });
-});
+);
 
-app.MapGet("/api/login/admin", (HttpContext ctx) =>
-{
-    int? role = ctx.Session.GetInt32("role");
-    if (role == 0)
+app.MapGet(
+    "/api/session/username",
+    (HttpContext ctx) =>
     {
-        return Results.Ok();
+        var username = ctx.Session.GetString("name");
+        return TypedResults.Ok(new { username = username });
     }
-    return TypedResults.BadRequest(new { success = false });
-});
+);
+
+app.MapGet(
+    "/api/company/current",
+    (HttpContext ctx) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+
+        if (companyId.HasValue)
+        {
+            return Results.Ok(new { companyId = companyId.Value });
+        }
+        else
+        {
+            return Results.NotFound(new { error = "No company session found" });
+        }
+    }
+);
+
+app.MapGet(
+    "/api/login/employee",
+    (HttpContext ctx) =>
+    {
+        int? role = ctx.Session.GetInt32("role");
+        if (role == 2)
+        {
+            return Results.Ok();
+        }
+        return TypedResults.BadRequest(new { success = false });
+    }
+);
+
+app.MapGet(
+    "/api/login/admin",
+    (HttpContext ctx) =>
+    {
+        int? role = ctx.Session.GetInt32("role");
+        if (role == 0)
+        {
+            return Results.Ok();
+        }
+        return TypedResults.BadRequest(new { success = false });
+    }
+);
 
 //Ticket APIs
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
@@ -114,6 +146,7 @@ app.MapPost("/api/tickets", TicketRoutes.PostTicket);
 app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
 app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
 app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
+app.MapDelete("/api/delete/ticket/{ticket_id}", TicketRoutes.RemoveTicket);
 
 //Question APIs
 app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
@@ -136,53 +169,69 @@ app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
 app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
 app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
 app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
-app.MapGet("/api/session/companyId", (HttpContext ctx) =>
-//app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.PasswordResetRequest);
-{
-    var companyId = ctx.Session.GetInt32("companyId");
-    return TypedResults.Ok(new { companyId = companyId });
-});
-app.MapGet("/api/employee/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
-{
-    var companyId = ctx.Session.GetInt32("companyId");
+app.MapGet(
+    "/api/session/companyId",
+    (HttpContext ctx) =>
+    //app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.PasswordResetRequest);
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+        return TypedResults.Ok(new { companyId = companyId });
+    }
+);
+app.MapGet(
+    "/api/employee/dashboard",
+    async (HttpContext ctx, NpgsqlDataSource db) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
 
-    var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
-    return Results.Ok(result);
-});
-app.MapGet("/api/admin/dashboard", async (HttpContext ctx, NpgsqlDataSource db) =>
-{
-    var companyId = ctx.Session.GetInt32("companyId");
+        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+        return Results.Ok(result);
+    }
+);
+app.MapGet(
+    "/api/admin/dashboard",
+    async (HttpContext ctx, NpgsqlDataSource db) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
 
-    var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
-    return Results.Ok(result);
-});
+        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+        return Results.Ok(result);
+    }
+);
 app.MapPut("/api/update/logo/{companyId}", CompanyRoutes.UpdateCompanyLogo);
+app.MapDelete("/api/delete/company/{companyId}", CompanyRoutes.RemoveCompany);
 
 //Feedback APIs
 app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
+
 //app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
 
 //Sign-up APIs
 app.MapPost("api/signup", UserRoutes.SignUpAdmin);
 
 //Sign-out APIs
-app.MapPost("/api/logout", (HttpContext ctx) =>
-{
-    ctx.Response.Cookies.Delete(".AspNetCore.Session", new CookieOptions
+app.MapPost(
+    "/api/logout",
+    (HttpContext ctx) =>
     {
-        Path = "/",
-        Secure = ctx.Request.IsHttps,
-        HttpOnly = true,
-        SameSite = SameSiteMode.Lax
-    });
-    return Results.Ok(new { success = true });
-});
+        ctx.Response.Cookies.Delete(
+            ".AspNetCore.Session",
+            new CookieOptions
+            {
+                Path = "/",
+                Secure = ctx.Request.IsHttps,
+                HttpOnly = true,
+                SameSite = SameSiteMode.Lax,
+            }
+        );
+        return Results.Ok(new { success = true });
+    }
+);
 
 //Password Reset APIs
 app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
 app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
 app.MapGet("/api/employee/{userId}/check-password", EmployeeRoutes.CheckDefaultPassword);
 app.MapGet("/api/password/validate-token/{resetToken}", EmployeeRoutes.ValidateResetToken);
-
 
 app.Run();

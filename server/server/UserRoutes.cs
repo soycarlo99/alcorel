@@ -1,26 +1,35 @@
-using Npgsql;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Npgsql;
+
 namespace Server;
-using Microsoft.AspNetCore.Identity;
+
 using Microsoft.AspNetCore.Http;
-
-
+using Microsoft.AspNetCore.Identity;
 
 public enum UserRole
 {
     admin,
     customer,
-    employee
+    employee,
 }
 
 public static class UserRoutes
 {
     public record User(int Id, string Name);
-    public record PostUserDTO(string Name, string Email, string Password, string admin_customer_employee, int company_id);
+
+    public record PostUserDTO(
+        string Name,
+        string Email,
+        string Password,
+        string admin_customer_employee,
+        int company_id
+    );
+
     public record CreationOfTicketDTO(string Name, string Email, string Message, int Category_id);
 
     public record Ticket(string Message, int Category_id);
+
     record VerifyDTO(string Password, string Hash);
 
     public static async Task<List<User>> GetUsers(NpgsqlDataSource db)
@@ -38,10 +47,14 @@ public static class UserRoutes
         return result;
     }
 
-    public static async Task<Results<Created<User>, BadRequest<string>>>
-    PostUser(PostUserDTO userDto, NpgsqlDataSource db)
+    public static async Task<Results<Created<User>, BadRequest<string>>> PostUser(
+        PostUserDTO userDto,
+        NpgsqlDataSource db
+    )
     {
-        using var command = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING id, name");
+        using var command = db.CreateCommand(
+            "INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, @role::user_role, @company_id) RETURNING id, name"
+        );
         command.Parameters.AddWithValue("name", userDto.Name);
         command.Parameters.AddWithValue("email", userDto.Email);
         command.Parameters.AddWithValue("password", userDto.Password);
@@ -64,10 +77,12 @@ public static class UserRoutes
         }
     }
 
-
-
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-    CreationOfTicket(CreationOfTicketDTO ticket_info, NpgsqlDataSource db, HttpContext ctx, IEmailService emailService)
+    public static async Task<Results<Ok<string>, BadRequest<string>>> CreationOfTicket(
+        CreationOfTicketDTO ticket_info,
+        NpgsqlDataSource db,
+        HttpContext ctx,
+        IEmailService emailService
+    )
     {
         int? companyId = ctx.Session.GetInt32("companyId");
         if (companyId == null)
@@ -78,20 +93,21 @@ public static class UserRoutes
         {
             // TODO(manuel): Starta er transaction här
             // 1. kolla ifall en användare finns, om inte, skapa en
-            using var insertUserCommand = db.CreateCommand("INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id");
+            using var insertUserCommand = db.CreateCommand(
+                "INSERT INTO testuser (name, email, company_id, admin_customer_employee) values ($1, $2, $3, 'customer') ON CONFLICT DO NOTHING RETURNING id"
+            );
             insertUserCommand.Parameters.AddWithValue(ticket_info.Name);
             insertUserCommand.Parameters.AddWithValue(ticket_info.Email);
             insertUserCommand.Parameters.AddWithValue(companyId.Value);
 
             var insertUserResult = await insertUserCommand.ExecuteScalarAsync();
 
-
             // 2. Skapa en ny ticket kopplat till användaren, och deras problem
             string accessToken = Guid.NewGuid().ToString("N");
             await emailService.SendEmailAsync(
-    to: ticket_info.Email,
-    subject: "Welcome to Alcorel - Support Ticket Confirmation",
-    body: $@"
+                to: ticket_info.Email,
+                subject: "Welcome to Alcorel - Support Ticket Confirmation",
+                body: $@"
         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
             <div style='text-align: center; margin-bottom: 20px;'>
                 <h1 style='color: #2c3e50;'>Hi {ticket_info.Name}, Thank You for Contacting Us</h1>
@@ -131,10 +147,12 @@ public static class UserRoutes
             </div>
         </div>
     "
-);
+            );
             if (insertUserResult is int userId)
             {
-                using var insertTicketCommand = db.CreateCommand("INSERT INTO ticket(category_id, user_id, access_token) values($1, $2, $3) RETURNING id");
+                using var insertTicketCommand = db.CreateCommand(
+                    "INSERT INTO ticket(category_id, user_id, access_token) values($1, $2, $3) RETURNING id"
+                );
                 insertTicketCommand.Parameters.AddWithValue(ticket_info.Category_id);
                 insertTicketCommand.Parameters.AddWithValue(userId);
                 insertTicketCommand.Parameters.AddWithValue(accessToken);
@@ -144,17 +162,18 @@ public static class UserRoutes
                 if (insertTicketResult is int ticketId)
                 {
                     // 3. Skapa ett nytt ticket-message med användarens meddelande
-                    using var insertTicketMessageCommand = db.CreateCommand("INSERT INTO ticket_messages(ticket_id, message) values($1, $2)");
+                    using var insertTicketMessageCommand = db.CreateCommand(
+                        "INSERT INTO ticket_messages(ticket_id, message) values($1, $2)"
+                    );
                     insertTicketMessageCommand.Parameters.AddWithValue(ticketId);
                     insertTicketMessageCommand.Parameters.AddWithValue(ticket_info.Message);
                     await insertTicketMessageCommand.ExecuteNonQueryAsync();
 
                     // Avsluta er transaction
-                    return TypedResults.Ok("Added successfully");
+                    return TypedResults.Ok("added user and ticket successfully");
                 }
 
-
-                return TypedResults.Ok("Added successfully");
+                return TypedResults.Ok("Added successfully yes");
             }
             // This should never happen, since the ID we return from postgres will either happen, or it will be caugth as an exception by the try-catch
             return TypedResults.BadRequest("Something went wrong");
@@ -165,30 +184,19 @@ public static class UserRoutes
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public record LoginDTO(string Email, string Password);
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-        CheckCredentials(LoginDTO loginDto, NpgsqlDataSource db)
+    public static async Task<Results<Ok<string>, BadRequest<string>>> CheckCredentials(
+        LoginDTO loginDto,
+        NpgsqlDataSource db
+    )
     {
-
-        using var command = db.CreateCommand(@"
+        using var command = db.CreateCommand(
+            @"
             SELECT id, name, email, admin_customer_employee
             FROM testuser
-            WHERE email = @email AND password = @password");
+            WHERE email = @email AND password = @password"
+        );
 
         command.Parameters.AddWithValue("email", loginDto.Email);
         command.Parameters.AddWithValue("password", loginDto.Password);
@@ -208,18 +216,17 @@ public static class UserRoutes
         }
     }
 
-
-
-
-
     public record GetAllDTO(int Id, string Name, UserRole UserRole);
-    public static async Task<Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>>
-    GetAll(NpgsqlDataSource db, HttpContext ctx)
-    {
 
-        if (ctx.Session.IsAvailable &&
-           ctx.Session.GetInt32("role") is int role &&
-           Enum.IsDefined(typeof(UserRole), role))
+    public static async Task<
+        Results<Ok<List<GetAllDTO>>, UnauthorizedHttpResult, ForbidHttpResult>
+    > GetAll(NpgsqlDataSource db, HttpContext ctx)
+    {
+        if (
+            ctx.Session.IsAvailable
+            && ctx.Session.GetInt32("role") is int role
+            && Enum.IsDefined(typeof(UserRole), role)
+        )
         {
             if ((UserRole)role == UserRole.admin)
             {
@@ -227,15 +234,19 @@ public static class UserRoutes
 
                 List<GetAllDTO> users = new();
 
-                var cmd = db.CreateCommand("select id, name, admin_customer_employee from testuser");
+                var cmd = db.CreateCommand(
+                    "select id, name, admin_customer_employee from testuser"
+                );
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    users.Add(new(
-                                reader.GetInt32(0),
-                                reader.GetString(1),
-                                reader.GetFieldValue<UserRole>(2)
-                                ));
+                    users.Add(
+                        new(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetFieldValue<UserRole>(2)
+                        )
+                    );
                 }
 
                 return TypedResults.Ok(users);
@@ -251,17 +262,20 @@ public static class UserRoutes
         }
     }
 
-
-
-
     public record Credentials(string Email, string? Password);
+
     public record LoginResponse(string redirectPath, int companyId);
 
-
-    public static async Task<IResult>
-    Post(Credentials credentials, NpgsqlDataSource db, HttpContext ctx, PasswordHasher<string> hasher)
+    public static async Task<IResult> Post(
+        Credentials credentials,
+        NpgsqlDataSource db,
+        HttpContext ctx,
+        PasswordHasher<string> hasher
+    )
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id, password, id from testuser where email = $1");
+        var cmd = db.CreateCommand(
+            "select name, admin_customer_employee, company_id, password, id from testuser where email = $1"
+        );
         cmd.Parameters.AddWithValue(credentials.Email);
 
         using var reader = await cmd.ExecuteReaderAsync();
@@ -272,23 +286,23 @@ public static class UserRoutes
             var companyId = reader.GetInt32(2);
             string hashedPassword = reader.GetString(3);
             int id = reader.GetInt32(4);
-            var verifyResult = hasher.VerifyHashedPassword("", hashedPassword, credentials.Password);
-            Console.WriteLine(verifyResult);
+            var verifyResult = hasher.VerifyHashedPassword(
+                "",
+                hashedPassword,
+                credentials.Password
+            );
 
             if (verifyResult == PasswordVerificationResult.Failed)
             {
                 Console.WriteLine("NOT cracked");
                 return TypedResults.BadRequest("Wrong credentials");
-
             }
 
-            Console.WriteLine(hashedPassword);
             ctx.Session.SetString("name", reader.GetString(0));
             ctx.Session.SetInt32("role", (int)role);
             ctx.Session.SetInt32("companyId", companyId);
             ctx.Session.SetString("email", credentials.Email);
             ctx.Session.SetInt32("id", id);
-
 
             string location = "";
             switch (role)
@@ -320,11 +334,15 @@ public static class UserRoutes
         }
     }
 
-
-    public static async Task<Results<Ok<LoginResponse>, BadRequest>>
-    CustomerVisit(Credentials credentials, NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<Results<Ok<LoginResponse>, BadRequest>> CustomerVisit(
+        Credentials credentials,
+        NpgsqlDataSource db,
+        HttpContext ctx
+    )
     {
-        var cmd = db.CreateCommand("select name, admin_customer_employee, company_id from testuser where email = $1");
+        var cmd = db.CreateCommand(
+            "select name, admin_customer_employee, company_id from testuser where email = $1"
+        );
         cmd.Parameters.AddWithValue(credentials.Email);
         using var reader = await cmd.ExecuteReaderAsync();
 
@@ -355,7 +373,6 @@ public static class UserRoutes
         }
     }
 
-
     public record SignUpAdminDTO(
         string CompanyName,
         string Email,
@@ -364,20 +381,29 @@ public static class UserRoutes
         string Password
     );
 
-    public static async Task<IResult> SignUpAdmin(SignUpAdminDTO adminDto, NpgsqlDataSource db, PasswordHasher<string> hasher, IEmailService emailService)
+    public static async Task<IResult> SignUpAdmin(
+        SignUpAdminDTO adminDto,
+        NpgsqlDataSource db,
+        PasswordHasher<string> hasher,
+        IEmailService emailService
+    )
     {
-        using var companyCmd = db.CreateCommand("INSERT INTO company (name, org_number, email, password) VALUES (@name, @orgNumber, @email, @password) RETURNING id");
+        using var companyCmd = db.CreateCommand(
+            "INSERT INTO company (name, org_number, email, password) VALUES (@name, @orgNumber, @email, @password) RETURNING id"
+        );
         string hashedPassword = hasher.HashPassword("", adminDto.Password);
         companyCmd.Parameters.AddWithValue("name", adminDto.CompanyName);
-        companyCmd.Parameters.AddWithValue("orgNumber", adminDto.orgNumber); 
+        companyCmd.Parameters.AddWithValue("orgNumber", adminDto.orgNumber);
         companyCmd.Parameters.AddWithValue("email", adminDto.Email);
         companyCmd.Parameters.AddWithValue("password", hashedPassword);
-        
+
         try
         {
             var companyId = (int)await companyCmd.ExecuteScalarAsync();
-            
-            using var userCmd = db.CreateCommand("INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, 'admin'::user_role, @company_id) RETURNING id, name");
+
+            using var userCmd = db.CreateCommand(
+                "INSERT INTO testuser (name, email, password, admin_customer_employee, company_id) VALUES (@name, @email, @password, 'admin'::user_role, @company_id) RETURNING id, name"
+            );
             userCmd.Parameters.AddWithValue("name", adminDto.AdminName);
             userCmd.Parameters.AddWithValue("email", adminDto.Email);
             userCmd.Parameters.AddWithValue("password", hashedPassword);
@@ -385,9 +411,9 @@ public static class UserRoutes
 
             //send welcome email
             await emailService.SendEmailAsync(
-    to: adminDto.Email,
-    subject: "Welcome to Alcorel",
-    body: $@"
+                to: adminDto.Email,
+                subject: "Welcome to Alcorel",
+                body: $@"
         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
             <div style='text-align: center; margin-bottom: 20px;'>
                 <h1 style='color: #2c3e50;'>Hi {adminDto.AdminName}, Thank You for using our services</h1>
@@ -408,9 +434,8 @@ Don't hesitate to contact us if you need guidance
             </div>
         </div>
     "
-);
+            );
 
-            
             using var reader = await userCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
@@ -423,4 +448,5 @@ Don't hesitate to contact us if you need guidance
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
-    }}
+    }
+}

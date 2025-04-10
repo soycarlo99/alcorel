@@ -1,11 +1,10 @@
-using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
-namespace Server;
+using Npgsql;
 
+namespace Server;
 
 public static class TicketRoutes
 {
-
     public record Ticket(
         int id,
         DateTime? ticket_time,
@@ -14,18 +13,11 @@ public static class TicketRoutes
         int category_id
     );
 
-
     /////////////////////////
     ///Våran DTOs grabbar!!!!
     /////////////////////////
 
-    public record PostTicketDTO(
-        DateTime ticket_time,
-        string status,
-        int user_id,
-        int category_id
-    );
-
+    public record PostTicketDTO(DateTime ticket_time, string status, int user_id, int category_id);
 
     public record DetailedTicket(
         int ticketId,
@@ -38,7 +30,6 @@ public static class TicketRoutes
         string Answer,
         string AnswerQuestion
     );
-
 
     public record UpdateStatusDTO(string Status);
 
@@ -53,17 +44,9 @@ public static class TicketRoutes
         List<QuestionAnswer> QuestionAnswers
     );
 
-    public record TicketMessage(
-        string Message,
-        DateTime Timestamp
-    );
+    public record TicketMessage(string Message, DateTime Timestamp);
 
-    public record QuestionAnswer(
-        int qid,
-        string Question,
-        string? Answer,
-        int CategoryId
-    );
+    public record QuestionAnswer(int qid, string Question, string? Answer, int CategoryId);
 
     /////////////////////////
     ///TheEnd!!!!!!!!!!!!!!!!
@@ -73,36 +56,43 @@ public static class TicketRoutes
         return Guid.NewGuid().ToString("N");
     }
 
-
-
     public static async Task<List<Ticket>> GetTickets(NpgsqlDataSource db)
     {
         List<Ticket> result = new();
-        using var query = db.CreateCommand("SELECT id, ticket_time, status, user_id, category_id FROM ticket");
+        using var query = db.CreateCommand(
+            "SELECT id, ticket_time, status, user_id, category_id FROM ticket"
+        );
         using var reader = await query.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            result.Add(new(
-                reader.GetInt32(0),
-                reader.GetFieldValue<DateTime>(1),
-                reader.GetString(2),
-                reader.GetInt32(3),
-                reader.GetInt32(4)
-            ));
+            result.Add(
+                new(
+                    reader.GetInt32(0),
+                    reader.GetFieldValue<DateTime>(1),
+                    reader.GetString(2),
+                    reader.GetInt32(3),
+                    reader.GetInt32(4)
+                )
+            );
         }
         return result;
     }
 
-    public static async Task<Results<Created<Ticket>, BadRequest<string>>>
-    PostTicket(PostTicketDTO ticketDto, NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<Results<Created<Ticket>, BadRequest<string>>> PostTicket(
+        PostTicketDTO ticketDto,
+        NpgsqlDataSource db,
+        HttpContext ctx
+    )
     {
         string token = GenerateToken();
 
-        using var command = db.CreateCommand(@"
+        using var command = db.CreateCommand(
+            @"
             INSERT INTO ticket (ticket_time, status, user_id, category_id, access_token) 
             VALUES (@time, @status, @user_id, @category_id, @token) 
-            RETURNING id, ticket_time, status, user_id, category_id");
+            RETURNING id, ticket_time, status, user_id, category_id"
+        );
 
         command.Parameters.AddWithValue("time", ticketDto.ticket_time);
         command.Parameters.AddWithValue("status", ticketDto.status);
@@ -114,7 +104,9 @@ public static class TicketRoutes
         if (companyId == null || role == 2)
         {
             Console.WriteLine("NOOO");
-            return TypedResults.BadRequest("Unauthorized, You are a employee and cant create a ticket");
+            return TypedResults.BadRequest(
+                "Unauthorized, You are a employee and cant create a ticket"
+            );
         }
 
         try
@@ -139,10 +131,14 @@ public static class TicketRoutes
         }
     }
 
-
-    public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketByToken(string token, NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketByToken(
+        string token,
+        NpgsqlDataSource db,
+        HttpContext ctx
+    )
     {
-        var ticketQuery = @"
+        var ticketQuery =
+            @"
             SELECT t.id, t.ticket_time, t.status, c.category_name, u.name, u.email
             FROM ticket t
             JOIN categories c ON t.category_id = c.id
@@ -167,7 +163,7 @@ public static class TicketRoutes
             Status = ticketReader.GetString(2),
             CategoryName = ticketReader.GetString(3),
             UserName = ticketReader.GetString(4),
-            Email = email
+            Email = email,
         };
 
         var messages = new List<TicketMessage>();
@@ -178,31 +174,34 @@ public static class TicketRoutes
         using var messagesReader = await messagesCmd.ExecuteReaderAsync();
         while (await messagesReader.ReadAsync())
         {
-            messages.Add(new TicketMessage(
-                messagesReader.GetString(0),
-                messagesReader.GetDateTime(1)
-            ));
+            messages.Add(
+                new TicketMessage(messagesReader.GetString(0), messagesReader.GetDateTime(1))
+            );
         }
 
         var questionAnswers = new List<QuestionAnswer>();
-        using var qaCmd = db.CreateCommand(@"
+        using var qaCmd = db.CreateCommand(
+            @"
             SELECT q.id, q.questions, txa.answer, c.id AS category_id
             FROM ticket t
             JOIN categories c ON t.category_id = c.id
             JOIN questions q ON q.category_id = c.id
             LEFT JOIN ticketxquestion txa ON txa.question_id = q.id AND txa.ticket_id = t.id
             WHERE t.id = @id
-        ");
+        "
+        );
         qaCmd.Parameters.AddWithValue("id", ticketId);
         using var qaReader = await qaCmd.ExecuteReaderAsync();
         while (await qaReader.ReadAsync())
         {
-            questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetInt32(0),
-                qaReader.GetString(1),
-                qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
-                qaReader.GetInt32(3)
-            ));
+            questionAnswers.Add(
+                new QuestionAnswer(
+                    qaReader.GetInt32(0),
+                    qaReader.GetString(1),
+                    qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
+                    qaReader.GetInt32(3)
+                )
+            );
         }
 
         var fullDetails = new FullTicketDetails(
@@ -219,16 +218,21 @@ public static class TicketRoutes
         return TypedResults.Ok(fullDetails);
     }
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-    UpdateTicketStatus(int ticketId, UpdateStatusDTO statusDto, NpgsqlDataSource db)
+    public static async Task<Results<Ok<string>, BadRequest<string>>> UpdateTicketStatus(
+        int ticketId,
+        UpdateStatusDTO statusDto,
+        NpgsqlDataSource db
+    )
     {
         string newStatus = statusDto.Status;
 
-        using var command = db.CreateCommand(@"
+        using var command = db.CreateCommand(
+            @"
             UPDATE ticket
             SET status = @status
             WHERE id = @ticket_id
-            RETURNING id, status");
+            RETURNING id, status"
+        );
 
         command.Parameters.AddWithValue("status", newStatus);
         command.Parameters.AddWithValue("ticket_id", ticketId);
@@ -248,7 +252,10 @@ public static class TicketRoutes
         }
     }
 
-    public static async Task<List<DetailedTicket>> GetDetailedTickets(NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<List<DetailedTicket>> GetDetailedTickets(
+        NpgsqlDataSource db,
+        HttpContext ctx
+    )
     {
         int? companyId = ctx.Session.GetInt32("companyId");
         if (companyId == null)
@@ -257,7 +264,8 @@ public static class TicketRoutes
         }
 
         List<DetailedTicket> result = new();
-        string query = @"
+        string query =
+            @"
             SELECT
                 t.id AS ticket_id,
                 t.ticket_time,
@@ -280,25 +288,30 @@ public static class TicketRoutes
 
         while (await reader.ReadAsync())
         {
-            result.Add(new DetailedTicket(
-                reader.GetInt32(0),
-                reader.GetFieldValue<DateTime>(1),
-                reader.GetString(2),
-                reader.GetString(3),
-                reader.GetString(4),
-                "",
-                null,
-                "",
-                ""
-            ));
+            result.Add(
+                new DetailedTicket(
+                    reader.GetInt32(0),
+                    reader.GetFieldValue<DateTime>(1),
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetString(4),
+                    "",
+                    null,
+                    "",
+                    ""
+                )
+            );
         }
         return result;
     }
 
-
-    public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketById(int id, NpgsqlDataSource db)
+    public static async Task<Results<Ok<FullTicketDetails>, NotFound>> GetTicketById(
+        int id,
+        NpgsqlDataSource db
+    )
     {
-        var ticketQuery = @"
+        var ticketQuery =
+            @"
             SELECT t.id, t.ticket_time, t.status, c.category_name, u.name, u.email
             FROM ticket t
             JOIN categories c ON t.category_id = c.id
@@ -319,7 +332,7 @@ public static class TicketRoutes
             Status = ticketReader.GetString(2),
             CategoryName = ticketReader.GetString(3),
             UserName = ticketReader.GetString(4),
-            Email = ticketReader.GetString(5)
+            Email = ticketReader.GetString(5),
         };
 
         var messages = new List<TicketMessage>();
@@ -330,31 +343,34 @@ public static class TicketRoutes
         using var messagesReader = await messagesCmd.ExecuteReaderAsync();
         while (await messagesReader.ReadAsync())
         {
-            messages.Add(new TicketMessage(
-                messagesReader.GetString(0),
-                messagesReader.GetDateTime(1)
-            ));
+            messages.Add(
+                new TicketMessage(messagesReader.GetString(0), messagesReader.GetDateTime(1))
+            );
         }
 
         var questionAnswers = new List<QuestionAnswer>();
-        using var qaCmd = db.CreateCommand(@"
+        using var qaCmd = db.CreateCommand(
+            @"
             SELECT q.id, q.questions, txa.answer, c.id AS category_id
             FROM ticket t
             JOIN categories c ON t.category_id = c.id
             JOIN questions q ON q.category_id = c.id
             LEFT JOIN ticketxquestion txa ON txa.question_id = q.id AND txa.ticket_id = t.id
             WHERE t.id = @id
-        ");
+        "
+        );
         qaCmd.Parameters.AddWithValue("id", id);
         using var qaReader = await qaCmd.ExecuteReaderAsync();
         while (await qaReader.ReadAsync())
         {
-            questionAnswers.Add(new QuestionAnswer(
-                qaReader.GetInt32(0),
-                qaReader.GetString(1),
-                qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
-                qaReader.GetInt32(3)
-            ));
+            questionAnswers.Add(
+                new QuestionAnswer(
+                    qaReader.GetInt32(0),
+                    qaReader.GetString(1),
+                    qaReader.IsDBNull(2) ? null : qaReader.GetString(2),
+                    qaReader.GetInt32(3)
+                )
+            );
         }
 
         var fullDetails = new FullTicketDetails(
@@ -371,4 +387,37 @@ public static class TicketRoutes
         return TypedResults.Ok(fullDetails);
     }
 
+    public static async Task<
+        Results<Ok<string>, BadRequest<string>, NotFound<string>, UnauthorizedHttpResult>
+    > RemoveTicket(int ticket_id, NpgsqlDataSource db, HttpContext ctx)
+    {
+        int? companyId = ctx.Session.GetInt32("companyId");
+        int? role = ctx.Session.GetInt32("role");
+        if (companyId == null || role == 1 || role == 2)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        using var command = db.CreateCommand(@"DELETE FROM ticket WHERE id = @selected_ticket");
+
+        command.Parameters.AddWithValue("selected_ticket", ticket_id);
+
+        try
+        {
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected > 0)
+            {
+                return TypedResults.Ok($"Deleted {rowsAffected} ticket successfully");
+            }
+            else
+            {
+                return TypedResults.NotFound("The ticket doesn't exist");
+            }
+        }
+        catch (PostgresException ex)
+        {
+            return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+    }
 }
