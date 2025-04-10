@@ -49,7 +49,7 @@ jobs:
       - name: Start server
         run: cd server/server && nohup dotnet run &
       - name: Run GUI-tests
-        run: cd alcorel-gui.Tests && dotnet test
+        run: cd server/alcorel-gui.Tests && dotnet test
 
   deploy:
     name: Deploy to Server
