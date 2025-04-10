@@ -23,7 +23,7 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
       - name: Install dotnet project dependencies
-        run: dotnet restore
+        run: cd server/server && dotnet restore
       - name: Build
         run: dotnet build
       - name: Start Server
