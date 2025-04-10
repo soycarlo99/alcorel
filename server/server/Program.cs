@@ -41,6 +41,11 @@ var app = builder.Build();
 
 app.UseSession();
 
+//Serves front-end via static files in WWWROOT
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.MapFallbackToFile("index.html");
+
 app.MapPost("/api/email", SendEmail);
 
 static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
