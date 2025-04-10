@@ -25,7 +25,7 @@ jobs:
       - name: Install dotnet project dependencies
         run: cd server/server && dotnet restore
       - name: Build
-        run: dotnet build
+        run: cd server/server && dotnet build
       - name: Start Server
         run: cd server/server && nohup dotnet run &
       - name: Run API-Tests
