@@ -19,8 +19,8 @@ public class GuiTest : PageTest
         _browser = await _playwright.Chromium.LaunchAsync(
             new BrowserTypeLaunchOptions
             {
-                Headless = false,
-                SlowMo = 500, // Lägger in en fördröjning så vi kan se vad som händer
+                Headless = true,
+                //SlowMo = 500, // Lägger in en fördröjning så vi kan se vad som händer
             }
         );
         _browserContext = await _browser.NewContextAsync();
