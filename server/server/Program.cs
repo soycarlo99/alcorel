@@ -5,11 +5,17 @@ using Server;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<PasswordHasher<string>>();
 
-var host = builder.Configuration["PG_HOST"] ?? "45.10.162.204";
-var port = builder.Configuration["PG_PORT"] ?? "5432";
-var username = builder.Configuration["PG_USER"] ?? "postgres";
-var password = builder.Configuration["PG_PASSWORD"] ?? "FlickeringCustomerMoves29";
-var database = builder.Configuration["PG_DATABASE"] ?? "postgres";
+// var host = builder.Configuration["PG_HOST"] ?? "45.10.162.204";
+// var port = builder.Configuration["PG_PORT"] ?? "5432";
+// var username = builder.Configuration["PG_USER"] ?? "postgres";
+// var password = builder.Configuration["PG_PASSWORD"] ?? "FlickeringCustomerMoves29";
+// var database = builder.Configuration["PG_DATABASE"] ?? "postgres";
+
+var host = builder.Configuration["PG_HOST"];
+var port = builder.Configuration["PG_PORT"];
+var username = builder.Configuration["PG_USER"];
+var password = builder.Configuration["PG_PASSWORD"];
+var database = builder.Configuration["PG_DATABASE"];
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
     $"Host={host};Port={port};Username={username};Password={password};Database={database}"
