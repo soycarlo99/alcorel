@@ -1,1703 +1,1551 @@
 {
-	"info": {
-		"_postman_id": "d0e58974-30b6-4bca-a2d4-262df0fa23e8",
-		"name": "AlcoRel",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43555795",
-		"_collection_link": "https://carlosdematos.postman.co/workspace/Carlos-De-Matos's-Workspace~e85606f1-4fb1-4bb5-84f7-f9a55a0dde57/collection/43555795-d0e58974-30b6-4bca-a2d4-262df0fa23e8?action=share&source=collection_link&creator=43555795"
-	},
-	"item": [
-		{
-			"name": "intro",
-			"item": [
-				{
-					"name": "get webpage",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"webpage\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"email\": \"test@company.com\",\n  \"password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}",
-							"host": [
-								"{{baseUrl}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create company",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"email\": \"test@company.com\",\n  \"password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}signup/",
-							"host": [
-								"{{baseUrl}}signup"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "login as company's admin",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"//pm.environment.set(\"email\", \"cj@cj.com\");",
-									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response has companyId\", function () {",
-									"    pm.expect(responseJson).to.have.property(\"companyId\");",
-									"});",
-									"pm.environment.set(\"companyId\", responseJson.companyId);",
-									"console.log(\"companyId saved to environment variable:\", responseJson.companyId);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\":\"test@company.com\",\n    \"password\":\"testpassword\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}login",
-							"host": [
-								"{{baseUrl}}login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add category for the new company",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Response has company_id\", function () {",
-									"    pm.expect(responseJson).to.have.property(\"company_id\");",
-									"});",
-									"pm.environment.set(\"company_id\", responseJson.company_id);",
-									"console.log(\"company_id saved to environment variable:\", responseJson.company_id);",
-									"",
-									"pm.test(\"Response has id\", function () {",
-									"    pm.expect(responseJson).to.have.property(\"id\");",
-									"});",
-									"pm.environment.set(\"category_id\", responseJson.id);",
-									"console.log(\"id saved to environment variable:\", responseJson.id);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"category_name\":\"test\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}PostCategory",
-							"host": [
-								"{{baseUrl}}PostCategory"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "ticket test",
-			"item": [
-				{
-					"name": "create ticket",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\":\"testticket\",\n    \"email\":\"testticket@test.com\",\n    \"status\":\"waiting\",\n    \"Message\":\"Test message\",\n    \"category_id\": {{category_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}createusers/",
-							"host": [
-								"{{baseUrl}}createusers"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get tickets",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response contains tickets\", function() {",
-									"    pm.expect(responseJson).to.be.an('array').that.is.not.empty;",
-									"});",
-									"",
-									"let highestTicketId = 0;",
-									"if (responseJson.length > 0) {",
-									"    const ticketIds = responseJson.map(ticket => ticket.ticketId);",
-									"    ",
-									"    highestTicketId = Math.max(...ticketIds);",
-									"    ",
-									"    pm.test(\"Found highest ticket ID\", function() {",
-									"        pm.expect(highestTicketId).to.be.above(0);",
-									"    });",
-									"    ",
-									"    pm.environment.set(\"ticketId\", highestTicketId);",
-									"    console.log(\"Highest ticketId saved to environment variable:\", highestTicketId);",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}DetailedTicket",
-							"host": [
-								"{{baseUrl}}DetailedTicket"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get ticket by ID",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}ticket/{{ticketId}}",
-							"host": [
-								"{{baseUrl}}ticket"
-							],
-							"path": [
-								"{{ticketId}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "category",
-			"item": [
-				{
-					"name": "get categories",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetCategory",
-							"host": [
-								"{{baseUrl}}GetCategory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get category by ID",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"test\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetCategory/{{category_id}}",
-							"host": [
-								"{{baseUrl}}GetCategory"
-							],
-							"path": [
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update a category",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"category updated for  #\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"Cat\":\"puttest\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}update/category/{{category_id}}",
-							"host": [
-								"{{baseUrl}}update"
-							],
-							"path": [
-								"category",
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get the updated cat",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"puttest\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetCategory/{{category_id}}",
-							"host": [
-								"{{baseUrl}}GetCategory"
-							],
-							"path": [
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "employeeTests",
-			"item": [
-				{
-					"name": "get employees (there are 0 employees)",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"[]\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetEmployee/",
-							"host": [
-								"{{baseUrl}}GetEmployee"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create employee",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"test\",\n  \"email\": \"test@test.se\",\n  \"password\": \"\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"employee\",\n  \"company_id\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}PostEmployee/",
-							"host": [
-								"{{baseUrl}}PostEmployee"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get employees (there is 1 employees)",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"company_id\");",
-									"});",
-									"",
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response contains users\", function() {",
-									"    pm.expect(responseJson).to.be.an('array').that.is.not.empty;",
-									"});",
-									"",
-									"let highestId = 0;",
-									"if (responseJson.length > 0) {",
-									"    const userIds = responseJson.map(user => user.id);",
-									"    highestId = Math.max(...userIds);",
-									"    ",
-									"    pm.test(\"Found highest user ID\", function() {",
-									"        pm.expect(highestId).to.be.above(0);",
-									"    });",
-									"    ",
-									"    pm.environment.set(\"empID\", highestId);",
-									"    console.log(\"Highest empID saved to environment variable:\", highestId);",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetEmployee/",
-							"host": [
-								"{{baseUrl}}GetEmployee"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "LOG_OUT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}logout",
-							"host": [
-								"{{baseUrl}}logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "log-in as the employee that was just created",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"CompanyId has been reterived - the user is logged-in\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"companyId\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@test.se\",\n    \"password\":\"welcome\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}login",
-							"host": [
-								"{{baseUrl}}login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "employee is not allowed to create categories",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Employee is not allowed to create categories\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									"pm.test(\"Unauthorized\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Unauthorized or invalid company ID\");",
-									"});",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"category_name\":\"test\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}PostCategory",
-							"host": [
-								"{{baseUrl}}PostCategory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get categories as emp",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}GetCategory",
-							"host": [
-								"{{baseUrl}}GetCategory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update status",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"status\":\"solved\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}tickets/{{ticketId}}/status",
-							"host": [
-								"{{baseUrl}}tickets"
-							],
-							"path": [
-								"{{ticketId}}",
-								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update status Copy",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response has status property\", function() {",
-									"    pm.expect(responseJson).to.have.property(\"status\");",
-									"});",
-									"",
-									"pm.test(\"Ticket status is solved\", function() {",
-									"    pm.expect(responseJson.status).to.equal(\"solved\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}ticket/{{ticketId}}",
-							"host": [
-								"{{baseUrl}}ticket"
-							],
-							"path": [
-								"{{ticketId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "LOG_OUT from emp",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response has success property\", function() {",
-									"    pm.expect(responseJson).to.have.property(\"success\");",
-									"});",
-									"",
-									"pm.test(\"Success is equal to true\", function() {",
-									"    pm.expect(responseJson.success).to.equal(true);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}logout",
-							"host": [
-								"{{baseUrl}}logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "outro",
-			"item": [
-				{
-					"name": "LOG_OUT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}logout",
-							"host": [
-								"{{baseUrl}}logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "login as company's admin",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"//pm.environment.set(\"email\", \"cj@cj.com\");",
-									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response has companyId\", function () {",
-									"    pm.expect(responseJson).to.have.property(\"companyId\");",
-									"});",
-									"pm.environment.set(\"TestcompanyId\", responseJson.companyId);",
-									"console.log(\"TestcompanyId saved to environment variable:\", responseJson.companyId);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\":\"test@company.com\",\n    \"password\":\"testpassword\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}login",
-							"host": [
-								"{{baseUrl}}login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Category",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
-							"host": [
-								"{{baseUrl}}DeleteCategory"
-							],
-							"path": [
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Not found",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"No categories deleted\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
-							"host": [
-								"{{baseUrl}}DeleteCategory"
-							],
-							"path": [
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete employee",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Deleted 1 employee successfully\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}DeleteEmployee/{{empID}}",
-							"host": [
-								"{{baseUrl}}DeleteEmployee"
-							],
-							"path": [
-								"{{empID}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete an employee that doesn't exist",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"No categories deleted\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
-							"host": [
-								"{{baseUrl}}DeleteCategory"
-							],
-							"path": [
-								"{{category_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "remove test ticket",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Deleted 1 ticket successfully\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}Delete/ticket/{{ticketId}}",
-							"host": [
-								"{{baseUrl}}Delete"
-							],
-							"path": [
-								"ticket",
-								"{{ticketId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete confirmation",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 404\", function () {",
-									"    pm.response.to.have.status(404);",
-									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"The ticket doesn't exist\");",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}Delete/ticket/{{ticketId}}",
-							"host": [
-								"{{baseUrl}}Delete"
-							],
-							"path": [
-								"ticket",
-								"{{ticketId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "LOG_OUT Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}logout",
-							"host": [
-								"{{baseUrl}}logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "login as company's admin Copy",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"//pm.environment.set(\"email\", \"cj@cj.com\");",
-									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const responseJson = pm.response.json();",
-									"",
-									"pm.test(\"Response has companyId\", function () {",
-									"    pm.expect(responseJson).to.have.property(\"companyId\");",
-									"});",
-									"pm.environment.set(\"companyId\", responseJson.companyId);",
-									"console.log(\"companyId saved to environment variable:\", responseJson.companyId);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\":\"cj@cj.com\",\n    \"password\":\"1\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}login",
-							"host": [
-								"{{baseUrl}}login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete test company",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}delete/company/{{TestcompanyId}}",
-							"host": [
-								"{{baseUrl}}delete"
-							],
-							"path": [
-								"company",
-								"{{TestcompanyId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "LOG_OUT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}logout",
-							"host": [
-								"{{baseUrl}}logout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	]
+  "info": {
+    "_postman_id": "d0e58974-30b6-4bca-a2d4-262df0fa23e8",
+    "name": "AlcoRel",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43555795",
+    "_collection_link": "https://carlosdematos.postman.co/workspace/Carlos-De-Matos's-Workspace~e85606f1-4fb1-4bb5-84f7-f9a55a0dde57/collection/43555795-d0e58974-30b6-4bca-a2d4-262df0fa23e8?action=share&source=collection_link&creator=43555795"
+  },
+  "item": [
+    {
+      "name": "intro",
+      "item": [
+        {
+          "name": "get webpage",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"webpage\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"email\": \"test@company.com\",\n  \"password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create company",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"email\": \"test@company.com\",\n  \"password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}signup",
+              "host": ["{{baseUrl}}signup"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login as company's admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "//pm.environment.set(\"email\", \"cj@cj.com\");",
+                  "pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has companyId\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"companyId\");",
+                  "});",
+                  "pm.environment.set(\"companyId\", responseJson.companyId);",
+                  "console.log(\"companyId saved to environment variable:\", responseJson.companyId);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"test@company.com\",\n    \"password\":\"testpassword\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}login",
+              "host": ["{{baseUrl}}login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add category for the new company",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has company_id\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"company_id\");",
+                  "});",
+                  "pm.environment.set(\"company_id\", responseJson.company_id);",
+                  "console.log(\"company_id saved to environment variable:\", responseJson.company_id);",
+                  "",
+                  "pm.test(\"Response has id\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"id\");",
+                  "});",
+                  "pm.environment.set(\"category_id\", responseJson.id);",
+                  "console.log(\"id saved to environment variable:\", responseJson.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"category_name\":\"test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}PostCategory",
+              "host": ["{{baseUrl}}PostCategory"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ticket test",
+      "item": [
+        {
+          "name": "create ticket",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\":\"testticket\",\n    \"email\":\"testticket@test.com\",\n    \"status\":\"waiting\",\n    \"Message\":\"Test message\",\n    \"category_id\": {{category_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}createusers/",
+              "host": ["{{baseUrl}}createusers"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get tickets",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains tickets\", function() {",
+                  "    pm.expect(responseJson).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "let highestTicketId = 0;",
+                  "if (responseJson.length > 0) {",
+                  "    const ticketIds = responseJson.map(ticket => ticket.ticketId);",
+                  "    ",
+                  "    highestTicketId = Math.max(...ticketIds);",
+                  "    ",
+                  "    pm.test(\"Found highest ticket ID\", function() {",
+                  "        pm.expect(highestTicketId).to.be.above(0);",
+                  "    });",
+                  "    ",
+                  "    pm.environment.set(\"ticketId\", highestTicketId);",
+                  "    console.log(\"Highest ticketId saved to environment variable:\", highestTicketId);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}DetailedTicket",
+              "host": ["{{baseUrl}}DetailedTicket"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get ticket by ID",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}ticket/{{ticketId}}",
+              "host": ["{{baseUrl}}ticket"],
+              "path": ["{{ticketId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "category",
+      "item": [
+        {
+          "name": "get categories",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetCategory",
+              "host": ["{{baseUrl}}GetCategory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get category by ID",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"test\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetCategory/{{category_id}}",
+              "host": ["{{baseUrl}}GetCategory"],
+              "path": ["{{category_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update a category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"category updated for  #\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"Cat\":\"puttest\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}update/category/{{category_id}}",
+              "host": ["{{baseUrl}}update"],
+              "path": ["category", "{{category_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get the updated cat",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"puttest\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetCategory/{{category_id}}",
+              "host": ["{{baseUrl}}GetCategory"],
+              "path": ["{{category_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "employeeTests",
+      "item": [
+        {
+          "name": "get employees (there are 0 employees)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"[]\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetEmployee/",
+              "host": ["{{baseUrl}}GetEmployee"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create employee",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"test\",\n  \"email\": \"test@test.se\",\n  \"password\": \"\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"employee\",\n  \"company_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}PostEmployee/",
+              "host": ["{{baseUrl}}PostEmployee"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get employees (there is 1 employees)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"company_id\");",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains users\", function() {",
+                  "    pm.expect(responseJson).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "let highestId = 0;",
+                  "if (responseJson.length > 0) {",
+                  "    const userIds = responseJson.map(user => user.id);",
+                  "    highestId = Math.max(...userIds);",
+                  "    ",
+                  "    pm.test(\"Found highest user ID\", function() {",
+                  "        pm.expect(highestId).to.be.above(0);",
+                  "    });",
+                  "    ",
+                  "    pm.environment.set(\"empID\", highestId);",
+                  "    console.log(\"Highest empID saved to environment variable:\", highestId);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetEmployee/",
+              "host": ["{{baseUrl}}GetEmployee"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOG_OUT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}logout",
+              "host": ["{{baseUrl}}logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "log-in as the employee that was just created",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"CompanyId has been reterived - the user is logged-in\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"companyId\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.se\",\n    \"password\":\"welcome\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}login",
+              "host": ["{{baseUrl}}login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employee is not allowed to create categories",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Employee is not allowed to create categories\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Unauthorized\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Unauthorized or invalid company ID\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"category_name\":\"test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}PostCategory",
+              "host": ["{{baseUrl}}PostCategory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get categories as emp",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}GetCategory",
+              "host": ["{{baseUrl}}GetCategory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update status",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\":\"solved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}tickets/{{ticketId}}/status",
+              "host": ["{{baseUrl}}tickets"],
+              "path": ["{{ticketId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update status Copy",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has status property\", function() {",
+                  "    pm.expect(responseJson).to.have.property(\"status\");",
+                  "});",
+                  "",
+                  "pm.test(\"Ticket status is solved\", function() {",
+                  "    pm.expect(responseJson.status).to.equal(\"solved\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}ticket/{{ticketId}}",
+              "host": ["{{baseUrl}}ticket"],
+              "path": ["{{ticketId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOG_OUT from emp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has success property\", function() {",
+                  "    pm.expect(responseJson).to.have.property(\"success\");",
+                  "});",
+                  "",
+                  "pm.test(\"Success is equal to true\", function() {",
+                  "    pm.expect(responseJson.success).to.equal(true);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}logout",
+              "host": ["{{baseUrl}}logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "outro",
+      "item": [
+        {
+          "name": "LOG_OUT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}logout",
+              "host": ["{{baseUrl}}logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login as company's admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "//pm.environment.set(\"email\", \"cj@cj.com\");",
+                  "pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has companyId\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"companyId\");",
+                  "});",
+                  "pm.environment.set(\"TestcompanyId\", responseJson.companyId);",
+                  "console.log(\"TestcompanyId saved to environment variable:\", responseJson.companyId);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"test@company.com\",\n    \"password\":\"testpassword\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}login",
+              "host": ["{{baseUrl}}login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
+              "host": ["{{baseUrl}}DeleteCategory"],
+              "path": ["{{category_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Not found",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"No categories deleted\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
+              "host": ["{{baseUrl}}DeleteCategory"],
+              "path": ["{{category_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete employee",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Deleted 1 employee successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}DeleteEmployee/{{empID}}",
+              "host": ["{{baseUrl}}DeleteEmployee"],
+              "path": ["{{empID}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete an employee that doesn't exist",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"No categories deleted\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}DeleteCategory/{{category_id}}",
+              "host": ["{{baseUrl}}DeleteCategory"],
+              "path": ["{{category_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remove test ticket",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Deleted 1 ticket successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}Delete/ticket/{{ticketId}}",
+              "host": ["{{baseUrl}}Delete"],
+              "path": ["ticket", "{{ticketId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete confirmation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Body matches string\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"The ticket doesn't exist\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}Delete/ticket/{{ticketId}}",
+              "host": ["{{baseUrl}}Delete"],
+              "path": ["ticket", "{{ticketId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOG_OUT Copy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}logout",
+              "host": ["{{baseUrl}}logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login as company's admin Copy",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "//pm.environment.set(\"email\", \"cj@cj.com\");",
+                  "pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has companyId\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"companyId\");",
+                  "});",
+                  "pm.environment.set(\"companyId\", responseJson.companyId);",
+                  "console.log(\"companyId saved to environment variable:\", responseJson.companyId);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"cj@cj.com\",\n    \"password\":\"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}login",
+              "host": ["{{baseUrl}}login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete test company",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}delete/company/{{TestcompanyId}}",
+              "host": ["{{baseUrl}}delete"],
+              "path": ["company", "{{TestcompanyId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOG_OUT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}logout",
+              "host": ["{{baseUrl}}logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
 }
+
