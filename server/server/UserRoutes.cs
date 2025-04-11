@@ -410,31 +410,31 @@ public static class UserRoutes
             userCmd.Parameters.AddWithValue("company_id", companyId);
 
             //send welcome email
-            await emailService.SendEmailAsync(
-                to: adminDto.Email,
-                subject: "Welcome to Alcorel",
-                body: $@"
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
-            <div style='text-align: center; margin-bottom: 20px;'>
-                <h1 style='color: #2c3e50;'>Hi {adminDto.AdminName}, Thank You for using our services</h1>
-            </div>
-            <div style='text-align: center; margin: 30px 0;'>
-                <a href='http://localhost:5173/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
-                   www.alcorel.com/admin/dashboard
-                </a>
-
-            </div>
-            <p style='font-size: 16px; line-height: 1.5; color: #333;'>
-Don't hesitate to contact us if you need guidance
-            </p>
-            <a href='mailto:support@alcorel.com'>support@alcorel.com</a>
-
-            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
-                Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
-            </div>
-        </div>
-    "
-            );
+            //             await emailService.SendEmailAsync(
+            //                 to: adminDto.Email,
+            //                 subject: "Welcome to Alcorel",
+            //                 body: $@"
+            //         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
+            //             <div style='text-align: center; margin-bottom: 20px;'>
+            //                 <h1 style='color: #2c3e50;'>Hi {adminDto.AdminName}, Thank You for using our services</h1>
+            //             </div>
+            //             <div style='text-align: center; margin: 30px 0;'>
+            //                 <a href='http://localhost:5173/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+            //                    www.alcorel.com/admin/dashboard
+            //                 </a>
+            //
+            //             </div>
+            //             <p style='font-size: 16px; line-height: 1.5; color: #333;'>
+            // Don't hesitate to contact us if you need guidance
+            //             </p>
+            //             <a href='mailto:support@alcorel.com'>support@alcorel.com</a>
+            //
+            //             <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #7f8c8d;'>
+            //                 Powered by <span style='font-weight: bold;'>Alcorel<sup>&reg;</sup></span>
+            //             </div>
+            //         </div>
+            //     "
+            //             );
 
             using var reader = await userCmd.ExecuteReaderAsync();
             if (await reader.ReadAsync())
