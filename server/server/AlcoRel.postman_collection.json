@@ -11,6 +11,58 @@
 			"name": "intro",
 			"item": [
 				{
+					"name": "get webpage",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"webpage\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"email\": \"test@company.com\",\n  \"password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "create company",
 					"event": [
 						{
