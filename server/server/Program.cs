@@ -9,7 +9,7 @@ var host = builder.Configuration["PG_HOST"] ?? "45.10.162.204";
 var port = builder.Configuration["PG_PORT"] ?? "5432";
 var username = builder.Configuration["PG_USER"] ?? "postgres";
 var password = builder.Configuration["PG_PASSWORD"] ?? "FlickeringCustomerMoves29";
-var database = builder.Configuration["PG_DATABASE"] ?? "alcorel_ab";
+var database = builder.Configuration["PG_DATABASE"] ?? "postgres";
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
     $"Host={host};Port={port};Username={username};Password={password};Database={database}"
