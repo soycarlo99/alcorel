@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  ASPNETCORE_ENVIRONMENT: CI
+  Email__Password: ${{ secrets.Email__Password }}
+
 jobs:
   # Name of the job/test
   api_tests:
