@@ -21,7 +21,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Install Newman
-        run: npm install -g newman
+        run: npm install -g newman@6.2.1
       - name: Install dotnet project dependencies
         run: cd server/server && dotnet restore
       - name: Build
