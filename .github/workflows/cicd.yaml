@@ -29,7 +29,7 @@ jobs:
       - name: Start Server
         run: cd server/server && nohup dotnet run &
       - name: Run API-Tests
-        run: cd server/server && newman run ./AlcoRel.postman_collection.json -e ./AlcoRel.postman_environment.json
+        run: cd server/server && newman run ./AlcoRel.postman_collection.json --environment ./AlcoRel.postman_environment.json
 
   gui_tests:
     runs-on: ubuntu-latest
