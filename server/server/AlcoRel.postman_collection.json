@@ -63,55 +63,6 @@
 					"response": []
 				},
 				{
-					"name": "create company",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"baseUrl\", \"http://localhost:5001/api/\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"CompanyName\": \"testcompany\",\n  \"adminName\":\"tester\",\n  \"orgNumber\":\"5234123\",\n  \"Email\": \"test@company.com\",\n  \"Password\": \"testpassword\",\n  \"pending_confirmed\": false,\n  \"admin_customer_employee\": \"admin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}signup",
-							"host": [
-								"{{baseUrl}}signup"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "login as company's admin",
 					"event": [
 						{
@@ -146,7 +97,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\":\"test@company.com\",\n    \"password\":\"testpassword\"\n}",
+							"raw": "{\n    \"email\":\"cj@cj.com\",\n    \"password\":\"1\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1692,6 +1643,10 @@
 		},
 		{
 			"key": "category_id",
+			"value": ""
+		},
+		{
+			"key": "companyId",
 			"value": ""
 		}
 	]
