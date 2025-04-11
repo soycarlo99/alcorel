@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
@@ -29,11 +29,11 @@ jobs:
       - name: Start Server
         run: cd server/server && nohup dotnet run &
       - name: Run API-Tests
-        run: cd server/server && newman run ./AlcoRel.postman_collection.json
+        run: cd server/server && newman run ./AlcoRel.postman_collection.json -e AlcoRel.postman_environment.json
 
   gui_tests:
     runs-on: ubuntu-latest
-    needs: api_tests 
+    needs: api_tests
     steps:
       - uses: actions/checkout@v4
       - name: Setup dotnet
@@ -63,7 +63,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          script: | 
+          script: |
             source /root/.nvm/nvm.sh
             nvm use v20.12.2
             cd /srv/www/shoptester
