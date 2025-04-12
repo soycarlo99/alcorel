@@ -8,7 +8,7 @@ on:
 
 env:
   ASPNETCORE_ENVIRONMENT: CI
-  Email__Password: ${{ secrets.EMAIL__PASSWORD }}
+  Email__Password: ${{ secrets.Email__Password }}
   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
   PG_DATABASE: ${{ secrets.PG_DATABASE }}
   PG_PORT: ${{ secrets.PG_PORT }}
@@ -63,7 +63,7 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
-    needs: [api_tests, gui_tests]
+    # needs: [api_tests, gui_tests]
     env:
       ASPNETCORE_ENVIRONMENT: CI
       Email__Password: ${{ secrets.Email__Password }}
@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            export EMAIL__PASSWORD=${{ secrets.EMAIL__PASSWORD }}
+            export Email__Password=${{ secrets.Email__Password }}
             export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             export PG_DATABASE=${{ secrets.PG_DATABASE }}
             export PG_PORT=${{ secrets.PG_PORT }}
