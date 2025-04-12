@@ -78,8 +78,11 @@ jobs:
             cd /srv/www/alcorel
             git pull
             npm ci
+            pwd
             npm run build
+            pwd 
             cd /server/server/
+            pwd
             dotnet restore
             pm2 stop alcorel
             pm2 delete alcorel
