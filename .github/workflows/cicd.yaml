@@ -8,7 +8,7 @@ on:
 
 env:
   ASPNETCORE_ENVIRONMENT: CI
-  Email__Password: ${{ secrets.Email__Password }}
+  Email__Password: ${{ secrets.EMAIL__PASSWORD }}
   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
   PG_DATABASE: ${{ secrets.PG_DATABASE }}
   PG_PORT: ${{ secrets.PG_PORT }}
@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            export Email__Password=${{ secrets.Email__Password }}
+            export EMAIL__PASSWORD=${{ secrets.EMAIL__PASSWORD }}
             export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             export PG_DATABASE=${{ secrets.PG_DATABASE }}
             export PG_PORT=${{ secrets.PG_PORT }}
