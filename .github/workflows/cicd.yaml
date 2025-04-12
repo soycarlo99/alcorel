@@ -81,7 +81,7 @@ jobs:
             pwd
             npm run build
             pwd 
-            cd /server/server/
+            cd server/server/
             pwd
             dotnet restore
             pm2 stop alcorel
