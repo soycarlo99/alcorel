@@ -75,6 +75,7 @@ jobs:
           script: |
             source /root/.nvm/nvm.sh
             nvm use v20.12.2
+            npm install -g pm2
             cd /srv/www/alcorel
             git pull
             npm ci
