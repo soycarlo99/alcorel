@@ -69,7 +69,6 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             source /root/.nvm/nvm.sh
-            . .bashrc
             nvm use v20.12.2
             cd /srv/www/alcorel
             git pull
@@ -77,6 +76,7 @@ jobs:
             npm run build
             cd server/server/
             dotnet restore
+            pm2 status
             pm2 stop alcorel
             pm2 delete alcorel
             pm2 start 'dotnet run' --name alcorel
