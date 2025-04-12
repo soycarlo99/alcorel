@@ -18,7 +18,7 @@ import { TicketProvider } from "./TicketContext";
 
 import "./style.css";
 import AiChat from "./chat";
-import Alcorel from "./Alcorel";
+import Alcorel from "./alcorel";
 import LoginPage from "./Login";
 import Navigation from "./Navigation";
 import AddQuestions from "./AddQuestions";

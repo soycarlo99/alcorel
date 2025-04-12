@@ -75,13 +75,12 @@ jobs:
           script: |
             source /root/.nvm/nvm.sh
             nvm use v20.12.2
-            cd /srv/www/shoptester
+            cd /srv/www/alcorel
             git pull
-            cd client
             npm ci
             npm run build
-            cd ../server
+            cd ../server/server
             dotnet restore
-            pm2 stop shoptester
-            pm2 delete shoptester
-            pm2 start "dotnet run" --name shoptester
+            pm2 stop alcorel
+            pm2 delete alcorel
+            pm2 start "dotnet run" --name alcorel
