@@ -79,7 +79,7 @@ jobs:
             git pull
             npm ci
             npm run build
-            cd ../server/server
+            cd /server/server
             dotnet restore
             pm2 stop alcorel
             pm2 delete alcorel
