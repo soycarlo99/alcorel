@@ -9,11 +9,11 @@ on:
 env:
   ASPNETCORE_ENVIRONMENT: CI
   Email__Password: ${{ secrets.Email__Password }}
-#   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-#   PG_DATABASE: ${{ secrets.PG_DATABASE }}
-#   PG_PORT: ${{ secrets.PG_PORT }}
-#   PG_HOST: ${{ secrets.PG_HOST }}
-#   PG_USER: ${{ secrets.PG_USER }}
+  PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  PG_DATABASE: ${{ secrets.PG_DATABASE }}
+  PG_PORT: ${{ secrets.PG_PORT }}
+  PG_HOST: ${{ secrets.PG_HOST }}
+  PG_USER: ${{ secrets.PG_USER }}
 
 jobs:
   # Name of the job/test
