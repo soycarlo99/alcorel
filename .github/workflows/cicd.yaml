@@ -58,7 +58,7 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
-    # needs: [api_tests, gui_tests]
+    needs: [api_tests, gui_tests]
     env:
       ASPNETCORE_ENVIRONMENT: CI
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
