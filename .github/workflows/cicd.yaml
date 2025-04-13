@@ -57,51 +57,44 @@ jobs:
         run: cd server/alcorel-gui.Tests && dotnet test
 
 
-
-
-  deploy:
-    name: Deploy to Server
-    runs-on: ubuntu-latest
-    # needs: [api_tests, gui_tests]
-    env:
-      ASPNETCORE_ENVIRONMENT: CI
-      Email__Password: ${{ secrets.EMAIL__PASSWORD }}
-      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-      PG_DATABASE: ${{ secrets.PG_DATABASE }}
-      PG_PORT: ${{ secrets.PG_PORT }}
-      PG_HOST: ${{ secrets.PG_HOST }}
-      PG_USER: ${{ secrets.PG_USER }}
-    steps:
-      - name: Debug Secrets
-        run: echo "Email Password is: ${EMAIL__PASSWORD}"
+      deploy:
+        name: Deploy to Server
+        runs-on: ubuntu-latest
         env:
+          ASPNETCORE_ENVIRONMENT: CI
           Email__Password: ${{ secrets.EMAIL__PASSWORD }}
+          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          PG_DATABASE: ${{ secrets.PG_DATABASE }}
+          PG_PORT: ${{ secrets.PG_PORT }}
+          PG_HOST: ${{ secrets.PG_HOST }}
+          PG_USER: ${{ secrets.PG_USER }}
 
-      - name: Deploy App
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: |
-            export Email__Password=${{ secrets.EMAIL__PASSWORD }}
-            export SMTP_PASSWORD=${{ secrets.EMAIL__PASSWORD }}
-            export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
-            export PG_DATABASE=${{ secrets.PG_DATABASE }}
-            export PG_PORT=${{ secrets.PG_PORT }}
-            export PG_HOST=${{ secrets.PG_HOST }}
-            export PG_USER=${{ secrets.PG_USER }}
-            source /root/.nvm/nvm.sh
-            source ~/.bashrc
-            nvm use v22
-            npm install -g pm2
-            cd /srv/www/alcorel
-            git pull
-            npm ci
-            npm run build
-            cd server/server/
-            dotnet restore
-            pm2 stop alcorel
-            pm2 delete alcorel
-            pm2 start "dotnet run" --name alcorel --env EMAIL__PASSWORD=$SMTP_PASSWORD,PG_PASSWORD=$PG_PASSWORD,PG_DATABASE=$PG_DATABASE,PG_PORT=$PG_PORT,PG_HOST=$PG_HOST,PG_USER=$PG_USER
+        steps:
+          - name: Deploy App
+            uses: appleboy/ssh-action@v1.2.0
+            with:
+              host: ${{ secrets.HOST }}
+              username: ${{ secrets.USERNAME }}
+              password: ${{ secrets.PASSWORD }}
+              port: ${{ secrets.PORT }}
+              script: |
+                export Email__Password=${{ secrets.EMAIL__PASSWORD }}
+                export SMTP_PASSWORD=${{ secrets.EMAIL__PASSWORD }}
+                export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
+                export PG_DATABASE=${{ secrets.PG_DATABASE }}
+                export PG_PORT=${{ secrets.PG_PORT }}
+                export PG_HOST=${{ secrets.PG_HOST }}
+                export PG_USER=${{ secrets.PG_USER }}
+                source /root/.nvm/nvm.sh
+                source ~/.bashrc
+                nvm use v22
+                npm install -g pm2
+                cd /srv/www/alcorel
+                git pull
+                npm ci
+                npm run build
+                cd server/server/
+                dotnet restore
+                pm2 stop alcorel
+                pm2 delete alcorel
+                pm2 start "dotnet run" --name alcorel --env EMAIL__PASSWORD=$SMTP_PASSWORD,PG_PASSWORD=$PG_PASSWORD,PG_DATABASE=$PG_DATABASE,PG_PORT=$PG_PORT,PG_HOST=$PG_HOST,PG_USER=$PG_USER
