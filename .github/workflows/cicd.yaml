@@ -88,13 +88,14 @@ jobs:
             cd server/server/
             dotnet restore
             dotnet build
-            pm2 stop alcorel
-            pm2 delete alcorel
-            pm2 start "dotnet run" --name alcorel --env-production \
-            --env '{"ASPNETCORE_ENVIRONMENT":"Production", 
-                    "EMAIL__PASSWORD":"${{ secrets.EMAIL_PASSWORD }}", 
-                    "PG_PASSWORD":"${{ secrets.PG_PASSWORD }}", 
-                    "PG_DATABASE":"${{ secrets.PG_DATABASE }}", 
-                    "PG_PORT":"${{ secrets.PG_PORT }}", 
-                    "PG_HOST":"${{ secrets.PG_HOST }}", 
-                    "PG_USER":"${{ secrets.PG_USER }}"}'
+            pm2 stop alcorel || true
+            pm2 delete alcorel || true
+
+            ASPNETCORE_ENVIRONMENT=Production \
+            EMAIL__PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+            PG_PASSWORD="${{ secrets.PG_PASSWORD }}" \
+            PG_DATABASE="${{ secrets.PG_DATABASE }}" \
+            PG_PORT="${{ secrets.PG_PORT }}" \
+            PG_HOST="${{ secrets.PG_HOST }}" \
+            PG_USER="${{ secrets.PG_USER }}"
+            pm2 start "dotnet run" --name alcorel
