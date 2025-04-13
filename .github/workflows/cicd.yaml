@@ -58,7 +58,7 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
-    # needs: [api_tests, gui_tests]
+    needs: [api_tests, gui_tests]
     steps:
       - name: Deploy App
         uses: appleboy/ssh-action@v1.2.0
