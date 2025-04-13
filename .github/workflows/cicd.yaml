@@ -55,6 +55,10 @@ jobs:
         run: cd server/server && nohup dotnet run &
       - name: Run GUI-tests
         run: cd server/alcorel-gui.Tests && dotnet test
+
+
+
+
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
@@ -68,6 +72,11 @@ jobs:
       PG_HOST: ${{ secrets.PG_HOST }}
       PG_USER: ${{ secrets.PG_USER }}
     steps:
+      - name: Debug Secrets
+        run: echo "Email Password is: ${EMAIL__PASSWORD}"
+        env:
+          Email__Password: ${{ secrets.EMAIL__PASSWORD }}
+
       - name: Deploy App
         uses: appleboy/ssh-action@v1.2.0
         with:
