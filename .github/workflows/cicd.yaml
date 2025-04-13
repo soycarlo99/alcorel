@@ -77,6 +77,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             export Email__Password=${{ secrets.EMAIL__PASSWORD }}
+            export SMTP_PASSWORD=${{ secrets.EMAIL__PASSWORD }}
             export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             export PG_DATABASE=${{ secrets.PG_DATABASE }}
             export PG_PORT=${{ secrets.PG_PORT }}
