@@ -96,8 +96,32 @@ jobs:
             npm run build
             cd server/server/
             dotnet restore
-            pm2 stop alcorel
-            pm2 delete alcorel
-            echo "Email Password is: ${EMAIL_PASSWORD}"
-            pm2 start "dotnet run" --name alcorel --env EMAIL_PASSWORD=$SMTP_PASSWORD,PG_PASSWORD=$PG_PASSWORD,PG_DATABASE=$PG_DATABASE,PG_PORT=$PG_PORT,PG_HOST=$PG_HOST,PG_USER=$PG_USER
+
+            cat > /srv/www/alcorel/ecosystem.config.js << 'EOF'
+            module.exports = {
+              apps: [{
+                name: "alcorel",
+                script: "dotnet",
+                args: "run",
+                cwd: "/srv/www/alcorel/server/server/",
+                env: {
+                  "EMAIL__PASSWORD": "$SMTP_PASSWORD",
+                  "PG_PASSWORD": "$PG_PASSWORD",
+                  "PG_DATABASE": "$PG_DATABASE",
+                  "PG_PORT": "$PG_PORT",
+                  "PG_HOST": "$PG_HOST",
+                  "PG_USER": "$PG_USER"
+                }
+              }]
+            }
+            EOF
+            sed -i "s/\\\$SMTP_PASSWORD/${SMTP_PASSWORD}/g" /srv/www/alcorel/ecosystem.config.js
+            sed -i "s/\\\$PG_PASSWORD/${PG_PASSWORD}/g" /srv/www/alcorel/ecosystem.config.js
+            sed -i "s/\\\$PG_DATABASE/${PG_DATABASE}/g" /srv/www/alcorel/ecosystem.config.js
+            sed -i "s/\\\$PG_PORT/${PG_PORT}/g" /srv/www/alcorel/ecosystem.config.js
+            sed -i "s/\\\$PG_HOST/${PG_HOST}/g" /srv/www/alcorel/ecosystem.config.js
+            sed -i "s/\\\$PG_USER/${PG_USER}/g" /srv/www/alcorel/ecosystem.config.js
+            pm2 stop alcorel || true
+            pm2 delete alcorel || true
+            pm2 start /srv/www/alcorel/ecosystem.config.js
             echo "Email Password is: ${EMAIL_PASSWORD}"
