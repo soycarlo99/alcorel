@@ -7,7 +7,7 @@ const HowToUseIframe = () => {
   const [error, setError] = useState("");
   const [isAutoFetched, setIsAutoFetched] = useState(false);
   const codeRef = useRef(null);
-  const baseUrl = "http://localhost:5173";
+  const baseUrl = "http://alcorel.echowords.xyz";
 
   useEffect(() => {
     const fetchCompanyId = async () => {
@@ -193,8 +193,9 @@ const HowToUseIframe = () => {
           max-width: 900px;
           margin: 0 auto;
           padding: 20px;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+          font-family:
+            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
         }
 
         h1 {
