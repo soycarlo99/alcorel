@@ -59,8 +59,10 @@ jobs:
     name: Deploy to Server
     runs-on: ubuntu-latest
     # needs: [api_tests, gui_tests]
+    steps:
+      - name: Deploy App
+        uses: appleboy/ssh-action@v1.2.0
     env:
-      ASPNETCORE_ENVIRONMENT: CI
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       EMAIL__PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
@@ -68,33 +70,29 @@ jobs:
       PG_PORT: ${{ secrets.PG_PORT }}
       PG_HOST: ${{ secrets.PG_HOST }}
       PG_USER: ${{ secrets.PG_USER }}
-    steps:
-      - name: Deploy App
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: |
-            source /root/.nvm/nvm.sh
-            source ~/.bashrc
-            nvm use v22
-            npm install -g pm2
-            cd /srv/www/alcorel
-            git pull
-            npm ci
-            npm run build
-            cd server/server/
-            export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
-            export PG_DATABASE=${{ secrets.PG_DATABASE }}
-            export PG_PORT=${{ secrets.PG_PORT }}
-            export PG_HOST=${{ secrets.PG_HOST }}
-            export PG_USER=${{ secrets.PG_USER }}
-            dotnet restore
-            export EMAIL__PASSWORD=${{ secrets.EMAIL_PASSWORD }}
-            echo $EMAIL__PASSWORD
-            dotnet build
-            pm2 stop alcorel
-            pm2 delete alcorel
-            pm2 start "dotnet run" --name alcorel
+    with:
+      host: ${{ secrets.HOST }}
+      username: ${{ secrets.USERNAME }}
+      password: ${{ secrets.PASSWORD }}
+      port: ${{ secrets.PORT }}
+      script: |
+        source /root/.nvm/nvm.sh
+        source ~/.bashrc
+        nvm use v22
+        npm install -g pm2
+        cd /srv/www/alcorel
+        git pull
+        npm ci
+        npm run build
+        cd server/server/
+        export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
+        export PG_DATABASE=${{ secrets.PG_DATABASE }}
+        export PG_PORT=${{ secrets.PG_PORT }}
+        export PG_HOST=${{ secrets.PG_HOST }}
+        export PG_USER=${{ secrets.PG_USER }}
+        dotnet restore
+        export EMAIL__PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+        dotnet build
+        pm2 stop alcorel
+        pm2 delete alcorel
+        pm2 start "dotnet run" --name alcorel
