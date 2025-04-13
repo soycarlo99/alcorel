@@ -88,9 +88,8 @@ jobs:
             cd server/server/
             dotnet restore
             dotnet build
-            pm2 stop alcorel || true
-            pm2 delete alcorel || true
-
+            pm2 stop alcorel
+            pm2 delete alcorel
             # ASPNETCORE_ENVIRONMENT=Production \
             Email__Password="${{ secrets.EMAIL_PASSWORD }}" \
             PG_PASSWORD="${{ secrets.PG_PASSWORD }}" \
