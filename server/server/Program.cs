@@ -52,25 +52,6 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapFallbackToFile("index.html");
 
-app.MapPost("/api/email", SendEmail);
-
-static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
-{
-    Console.WriteLine("SendEmail is called..Sending email");
-
-    await email.SendEmailAsync(request.To, request.Subject, request.Body);
-
-    Console.WriteLine(
-        "Email sent to: "
-            + request.To
-            + " with subject: "
-            + request.Subject
-            + " and body: "
-            + request.Body
-    );
-    return Results.Ok(new { message = "Email sent." });
-}
-
 //User APIs
 app.MapGet("/api/users", UserRoutes.GetUsers);
 app.MapPost("/api/createusers", UserRoutes.CreationOfTicket);
@@ -78,8 +59,86 @@ app.MapPost("/api/login", UserRoutes.Post);
 app.MapPost("/api/customersesh", UserRoutes.CustomerVisit);
 app.MapGet("/api/ticket/token/{token}", TicketRoutes.GetTicketByToken);
 
+//Ticket APIs
+app.MapGet("/api/tickets", TicketRoutes.GetTickets);
+app.MapPost("/api/tickets", TicketRoutes.PostTicket);
+app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
+app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
+app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
+app.MapDelete("/api/delete/ticket/{ticket_id}", TicketRoutes.RemoveTicket);
+
+//Question APIs
+app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
+app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
+app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
+app.MapPut("/api/update/question/{questionId}", QuestionRoutes.UpdateQuestion);
+
+//Category APIs
+app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
+app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
+app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
+app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
+app.MapPut("/api/update/category/{catId}", CategoryRoutes.UpdateCategories);
+
+//Message APIs
+app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
+app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
+
+//Employee APIs
+app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
+app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
+app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
+
+//Password Reset APIs
+app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
+app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
+app.MapGet("/api/employee/{userId}/check-password", EmployeeRoutes.CheckDefaultPassword);
+app.MapGet("/api/password/validate-token/{resetToken}", EmployeeRoutes.ValidateResetToken);
+
+//Company APIs
+app.MapPut("/api/update/logo/{companyId}", CompanyRoutes.UpdateCompanyLogo);
+app.MapDelete("/api/delete/company/{companyId}", CompanyRoutes.RemoveCompany);
+
+//Feedback APIs
+app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
+
+//app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
+//app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.PasswordResetRequest);
 //app.MapPost("/api/users", UserRoutes.PostUser);
 //app.MapPost("/api/login", UserRoutes.CheckCredentials);
+
+//Sign-up APIs
+app.MapPost("api/signup", UserRoutes.SignUpAdmin);
+
+app.MapGet(
+    "/api/session/companyId",
+    (HttpContext ctx) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+        return TypedResults.Ok(new { companyId = companyId });
+    }
+);
+app.MapGet(
+    "/api/employee/dashboard",
+    async (HttpContext ctx, NpgsqlDataSource db) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+
+        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+        return Results.Ok(result);
+    }
+);
+app.MapGet(
+    "/api/admin/dashboard",
+    async (HttpContext ctx, NpgsqlDataSource db) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+
+        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+        return Results.Ok(result);
+    }
+);
+
 app.MapGet(
     "/api/company/{companyId}/init",
     (int companyId, HttpContext ctx) =>
@@ -151,75 +210,6 @@ app.MapGet(
     }
 );
 
-//Ticket APIs
-app.MapGet("/api/tickets", TicketRoutes.GetTickets);
-app.MapPost("/api/tickets", TicketRoutes.PostTicket);
-app.MapPut("/api/tickets/{ticketId}/status", TicketRoutes.UpdateTicketStatus);
-app.MapGet("/api/DetailedTicket", TicketRoutes.GetDetailedTickets);
-app.MapGet("/api/ticket/{id}", TicketRoutes.GetTicketById);
-app.MapDelete("/api/delete/ticket/{ticket_id}", TicketRoutes.RemoveTicket);
-
-//Question APIs
-app.MapGet("/api/questions/{category_id}", QuestionRoutes.GetQuestion);
-app.MapPost("/api/questions", QuestionRoutes.PostQuestions);
-app.MapDelete("/api/questions/{id}", QuestionRoutes.DeleteQuestion);
-app.MapPut("/api/update/question/{questionId}", QuestionRoutes.UpdateQuestion);
-
-//Category APIs
-app.MapGet("/api/GetCategory", CategoryRoutes.GetCategories);
-app.MapGet("/api/GetCategory/{categoryId}", CategoryRoutes.GetCategoriesById);
-app.MapPost("/api/PostCategory", CategoryRoutes.PostCategory);
-app.MapDelete("/api/DeleteCategory/{categoryId}", CategoryRoutes.RemoveCategory);
-app.MapPut("/api/update/category/{catId}", CategoryRoutes.UpdateCategories);
-
-//Message APIs
-app.MapPost("/api/{id}/message", MessageRoutes.PostMessage);
-app.MapPost("/api/{ticketId}/{questionId}/postAnswer", AnswerRoutes.PostAnswer);
-
-//Employee APIs
-app.MapGet("/api/GetEmployee", EmployeeRoutes.GetEmployee);
-app.MapPost("/api/PostEmployee", EmployeeRoutes.PostEmployee);
-app.MapDelete("/api/DeleteEmployee/{testuserId}", EmployeeRoutes.RemoveEmployee);
-app.MapGet(
-    "/api/session/companyId",
-    (HttpContext ctx) =>
-    //app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.PasswordResetRequest);
-    {
-        var companyId = ctx.Session.GetInt32("companyId");
-        return TypedResults.Ok(new { companyId = companyId });
-    }
-);
-app.MapGet(
-    "/api/employee/dashboard",
-    async (HttpContext ctx, NpgsqlDataSource db) =>
-    {
-        var companyId = ctx.Session.GetInt32("companyId");
-
-        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
-        return Results.Ok(result);
-    }
-);
-app.MapGet(
-    "/api/admin/dashboard",
-    async (HttpContext ctx, NpgsqlDataSource db) =>
-    {
-        var companyId = ctx.Session.GetInt32("companyId");
-
-        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
-        return Results.Ok(result);
-    }
-);
-app.MapPut("/api/update/logo/{companyId}", CompanyRoutes.UpdateCompanyLogo);
-app.MapDelete("/api/delete/company/{companyId}", CompanyRoutes.RemoveCompany);
-
-//Feedback APIs
-app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
-
-//app.MapGet("/api/GetRating", FeedbackRoutes.GetRating);
-
-//Sign-up APIs
-app.MapPost("api/signup", UserRoutes.SignUpAdmin);
-
 //Sign-out APIs
 app.MapPost(
     "/api/logout",
@@ -239,10 +229,23 @@ app.MapPost(
     }
 );
 
-//Password Reset APIs
-app.MapPost("/api/password/reset/{resetToken}", EmployeeRoutes.ResetPasswordWithLink);
-app.MapPut("/api/ResetPassword/{testuserId}", EmployeeRoutes.SendResetLink);
-app.MapGet("/api/employee/{userId}/check-password", EmployeeRoutes.CheckDefaultPassword);
-app.MapGet("/api/password/validate-token/{resetToken}", EmployeeRoutes.ValidateResetToken);
+app.MapPost("/api/email", SendEmail);
+
+static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
+{
+    Console.WriteLine("SendEmail is called..Sending email");
+
+    await email.SendEmailAsync(request.To, request.Subject, request.Body);
+
+    Console.WriteLine(
+        "Email sent to: "
+            + request.To
+            + " with subject: "
+            + request.Subject
+            + " and body: "
+            + request.Body
+    );
+    return Results.Ok(new { message = "Email sent." });
+}
 
 app.Run();
