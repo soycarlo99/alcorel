@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 env:
   ASPNETCORE_ENVIRONMENT: CI
-  EmailPassword: ${{ secrets.EmailPassword }}
+  Email__Password: ${{ secrets.EMAIL__PASSWORD }}
   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
   PG_DATABASE: ${{ secrets.PG_DATABASE }}
   PG_PORT: ${{ secrets.PG_PORT }}
@@ -61,7 +61,7 @@ jobs:
     # needs: [api_tests, gui_tests]
     env:
       ASPNETCORE_ENVIRONMENT: CI
-      EmailPassword: ${{ secrets.EmailPassword }}
+      Email__Password: ${{ secrets.EMAIL__PASSWORD }}
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
       PG_DATABASE: ${{ secrets.PG_DATABASE }}
       PG_PORT: ${{ secrets.PG_PORT }}
@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            export EmailPassword=${{ secrets.EmailPassword }}
+            export Email__Password=${{ secrets.EMAIL__PASSWORD }}
             export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             export PG_DATABASE=${{ secrets.PG_DATABASE }}
             export PG_PORT=${{ secrets.PG_PORT }}
