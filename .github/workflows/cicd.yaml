@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 env:
   ASPNETCORE_ENVIRONMENT: CI
-  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+  EMAIL__PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
   PG_DATABASE: ${{ secrets.PG_DATABASE }}
   PG_PORT: ${{ secrets.PG_PORT }}
