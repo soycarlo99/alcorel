@@ -84,7 +84,7 @@ jobs:
             export PG_USER=${{ secrets.PG_USER }}
             source /root/.nvm/nvm.sh
             source ~/.bashrc
-            nvm use v20.12.2
+            nvm use v22
             npm install -g pm2
             cd /srv/www/alcorel
             git pull
