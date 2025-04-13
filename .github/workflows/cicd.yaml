@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 env:
   ASPNETCORE_ENVIRONMENT: CI
-  Email__Password: ${{ secrets.EMAIL__PASSWORD }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
   PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
   PG_DATABASE: ${{ secrets.PG_DATABASE }}
   PG_PORT: ${{ secrets.PG_PORT }}
@@ -61,7 +61,7 @@ jobs:
     # needs: [api_tests, gui_tests]
     env:
       ASPNETCORE_ENVIRONMENT: CI
-      Email__Password: ${{ secrets.EMAIL__PASSWORD }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
       PG_DATABASE: ${{ secrets.PG_DATABASE }}
       PG_PORT: ${{ secrets.PG_PORT }}
@@ -76,8 +76,8 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            export Email__Password=${{ secrets.EMAIL__PASSWORD }}
-            export SMTP_PASSWORD=${{ secrets.EMAIL__PASSWORD }}
+            export EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+            export SMTP_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
             export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
             export PG_DATABASE=${{ secrets.PG_DATABASE }}
             export PG_PORT=${{ secrets.PG_PORT }}
@@ -98,6 +98,6 @@ jobs:
             dotnet restore
             pm2 stop alcorel
             pm2 delete alcorel
-            echo "Email Password is: ${EMAIL__PASSWORD}"
-            pm2 start "dotnet run" --name alcorel --env EMAIL__PASSWORD=$SMTP_PASSWORD,PG_PASSWORD=$PG_PASSWORD,PG_DATABASE=$PG_DATABASE,PG_PORT=$PG_PORT,PG_HOST=$PG_HOST,PG_USER=$PG_USER
-            echo "Email Password is: ${EMAIL__PASSWORD}"
+            echo "Email Password is: ${EMAIL_PASSWORD}"
+            pm2 start "dotnet run" --name alcorel --env EMAIL_PASSWORD=$SMTP_PASSWORD,PG_PASSWORD=$PG_PASSWORD,PG_DATABASE=$PG_DATABASE,PG_PORT=$PG_PORT,PG_HOST=$PG_HOST,PG_USER=$PG_USER
+            echo "Email Password is: ${EMAIL_PASSWORD}"
