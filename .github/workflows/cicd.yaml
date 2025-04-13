@@ -63,6 +63,7 @@ jobs:
       - name: Deploy App
         uses: appleboy/ssh-action@v1.2.0
         env:
+          ASPNETCORE_ENVIRONMENT: CI
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL__PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
