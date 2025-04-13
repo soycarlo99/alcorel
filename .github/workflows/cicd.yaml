@@ -91,8 +91,8 @@ jobs:
             pm2 stop alcorel || true
             pm2 delete alcorel || true
 
-            ASPNETCORE_ENVIRONMENT=Production \
-            EMAIL__PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+            # ASPNETCORE_ENVIRONMENT=Production \
+            Email__Password="${{ secrets.EMAIL_PASSWORD }}" \
             PG_PASSWORD="${{ secrets.PG_PASSWORD }}" \
             PG_DATABASE="${{ secrets.PG_DATABASE }}" \
             PG_PORT="${{ secrets.PG_PORT }}" \
