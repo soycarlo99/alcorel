@@ -85,9 +85,9 @@ jobs:
             export PG_USER=${{ secrets.PG_USER }}
             echo "Email Password is: ${Email__Password}"
             source /root/.nvm/nvm.sh
-            echo "Email Password is: ${EMAIL__PASSWORD}"
+            echo "Email Password is: ${Email__Password}"
             source ~/.bashrc
-            echo "Email Password is: ${EMAIL__PASSWORD}"
+            echo "Email Password is: ${Email__Password}"
             nvm use v22
             npm install -g pm2
             cd /srv/www/alcorel
