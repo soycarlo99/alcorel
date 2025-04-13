@@ -31,6 +31,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+var envPassword = Environment.GetEnvironmentVariable("EMAIL_PASSWORD");
+
 var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
 if (emailSettings != null)
 {
