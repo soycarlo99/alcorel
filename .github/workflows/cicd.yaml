@@ -86,14 +86,15 @@ jobs:
             npm ci
             npm run build
             cd server/server/
-            export PG_PASSWORD=${{ secrets.PG_PASSWORD }}
-            export PG_DATABASE=${{ secrets.PG_DATABASE }}
-            export PG_PORT=${{ secrets.PG_PORT }}
-            export PG_HOST=${{ secrets.PG_HOST }}
-            export PG_USER=${{ secrets.PG_USER }}
             dotnet restore
-            export EMAIL__PASSWORD=${{ secrets.EMAIL_PASSWORD }}
             dotnet build
             pm2 stop alcorel
             pm2 delete alcorel
-            pm2 start "dotnet run" --name alcorel
+            pm2 start "dotnet run" --name alcorel --env-production \
+            --env '{"ASPNETCORE_ENVIRONMENT":"Production", 
+                    "EMAIL__PASSWORD":"${{ secrets.EMAIL_PASSWORD }}", 
+                    "PG_PASSWORD":"${{ secrets.PG_PASSWORD }}", 
+                    "PG_DATABASE":"${{ secrets.PG_DATABASE }}", 
+                    "PG_PORT":"${{ secrets.PG_PORT }}", 
+                    "PG_HOST":"${{ secrets.PG_HOST }}", 
+                    "PG_USER":"${{ secrets.PG_USER }}"}'
