@@ -36,6 +36,7 @@ jobs:
         run: cd server/server && nohup dotnet run &
       - name: Run API-Tests
         run: cd server/server && newman run ./AlcoRel.postman_collection.json --verbose
+
   gui_tests:
     runs-on: ubuntu-latest
     needs: api_tests
@@ -55,6 +56,7 @@ jobs:
         run: cd server/server && nohup dotnet run &
       - name: Run GUI-tests
         run: cd server/alcorel-gui.Tests && dotnet test
+
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
