@@ -38,12 +38,6 @@ public class GuiTest : PageTest
     [TestMethod]
     public async Task createCompany()
     {
-        await _page.GotoAsync("http://localhost:5001/");
-    }
-
-    [TestMethod]
-    public async Task createCompany()
-    {
         await _page.GotoAsync("http://localhost:5001/alcorel");
         await _page
             .GetByRole(AriaRole.Textbox, new() { Name = "Company Name" })
@@ -279,5 +273,10 @@ public class GuiTest : PageTest
     //         .GetByRole(AriaRole.Combobox)
     //         .SelectOptionAsync(new[] { "15" });
     //     await _page.GetByRole(AriaRole.Link, new() { Name = "Manage Employee" }).ClickAsync();
+    // }
+    // [TestMethod]
+    // public async Task createCompany()
+    // {
+    //     await _page.GotoAsync("http://localhost:5001/");
     // }
 }
