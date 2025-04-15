@@ -90,7 +90,7 @@ public class GuiTest : PageTest
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).ClickAsync();
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("testtest");
         await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
-        await _page.Locator("#logotype_url").ClickAsync();
+        await _page.Locator("#logotype_url").ClickAsync(new LocatorClickOptions { Timeout = 2000 });
         await _page
             .Locator("#logotype_url")
             .FillAsync(
