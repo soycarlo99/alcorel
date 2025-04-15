@@ -120,6 +120,7 @@ app.MapGet(
         return TypedResults.Ok(new { companyId = companyId });
     }
 );
+
 app.MapGet(
     "/api/employee/dashboard",
     async (HttpContext ctx, NpgsqlDataSource db) =>
@@ -130,11 +131,33 @@ app.MapGet(
         return Results.Ok(result);
     }
 );
+
 app.MapGet(
     "/api/admin/dashboard",
     async (HttpContext ctx, NpgsqlDataSource db) =>
     {
         var companyId = ctx.Session.GetInt32("companyId");
+
+        if (!companyId.HasValue)
+        {
+            return Results.BadRequest(new { error = "No company ID found in session" });
+        }
+
+        var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
+        return Results.Ok(result);
+    }
+);
+
+app.MapGet(
+    "/api/employee/dashboard",
+    async (HttpContext ctx, NpgsqlDataSource db) =>
+    {
+        var companyId = ctx.Session.GetInt32("companyId");
+
+        if (!companyId.HasValue)
+        {
+            return Results.BadRequest(new { error = "No company ID found in session" });
+        }
 
         var result = await CompanyRoutes.GetCompanyName(db, companyId.Value);
         return Results.Ok(result);
