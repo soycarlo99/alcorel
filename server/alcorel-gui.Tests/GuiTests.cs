@@ -39,7 +39,6 @@ public class GuiTest : PageTest
     public async Task createCompany()
     {
         await _page.GotoAsync("http://localhost:5001/alcorel");
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Company Name" }).ClickAsync();
         await _page
             .GetByRole(AriaRole.Textbox, new() { Name = "Company Name" })
             .FillAsync("testcompany");
