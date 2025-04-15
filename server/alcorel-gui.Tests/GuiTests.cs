@@ -20,7 +20,7 @@ public class GuiTest : PageTest
             new BrowserTypeLaunchOptions
             {
                 Headless = true,
-                // SlowMo = 200, // Lägger in en fördröjning så vi kan se vad som händer
+                // SlowMo = 500, // Lägger in en fördröjning så vi kan se vad som händer
             }
         );
         _browserContext = await _browser.NewContextAsync();
@@ -70,23 +70,38 @@ public class GuiTest : PageTest
         await _page.GotoAsync("http://localhost:5001/");
         await _page.GetByRole(AriaRole.Link, new() { Name = "log-in for businesses" }).ClickAsync();
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync("cj@cj.com");
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "Email" })
+            .FillAsync("testament@test.com");
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("1");
+        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("testtest");
         await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
     }
 
     [TestMethod]
-    public async Task NavTesting()
+    public async Task navibarextensivetesting()
     {
         await _page.GotoAsync("http://localhost:5001/");
         await _page.GetByRole(AriaRole.Link, new() { Name = "log-in for businesses" }).ClickAsync();
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync("cj@cj.com");
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "Email" })
+            .FillAsync("testament@test.com");
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("1");
+        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("testtest");
         await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
+        await _page.Locator("#logotype_url").ClickAsync();
+        await _page
+            .Locator("#logotype_url")
+            .FillAsync(
+                "https://cpmr-islands.org/wp-content/uploads/sites/4/2019/07/Test-Logo-Small-Black-transparent-1.png"
+            );
+        await _page.GetByRole(AriaRole.Button, new() { Name = "Submit Link" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Link, new() { Name = "Edit Categories" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Dashboard" }).ClickAsync();
+        await Expect(_page.GetByRole(AriaRole.Img, new() { Name = "Your Company's logo" }))
+            .ToBeVisibleAsync();
+        await _page.GetByRole(AriaRole.Img, new() { Name = "Your Company's logo" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Edit Categories" }).ClickAsync();
         await _page
             .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
@@ -95,38 +110,106 @@ public class GuiTest : PageTest
             .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
             .FillAsync("test");
         await _page.GetByRole(AriaRole.Button, new() { Name = "ADD" }).ClickAsync();
-        await _page
-            .Locator("div")
-            .Filter(new() { HasTextRegex = new Regex("^-test✎$") })
-            .GetByRole(AriaRole.Button)
-            .Nth(1)
-            .ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "✎" }).Nth(4).ClickAsync();
         await _page.Locator("input[name=\"Cat\"]").ClickAsync();
-        await _page.Locator("input[name=\"Cat\"]").FillAsync("testedit");
+        await _page.Locator("input[name=\"Cat\"]").FillAsync("testtest");
         await _page.GetByRole(AriaRole.Button, new() { Name = "✓" }).ClickAsync();
-        await _page
-            .Locator("div")
-            .Filter(new() { HasTextRegex = new Regex("^-testedit✎$") })
-            .GetByRole(AriaRole.Button)
-            .First.ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "-" }).Nth(4).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Tickets" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Button, new() { Name = "ID ↕️" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Button, new() { Name = "Date ↕️" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Add Questions" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Link, new() { Name = "Add Questions" }).ClickAsync();
+        await _page.Locator("select").Nth(0).SelectOptionAsync(new[] { "180" });
+        await _page.GetByPlaceholder("New question").FillAsync("testquestion");
+        await _page.Locator("select[name=\"category_id\"]").SelectOptionAsync(new[] { "180" });
+        await _page.GetByRole(AriaRole.Button, new() { Name = "Add Question" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "✎" }).Nth(0).ClickAsync();
+        await _page.Locator("input[name=\"question\"]").FillAsync("testquestionstest");
+        await _page.GetByRole(AriaRole.Button, new() { Name = "✓" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "-" }).Nth(0).ClickAsync();
         await _page
-            .Locator("div")
-            .Filter(
-                new()
-                {
-                    HasTextRegex = new Regex(
-                        "^Select Category to ViewOtherLawhardwareSoftware testDelivery$"
-                    ),
-                }
-            )
-            .GetByRole(AriaRole.Combobox)
-            .SelectOptionAsync(new[] { "15" });
+            .Locator("select[name=\"category_id\"]")
+            .SelectOptionAsync(new SelectOptionValue[] { new SelectOptionValue { Index = 0 } });
+        await _page.GetByPlaceholder("New question").FillAsync("testquestion");
+        await _page.GetByRole(AriaRole.Button, new() { Name = "Add Question" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Manage Employee" }).ClickAsync();
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "enter new employee's name" })
+            .ClickAsync();
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "enter new employee's name" })
+            .FillAsync("test testsson");
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "enter new employee's email" })
+            .ClickAsync();
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "enter new employee's email" })
+            .FillAsync("test@testsson.com");
+        await _page.GetByRole(AriaRole.Button, new() { Name = "Add employee" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "-" }).ClickAsync();
+        await _page.GetByRole(AriaRole.Link, new() { Name = "log-out ⏻" }).ClickAsync();
     }
+
+    // [TestMethod]
+    // public async Task NavTesting()
+    // {
+    //     await _page.GotoAsync("http://localhost:5001/");
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "log-in for businesses" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).ClickAsync();
+    //     await _page
+    //         .GetByRole(AriaRole.Textbox, new() { Name = "Email" })
+    //         .FillAsync("testament@test.com");
+    //     await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("testtest");
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "Dashboard" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "Edit Categories" }).ClickAsync();
+    //     await _page
+    //         .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
+    //         .ClickAsync();
+    //     await _page
+    //         .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
+    //         .FillAsync("test");
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "ADD" }).ClickAsync();
+    //     await _page
+    //         .Locator("div")
+    //         .Filter(new() { HasTextRegex = new Regex("^-test✎$") })
+    //         .GetByRole(AriaRole.Button)
+    //         .Nth(1)
+    //         .ClickAsync();
+    //     await _page.Locator("input[name=\"Cat\"]").ClickAsync();
+    //     await _page.Locator("input[name=\"Cat\"]").FillAsync("testedit");
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "✓" }).ClickAsync();
+    //     await _page
+    //         .Locator("div")
+    //         .Filter(new() { HasTextRegex = new Regex("^-testedit✎$") })
+    //         .GetByRole(AriaRole.Button)
+    //         .First.ClickAsync();
+    //     await _page
+    //         .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
+    //         .ClickAsync();
+    //     await _page
+    //         .GetByRole(AriaRole.Textbox, new() { Name = "Please enter new category" })
+    //         .FillAsync("customertest");
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "ADD" }).ClickAsync();
+    //
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "Tickets" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "ID ↕️" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Button, new() { Name = "Date ↕️" }).ClickAsync();
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "Add Questions" }).ClickAsync();
+    //     await _page
+    //         .Locator("div")
+    //         .Filter(
+    //             new()
+    //             {
+    //                 HasTextRegex = new Regex(
+    //                     "^Select Category to ViewOtherLawhardwareSoftware testDelivery$"
+    //                 ),
+    //             }
+    //         )
+    //         .GetByRole(AriaRole.Combobox)
+    //         .SelectOptionAsync(new[] { "15" });
+    //     await _page.GetByRole(AriaRole.Link, new() { Name = "Manage Employee" }).ClickAsync();
+    // }
 
     [TestMethod]
     public async Task ticketCreation()
@@ -165,9 +248,11 @@ public class GuiTest : PageTest
         await _page.GotoAsync("http://localhost:5001/");
         await _page.GetByRole(AriaRole.Link, new() { Name = "log-in for businesses" }).ClickAsync();
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync("cj@cj.com");
+        await _page
+            .GetByRole(AriaRole.Textbox, new() { Name = "Email" })
+            .FillAsync("testament@test.com");
         await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).ClickAsync();
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("1");
+        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("testtest");
         await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Edit Categories" }).ClickAsync();
         await _page.GetByRole(AriaRole.Link, new() { Name = "Tickets" }).ClickAsync();

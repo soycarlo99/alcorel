@@ -82,6 +82,7 @@ export default function AdminDashboard() {
             value={logotype}
             type="text"
             name="logotype"
+            id="logotype_url"
             onChange={(e) => setLogoType(e.target.value)}
           />
           <button type="submit">Submit Link</button>
