@@ -47,8 +47,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Install dotnet project dependencies
-        # run: cd server/server &&
-        run: dotnet restore
+        run: cd server/server && dotnet restore
       - name: Build/Restore Playwright Project
         run: cd server/alcorel-gui.Tests && dotnet build
       - name: Ensure browsers are installed
