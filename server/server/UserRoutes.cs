@@ -122,13 +122,13 @@ public static class UserRoutes
             </p>
             
             <div style='text-align: center; margin: 30px 0;'>
-                <a href='http://localhost:5173/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                <a href='http://localhost:5001/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                     Complete Additional Questions
                 </a>
 <p style='font-size: 16px; line-height: 1.5; color: #333;'>
                 if the button doesn't work click on the link below:
             </p>
-                <a href='http://localhost:5173/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                <a href='http://localhost:5001/customer-view/{accessToken}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                    www.alcorel.com/customerservice 
                 </a>
 
@@ -419,7 +419,7 @@ public static class UserRoutes
                             <h1 style='color: #2c3e50;'>Hi {adminDto.AdminName}, Thank You for using our services</h1>
                         </div>
                         <div style='text-align: center; margin: 30px 0;'>
-                            <a href='http://localhost:5173/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+                            <a href='http://localhost:5001/admin/dashboard' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                                www.alcorel.com/admin/dashboard
                             </a>
 

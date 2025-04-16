@@ -1,18 +1,18 @@
-using Npgsql;
 using Microsoft.AspNetCore.Http.HttpResults;
-namespace Server;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
+using Npgsql;
 
+namespace Server;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 public static class EmployeeRoutes
 {
-
     public enum user_role
     {
         admin,
         customer,
-        employee
+        employee,
     }
 
     public record Employee(
@@ -24,7 +24,6 @@ public static class EmployeeRoutes
         string admin_customer_employee,
         int company_id
     );
-
 
     /////////////////////////
     ///Våran DTOs grabbar!!!!
@@ -56,7 +55,7 @@ public static class EmployeeRoutes
         string password,
         bool pending_confirmed,
         int company_id
-        );
+    );
 
     record HashDTO(string Password);
 
@@ -75,28 +74,35 @@ public static class EmployeeRoutes
         }
 
         List<GetEmployeeDTO> result = new();
-        using var query = db.CreateCommand("SELECT id, name, email, password, pending_confirmed, company_id FROM testuser WHERE admin_customer_employee = 'employee' AND company_id = @companyId");
+        using var query = db.CreateCommand(
+            "SELECT id, name, email, password, pending_confirmed, company_id FROM testuser WHERE admin_customer_employee = 'employee' AND company_id = @companyId"
+        );
         query.Parameters.AddWithValue("companyId", companyId);
         using var reader = await query.ExecuteReaderAsync();
 
-
-
         while (await reader.ReadAsync())
         {
-            result.Add(new(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2),
-                reader.GetString(3),
-                reader.GetBoolean(4),
-                reader.GetInt32(5)
-            ));
+            result.Add(
+                new(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetBoolean(4),
+                    reader.GetInt32(5)
+                )
+            );
         }
         return result;
     }
 
-    public static async Task<Results<Created<Employee>, BadRequest<string>>>
-        PostEmployee(PostEmployeeDTO employeeDto, NpgsqlDataSource db, PasswordHasher<string> hasher, HttpContext ctx, IEmailService emailService)
+    public static async Task<Results<Created<Employee>, BadRequest<string>>> PostEmployee(
+        PostEmployeeDTO employeeDto,
+        NpgsqlDataSource db,
+        PasswordHasher<string> hasher,
+        HttpContext ctx,
+        IEmailService emailService
+    )
     {
         int? companyId = ctx.Session.GetInt32("companyId");
         int? role = ctx.Session.GetInt32("role");
@@ -105,13 +111,15 @@ public static class EmployeeRoutes
             return TypedResults.BadRequest("You don't have a company ID nor a role");
         }
 
-        using var command = db.CreateCommand(@"
+        using var command = db.CreateCommand(
+            @"
         INSERT INTO testuser 
             (name, email, password, pending_confirmed, admin_customer_employee, company_id) 
         VALUES 
             (@name, @email, @password, @pending_confirmed, @role::user_role, @company_id)  
         RETURNING 
-            id, name, email, password, pending_confirmed, admin_customer_employee, company_id");
+            id, name, email, password, pending_confirmed, admin_customer_employee, company_id"
+        );
 
         string hashedPassword = hasher.HashPassword("", "welcome");
         command.Parameters.AddWithValue("name", employeeDto.name);
@@ -136,11 +144,10 @@ public static class EmployeeRoutes
                     reader.GetInt32(6)
                 );
 
-
                 await emailService.SendEmailAsync(
-    to: employeeDto.email,
-    subject: "Welcome onboard!",
-    body: $@"
+                    to: employeeDto.email,
+                    subject: "Welcome onboard!",
+                    body: $@"
     <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>
         <div style='text-align: center; margin-bottom: 20px;'>
             <h1 style='color: #2c3e50;'>Welcome Onboard!</h1>
@@ -158,7 +165,7 @@ public static class EmployeeRoutes
             </p>
         </div>
         <div style='text-align: center; margin: 30px 0;'>
-            <a href='http://localhost:5173/login' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
+            <a href='http://localhost:5001/login' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>
                Log In Now
             </a>
         </div>
@@ -170,7 +177,7 @@ public static class EmployeeRoutes
         </div>
     </div>
 "
-);
+                );
                 return TypedResults.Created($"/api/Employee/{employee.id}", employee);
             }
             return TypedResults.BadRequest("Failed to create employee");
@@ -181,9 +188,11 @@ public static class EmployeeRoutes
         }
     }
 
-
-    public static async Task<Results<Ok<string>, BadRequest<string>>>
-    RemoveEmployee(int testuserId, NpgsqlDataSource db, HttpContext ctx)
+    public static async Task<Results<Ok<string>, BadRequest<string>>> RemoveEmployee(
+        int testuserId,
+        NpgsqlDataSource db,
+        HttpContext ctx
+    )
     {
         using var command = db.CreateCommand(@"DELETE FROM testuser WHERE id = @selected_employee");
 
@@ -209,12 +218,19 @@ public static class EmployeeRoutes
     }
 
     public record PasswordResetDTO(string NewPassword);
-    
-    public static async Task<IResult> SendResetLink(int testuserId, NpgsqlDataSource db, PasswordHasher<string> hasher, IEmailService emailService)
+
+    public static async Task<IResult> SendResetLink(
+        int testuserId,
+        NpgsqlDataSource db,
+        PasswordHasher<string> hasher,
+        IEmailService emailService
+    )
     {
         string token = Guid.NewGuid().ToString();
 
-        using var command = db.CreateCommand(@"UPDATE testuser SET password = @hashedwelcome, reset_token = @resetToken WHERE id = @userid  RETURNING email");
+        using var command = db.CreateCommand(
+            @"UPDATE testuser SET password = @hashedwelcome, reset_token = @resetToken WHERE id = @userid  RETURNING email"
+        );
 
         string hashedPassword = hasher.HashPassword("", "welcome");
         command.Parameters.AddWithValue("resetToken", token);
@@ -224,14 +240,14 @@ public static class EmployeeRoutes
         try
         {
             using var reader = await command.ExecuteReaderAsync();
-         
-            if(await reader.ReadAsync())
+
+            if (await reader.ReadAsync())
             {
                 string email = reader.GetString(0);
-                
-                
-                string resetUrl = $"http://localhost:5173/reset-password?token={token}&id={testuserId}";
-                
+
+                string resetUrl =
+                    $"http://localhost:5001/reset-password?token={token}&id={testuserId}";
+
                 await emailService.SendEmailAsync(
                     to: email,
                     subject: "Password Reset Link",
@@ -265,7 +281,7 @@ public static class EmployeeRoutes
                         </div>
                     "
                 );
-                
+
                 return TypedResults.Ok($"Reset link sent to employee's email");
             }
             else
@@ -278,28 +294,35 @@ public static class EmployeeRoutes
             return TypedResults.BadRequest($"Database error: {ex.Message}");
         }
     }
-    
-    public static async Task<IResult> ResetPasswordWithLink(string resetToken, PasswordResetDTO passwordResetDTO, NpgsqlDataSource db, PasswordHasher<string> hasher)
+
+    public static async Task<IResult> ResetPasswordWithLink(
+        string resetToken,
+        PasswordResetDTO passwordResetDTO,
+        NpgsqlDataSource db,
+        PasswordHasher<string> hasher
+    )
     {
         if (string.IsNullOrEmpty(passwordResetDTO.NewPassword))
         {
             return Results.BadRequest(new { error = "New password is required" });
         }
-        
-        using var command = db.CreateCommand(@"UPDATE testuser SET password = @password WHERE reset_token = @resetToken RETURNING email");
+
+        using var command = db.CreateCommand(
+            @"UPDATE testuser SET password = @password WHERE reset_token = @resetToken RETURNING email"
+        );
         string hashedPassword = hasher.HashPassword("", passwordResetDTO.NewPassword);
         command.Parameters.AddWithValue("resetToken", resetToken);
         command.Parameters.AddWithValue("password", hashedPassword);
-        
+
         try
         {
             using var reader = await command.ExecuteReaderAsync();
-            
+
             if (await reader.ReadAsync())
             {
                 return Results.Ok(new { message = "Password has been successfully reset" });
             }
-            
+
             return Results.NotFound(new { error = "User not found" });
         }
         catch (PostgresException ex)
@@ -308,27 +331,33 @@ public static class EmployeeRoutes
         }
     }
 
-    public static async Task<IResult> CheckDefaultPassword(int userId, NpgsqlDataSource db, PasswordHasher<string> hasher)
+    public static async Task<IResult> CheckDefaultPassword(
+        int userId,
+        NpgsqlDataSource db,
+        PasswordHasher<string> hasher
+    )
     {
         using var command = db.CreateCommand("SELECT password FROM testuser WHERE id = @userId");
         command.Parameters.AddWithValue("userId", userId);
-        
+
         try
         {
             var storedHash = await command.ExecuteScalarAsync() as string;
-            
+
             if (storedHash == null)
             {
                 return TypedResults.NotFound("User not found");
             }
-            
+
             var verificationResult = hasher.VerifyHashedPassword("", storedHash, "welcome");
-            
+
             if (verificationResult == PasswordVerificationResult.Success)
             {
-                return TypedResults.BadRequest("You are using the default password, please change your password");
+                return TypedResults.BadRequest(
+                    "You are using the default password, please change your password"
+                );
             }
-            
+
             return TypedResults.Ok("Password is not the default");
         }
         catch (PostgresException ex)
@@ -343,26 +372,38 @@ public static class EmployeeRoutes
         {
             return Results.BadRequest(new { valid = false, error = "Reset token is required" });
         }
-        
-        using var command = db.CreateCommand(@"SELECT id FROM testuser WHERE reset_token = @resetToken");
+
+        using var command = db.CreateCommand(
+            @"SELECT id FROM testuser WHERE reset_token = @resetToken"
+        );
         command.Parameters.AddWithValue("resetToken", resetToken);
-        
+
         try
         {
             using var reader = await command.ExecuteReaderAsync();
-            
+
             if (await reader.ReadAsync())
             {
                 int userId = reader.GetInt32(0);
-                return Results.Ok(new { valid = true, userId, message = "Token is valid" });
+                return Results.Ok(
+                    new
+                    {
+                        valid = true,
+                        userId,
+                        message = "Token is valid",
+                    }
+                );
             }
-            
-            return Results.NotFound(new { valid = false, error = "Invalid or expired reset token" });
+
+            return Results.NotFound(
+                new { valid = false, error = "Invalid or expired reset token" }
+            );
         }
         catch (PostgresException ex)
         {
-            return Results.BadRequest(new { valid = false, error = $"Database error: {ex.Message}" });
+            return Results.BadRequest(
+                new { valid = false, error = $"Database error: {ex.Message}" }
+            );
         }
     }
 }
-
