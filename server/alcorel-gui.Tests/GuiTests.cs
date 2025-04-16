@@ -19,7 +19,7 @@ public class GuiTest : PageTest
     {
         _playwright = await Microsoft.Playwright.Playwright.CreateAsync();
         _browser = await _playwright.Chromium.LaunchAsync(
-            new BrowserTypeLaunchOptions { Headless = false, SlowMo = 250 }
+            new BrowserTypeLaunchOptions { Headless = true, SlowMo = 0 }
         );
         _browserContext = await _browser.NewContextAsync();
         _page = await _browserContext.NewPageAsync();
