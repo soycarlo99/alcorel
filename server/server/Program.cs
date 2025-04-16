@@ -106,6 +106,9 @@ app.MapPut("/api/sendRating/{rating}/{ticketId}", FeedbackRoutes.SendRating);
 //Sign-up APIs
 app.MapPost("api/signup", UserRoutes.SignUpAdmin);
 
+//GUI-Test clean-up APIs
+app.MapDelete("/api/delete/ui/test/trash", UiTestCleanUp.RemoveTicket);
+
 app.MapGet(
     "/api/session/companyId",
     (HttpContext ctx) =>

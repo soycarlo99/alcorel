@@ -11,23 +11,58 @@ public static class UiTestCleanUp
         HttpContext ctx
     )
     {
-        using var command = db.CreateCommand(@"DELETE FROM tickets WHERE category = 17");
         try
         {
-            var rowsAffected = await command.ExecuteNonQueryAsync();
+            int ticketsDeleted = 0;
+            int usersDeleted = 0;
 
-            if (rowsAffected > 0)
+            using var connection = await db.OpenConnectionAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+
+            try
             {
-                return TypedResults.Ok($"Deleted {rowsAffected} tickets successfully");
+                using var ticketCommand = new NpgsqlCommand(
+                    @"DELETE FROM ticket WHERE category_id = 17",
+                    connection,
+                    transaction
+                );
+
+                ticketsDeleted = await ticketCommand.ExecuteNonQueryAsync();
+
+                using var userCommand = new NpgsqlCommand(
+                    @"DELETE FROM testuser WHERE email = 'gui@alcorelteam.testinator.com'",
+                    connection,
+                    transaction
+                );
+
+                usersDeleted = await userCommand.ExecuteNonQueryAsync();
+
+                await transaction.CommitAsync();
+
+                var message = $"Operation completed successfully. ";
+                if (ticketsDeleted > 0)
+                    message += $"Deleted {ticketsDeleted} ticket(s). ";
+                if (usersDeleted > 0)
+                    message += $"Deleted {usersDeleted} user(s).";
+
+                if (ticketsDeleted == 0 && usersDeleted == 0)
+                    message = "No records were deleted.";
+
+                return TypedResults.Ok(message);
             }
-            else
+            catch (Exception ex)
             {
-                return TypedResults.Ok("No ticket(s) deleted");
+                await transaction.RollbackAsync();
+                throw;
             }
         }
         catch (PostgresException ex)
         {
             return TypedResults.BadRequest($"Database error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest($"Error occurred: {ex.Message}");
         }
     }
 }

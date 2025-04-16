@@ -300,7 +300,7 @@ public class GuiTest : PageTest
     }
 
     [TestMethod]
-    public async Task TempMailTest()
+    public async Task GivenIamACustomerAndWantToCreateATicket()
     {
         Page1 = await _browserContext.NewPageAsync();
 

@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "d477af24-1c7c-4f1e-8197-0f5dd52f980c",
+		"name": "ui-test-clean-up",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43555795",
+		"_collection_link": "https://carlosdematos.postman.co/workspace/Carlos-De-Matos's-Workspace~e85606f1-4fb1-4bb5-84f7-f9a55a0dde57/collection/43555795-d477af24-1c7c-4f1e-8197-0f5dd52f980c?action=share&source=collection_link&creator=43555795"
+	},
+	"item": [
+		{
+			"name": "get webpage Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"baseUrl\", \"http://localhost:5001/api/\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"webpage\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"I cleaned up the trash for ya\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Operation completed successfully\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}delete/ui/test/trash",
+					"host": [
+						"{{baseUrl}}delete"
+					],
+					"path": [
+						"ui",
+						"test",
+						"trash"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": ""
+		}
+	]
+}
