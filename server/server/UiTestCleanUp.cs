@@ -30,7 +30,7 @@ public static class UiTestCleanUp
                 ticketsDeleted = await ticketCommand.ExecuteNonQueryAsync();
 
                 using var userCommand = new NpgsqlCommand(
-                    @"DELETE FROM testuser WHERE email = 'gui@alcorelteam.testinator.com'",
+                    @"DELETE FROM testuser WHERE email IN ('gui@alcorelteam.testinator.com', 'testament@test.com', 'cj@cj.com')",
                     connection,
                     transaction
                 );
