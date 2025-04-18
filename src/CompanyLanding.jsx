@@ -31,6 +31,7 @@ export default function CompanyLanding() {
         .finally(() => {
           setLoading(false);
         });
+      fetchCompanyName();
     }
 
     async function fetchCompanyName() {
@@ -54,7 +55,6 @@ export default function CompanyLanding() {
         setError("Failed to load company name");
       }
     }
-
     fetchCompanyName();
   }, [companyId, navigate]);
 

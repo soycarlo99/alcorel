@@ -245,8 +245,9 @@ public class GuiTest : PageTest
         await GivenIAmLoggedInAsCompany("testament@test.com", "testtest");
         await WhenIClickLink("Edit Categories");
         await WhenIAddCategory("test");
-        await WhenIEditCategory(1, "testtest");
-        await WhenIDeleteCategory(1);
+        await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await WhenIEditCategory(0, "testtest");
+        await WhenIDeleteCategory(0);
     }
 
     // [TestMethod]
