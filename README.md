@@ -1,6 +1,6 @@
 ![Alcorel demo](https://github.com/soycarlo99/alcorel/blob/main/src/logotype/trimmed.gif)
 
-Technologies used in the project:
+Technologies used in this project:
 
 - .NET8 Minimal API:s (RESTful)
 - Npgsql
